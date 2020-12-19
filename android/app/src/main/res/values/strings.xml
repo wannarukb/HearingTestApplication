@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">HearingTest</string>
+    <string name="start">เริ่มทดสอบ</string>
+    <string name="testing">กำลังอยู่ในกระบวนการทดสอบ</string>
+    <string name="testing_action_desc_1">โปรดกดปุ่ม \"ได้ยิน\" แล้วกดปล่อย</string>
+    <string name="testing_action_desc_2">เมื่อท่านได้ยินเสียง</string>
+    <string name="testing_can_hear">ได้ยิน</string>
+    <string name="testing_cannot_hear">ไม่ได้ยิน</string>
 </resources>
