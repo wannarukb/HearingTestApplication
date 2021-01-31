@@ -4,7 +4,7 @@ import { Block, Text, theme, Radio } from "galio-framework";
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 import { Button } from "../components";
-import {Picker} from '@react-native-community/picker';
+// import {Picker} from '@react-native-community/picker';
 
 const { height, width } = Dimensions.get("screen");
 
@@ -81,7 +81,7 @@ class HeadsetSelect extends React.Component {
                   <Text  style={styles.mainQuestionText} >กรุณาเลือกชนิดยี่ห้อหรือโมเดลของหูฟัง</Text>
                 </Block>
                 <Block style={styles.questionRow}>
-                <Picker
+                {/* <Picker
                     selectedValue={this.state.deviceType}
                     style={styles.selectList}
                     onValueChange={(itemValue, itemIndex) =>
@@ -91,7 +91,7 @@ class HeadsetSelect extends React.Component {
                     <Picker.Item label="Beats" value="Beats" />
                     <Picker.Item label="Sony" value="Sony" />
                     <Picker.Item label="ไม่แน่ใจ" value="ไม่แน่ใจ" />
-                </Picker>
+                </Picker> */}
                 </Block>
               </Block>
               {(this.state.q1 || this.state.q2 || this.state.q3)

@@ -4,7 +4,7 @@ import { Block, Text, theme } from "galio-framework";
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 import { Button } from "../components";
-import CheckBox from '@react-native-community/checkbox';
+// import CheckBox from '@react-native-community/checkbox';
 
 
 const { height, width } = Dimensions.get("screen");
@@ -66,11 +66,11 @@ class UserSurvey extends React.Component {
                       <Text  style={styles.subQuestionText} >ท่านรู้สึกหูอื้อ ?</Text>
                   </Block>
                   <Block style={styles.checkboxBlock}>
-                      <CheckBox
+                      {/* <CheckBox
                       disabled={false}
                       value={this.state.q1}
                       onValueChange={(newValue) => this.setState({ q1: newValue})}
-                      />
+                      /> */}
                   </Block>
                   <Block style={styles.subQuestionLabel}>
                       <Text  style={styles.subQuestionText} > ใช่</Text>
@@ -82,11 +82,11 @@ class UserSurvey extends React.Component {
                       <Text  style={styles.subQuestionText} >ท่านไม่สบายเป็นหวัด ?</Text>
                   </Block>
                   <Block style={styles.checkboxBlock}>
-                      <CheckBox
+                      {/* <CheckBox
                       disabled={false}
                       value={this.state.q2}
                       onValueChange={(newValue) => this.setState({ q2: newValue})}
-                      />
+                      /> */}
                   </Block>
                   <Block style={styles.subQuestionLabel}>
                       <Text  style={styles.subQuestionText} > ใช่</Text>
@@ -98,11 +98,11 @@ class UserSurvey extends React.Component {
                       <Text  style={styles.subQuestionText} >ท่านมีน้ำไหลในหู ?</Text>
                   </Block>
                   <Block style={styles.checkboxBlock}>
-                      <CheckBox
+                      {/* <CheckBox
                       disabled={false}
                       value={this.state.q3}
                       onValueChange={(newValue) => this.setState({ q3: newValue})}
-                      />
+                      /> */}
                   </Block>
                   <Block style={styles.subQuestionLabel}>
                       <Text  style={styles.subQuestionText} > ใช่</Text>

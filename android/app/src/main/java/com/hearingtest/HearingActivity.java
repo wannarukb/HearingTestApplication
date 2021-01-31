@@ -3,6 +3,7 @@ package com.hearingtest;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.AudioAttributes;
@@ -14,152 +15,537 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+//import android.widget.TextView;
 
 import com.facebook.react.ReactActivity;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import com.facebook.react.bridge.Callback;
 
 public class HearingActivity extends ReactActivity {
 
-    private final int duration = 200; // seconds
-    private final int sampleRate = 8000;
-    private final int numSamples = duration * sampleRate / 1000;
-    private double sample[];// =new double[numSamples];
-    private final double freqOfTone = 1440; // hz
-    private int pulseLength;
-    private byte generatedSnd[];// = new byte[2 * numSamples];
-    private int period = 4; // hz
-    public AudioTrack mAudioTrack;
-    Handler handler = new Handler();
-
-    Button startBtn;
-
+    private final int       sampleRate = 44100;
+    public final int        MAX_DB     = 90;
+    public final int        MIN_DB     = 5;
+    public AudioTrack       mAudioTrack;
+    public List<TestTone>   testToneList;
+    public List<TestResult> testResultList;
+    public Boolean          isCanHearClick;
+    public TestTone         currentRunTone;
+    public int              runningIndex;
+    public int              currentTestRound;
+    public Button           startButton, hearButton;
+    public TextView         freqView, decibelView, suiteView;
+    Thread m_PlayThread = null;
+    boolean m_bStop = false;
+    Integer noOfClick;
+    AudioManager mAudioManager;
+    AudioDeviceInfo[] devices;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+//        super.onCreate(savedInstanceState);
+        super.onCreate(null);
         setContentView(R.layout.activity_hearing);
+        this.isCanHearClick = false;
 
-        int mBufferSize = AudioTrack.getMinBufferSize(sampleRate,
-                AudioFormat.CHANNEL_OUT_MONO,
-                AudioFormat.ENCODING_PCM_8BIT);
-
-        mAudioTrack = new AudioTrack.Builder()
-                .setAudioAttributes(new AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_ALARM)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                        .build())
-                .setAudioFormat(new AudioFormat.Builder()
-                        .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                        .setSampleRate(sampleRate)
-                        .setChannelMask(AudioFormat.CHANNEL_OUT_STEREO)
-                        .build())
-                .setBufferSizeInBytes(mBufferSize)
-                .build();
+        testResultList = new ArrayList<TestResult>();
+        testToneList   = new ArrayList<TestTone>();
 
 
-        pulseLength = duration * sampleRate / 1000;
-        System.out.print("+++ Pulse " + pulseLength);
-
-//        genTone();
-
-//        View view = this.getWindow().getDecorView();
-//
-//        final Button button = findViewById(R.id.canHearBtn);
-//        button.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v) {
-//                // Code here executes on main thread after user presses button
-//            }
-//        });
-//        view.setBackgroundColor(Color.parseColor("#505050"));
+        testToneList.add(new TestTone(0, 1000, 25, 3, 0,  5,  10,  3,  0,  2,  0, "R"));
+        testToneList.add(new TestTone(1, 2000, 30, 3, 0,  5,  10,  3,  0,  1,  0, "R"));
+        testToneList.add(new TestTone(2, 4000, 35, 3, 0,  5,  10,   3,0 ,  2,  0, "R"));
+        testToneList.add(new TestTone(3, 500, 35, 3, 0,  5,  10,  3,  0,  3,  0, "R"));
+        testToneList.add(new TestTone(4, 1000, 35, 3, 0,  5,  10,  3,  0,  2,  0, "L"));
+        testToneList.add(new TestTone(5, 2000, 35, 3, 0,  5,  10,  3,  0,  3,  0, "L"));
+        testToneList.add(new TestTone(6, 4000, 35, 3, 0,  5,  10,  3,  0,  1,  0, "L"));
+        testToneList.add(new TestTone(7, 500, 35, 3, 0,  5,  10,  3,  0,  4,  0, "L"));
 
 
+        runningIndex        = 0;
 
+        currentRunTone      = testToneList.get(runningIndex);
+        currentTestRound    = currentRunTone.testRound;
+
+        freqView            = (TextView) findViewById(R.id.frequency);
+        decibelView         = (TextView) findViewById(R.id.decibel);
+        suiteView           = (TextView) findViewById(R.id.testSuite);
+
+        freqView.setText(""+currentRunTone.frequency);
+        decibelView.setText(""+currentRunTone.runDB);
+        suiteView.setText(currentRunTone.testSuite);
+
+        noOfClick = 0;
+
+
+        mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        devices      = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
 
     }
 
+
+
+    /*
+        When Click start --> system will play the set of frequency
+     */
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void onClickStart(View view) {
-        genTone();
-    }
+        System.out.println("++++++++++++ Start ++++++++++++ ");
+        startButton         = (Button) findViewById(R.id.start);
+
+        startButton.setText("ได้ยิน");
+
+        noOfClick += 1;
+
+        System.out.println(" no of click = " + noOfClick);
+        if(noOfClick == 1){
+            try {
+                play();
+                m_PlayThread.interrupt();
+                m_PlayThread.join();
+                m_PlayThread = null;
+                play();
+            }catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }else{
+            m_bStop = true;
+
+            if (mAudioTrack != null) {
+                mAudioTrack.stop();
+                mAudioTrack.release();
+                mAudioTrack = null;
+            }
+
+            if (m_PlayThread != null) {
+                try {
+                    m_PlayThread.interrupt();
+                    m_PlayThread.join();
+                    m_PlayThread = null;
+
+                    System.out.println("Lek = mAudioTrack = " + mAudioTrack);
+                    System.out.println("Lek = m_PlayThread = " + m_PlayThread);
+                    if (m_bStop) {
+                        System.out.println(" STOP AT F = " + currentRunTone.frequency + " DB = " + currentRunTone.runDB);
+                        currentRunTone.setDecreaseDB();
 
 
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//
-//        new SoundGen().execute(period);
-//
-//    }
-//
-//    private class SoundGen extends AsyncTask<Integer, Void, Void> {
-//        @Override
-//        protected Void doInBackground(Integer... hz) {
-//            long mils = (int) (1000.0 / hz[0]);
-//            long start = System.currentTimeMillis();
-//            long next = start + mils;
-//
-//            while (true) {
-//                long now = System.currentTimeMillis();
-//                if (now > next) {
-//                    next = now + mils;
-//                    playSound();
-//                }
-//
-//            }
-//        }
-//
-//    }
+                        if (currentRunTone.runDB < MIN_DB) {
+                            currentRunTone.setDecreaseRemainingRound();
+                            if (currentRunTone.remainingRound >= 0) {
+                                testToneList.add(new TestTone(currentRunTone));
+                            }
 
-    void genTone() {
-        sample = new double[numSamples];
-        generatedSnd = new byte[2 * numSamples];
-        int rate = numSamples / period;
+                            runningIndex = runningIndex + 1;
+                            currentRunTone = testToneList.get(runningIndex);
 
-        for (int i = 0; i < numSamples; ++i) {
-            if (i % rate == 0) {
-                System.out.println("+++ Create tone " + i);
+                        }
 
-                int j = 0;
-                for (j = 0; j < pulseLength; j++) {
+                        play();
+                    }
 
-                    sample[i + j] = Math.sin(2 * Math.PI * (i + j)
-                            / (sampleRate / freqOfTone));
-                    System.out.println("+++ SAMPLE " + (i + j) + " "
-                            + sample[i + j]);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
                 }
-                i = i + j;
             }
         }
 
-        // convert to 16 bit pcm sound array
-        // assumes the sample buffer is normalised.
-        int idx = 0;
-        for (final double dVal : sample) {
-            // scale to maximum amplitude
-            final short val = (short) ((dVal * 32767));
-            // in 16 bit wav PCM, first byte is the low order byte
-            generatedSnd[idx++] = (byte) (val & 0x00ff);
-            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+    }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void onClickCanHear(View view)  {
+
+
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                }
+//            }
+//        });
+    }
+
+    synchronized void stop() {
+        m_bStop = true;
+
+        if (mAudioTrack != null) {
+            mAudioTrack.stop();
+            mAudioTrack.release();
+            mAudioTrack = null;
         }
 
-        playSound();
+        if (m_PlayThread != null) {
+            try {
+                m_PlayThread.interrupt();
+                m_PlayThread.join();
+                m_PlayThread = null;
+            } catch (Exception e) {
+
+            }
+        }
+
+    }
+
+    synchronized void play() {
+        System.out.println("LEK PLAY");
+        m_bStop = false;
+
+
+        m_PlayThread = new Thread() {
+
+
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            public void run() {
+                try {
+                    freqView.setText(""+currentRunTone.frequency);
+                    decibelView.setText(""+currentRunTone.runDB);
+                    suiteView.setText(currentRunTone.testSuite);
+                    generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.runDB, currentRunTone.testSuite);
+
+                    synchronized (this) {
+
+                        wait(currentRunTone.intervalSleep);
+                        if (!m_bStop) {
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                        System.out.println("Thead F = " + currentRunTone.frequency + "DB = " + currentRunTone.runDB);
+                                        currentRunTone.setIncreaseDB();
+
+                                        freqView.setText(""+currentRunTone.frequency);
+                                        decibelView.setText(""+currentRunTone.runDB);
+                                        suiteView.setText(currentRunTone.testSuite);
+                                        if(currentRunTone.runDB > MAX_DB){
+                                            runningIndex   = runningIndex + 1;
+                                            currentRunTone = testToneList.get(runningIndex);
+                                        }
+
+
+                                        m_PlayThread = null;
+                                        play();
+
+                                }
+                            });
+                        }
+
+                    }
+
+
+                } catch (Exception e) {
+                    Log.e("Tone", e.toString());
+                } catch (OutOfMemoryError e) {
+                    Log.e("Tone", e.toString());
+                }
+
+            }
+        };
+        m_PlayThread.start();
+
+
     }
 
 
-    void playSound() {
-        System.out.println("+++ PLAY ++++ playSound " );
-        //audioTrack.stop();
-        //audioTrack.setPlaybackHeadPosition(0);
-//        final AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate, AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length, AudioTrack.MODE_STATIC);
-        mAudioTrack.write(generatedSnd, 0, generatedSnd.length);
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    synchronized TestTone runTestTone2(TestTone runTone, Boolean canHear){
+
+
+        generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.runDB, currentRunTone.testSuite);
+
+        this.isCanHearClick = false;
+        try {
+            Thread.sleep(currentRunTone.intervalSleep);
+            if(canHear == false){
+                currentRunTone.setIncreaseDB();
+
+                freqView.setText(""+currentRunTone.frequency);
+                decibelView.setText(""+currentRunTone.runDB);
+                suiteView.setText(currentRunTone.testSuite);
+
+                if(currentRunTone.runDB > MAX_DB) {
+
+                    runningIndex   = runningIndex + 1;
+                    currentRunTone = testToneList.get(runningIndex);
+                }
+
+                currentRunTone = runTestTone2(currentRunTone, false);
+            }
+
+
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return runTone;
+    }
+
+
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public TestTone runTestTone(TestTone runTone, Boolean canHear){
+
+//        runner = new Runnable() {
+//            @Override
+//            public void run() {
+//                runOnUiThread(new Runnable() {
+//                    @RequiresApi(api = Build.VERSION_CODES.M)
+//                    @Override
+//                    public void run() {
+//
+//                        generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.runDB, currentRunTone.testSuite);
+//                        isCanHearClick = false;
+//                        try {
+//                            Thread.sleep(currentRunTone.intervalSleep);
+//
+//                            try{
+//                                Thread.sleep(currentRunTone.intervalSleep);
+//                                if(isCanHearClick == false){
+//                                    currentRunTone.setIncreaseDB();
+//                                    freqView            = (TextView) findViewById(R.id.frequency);
+//                                    decibelView         = (TextView) findViewById(R.id.decibel);
+//                                    suiteView           = (TextView) findViewById(R.id.testSuite);
+//
+//                                    freqView.setText(""+currentRunTone.frequency);
+//                                    decibelView.setText(""+currentRunTone.runDB);
+//                                    suiteView.setText(currentRunTone.testSuite);
+//
+//                                    if(currentRunTone.runDB > MAX_DB) {
+//
+//                                        runningIndex   = runningIndex + 1;
+//                                        currentRunTone = testToneList.get(runningIndex);
+//                                    }
+//
+//                                    currentRunTone = runTestTone(currentRunTone, false);
+//                                }
+//                            }catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                });
+//            }
+//        };
+//        handler.post(runner);
+//
+
+        return runTone;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void generateTone2(int frequency, double durationSec, int volDB, String testSuite){
+        Thread thread = new Thread(){
+            @Override
+            public  void run(){
+//                try{
+                    System.out.println("GET TONE");
+
+                    System.out.println("LEK --> F = " + frequency + " DB : " + volDB);
+                    // int mBufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+
+                    int runDuration = (int) durationSec * sampleRate;
+                    System.out.println("runDuration = " + runDuration);
+                    double[] samples = new double[runDuration];
+                    short[] mBuffer = new short[runDuration];
+
+                    for (int i = 0; i < runDuration; i++) {
+                        samples[i] = Math.sin(2.0 * Math.PI * i / (sampleRate / frequency)); // Sine wave
+                        mBuffer[i] = (short) (samples[i] * Short.MAX_VALUE);  // Higher amplitude increases volume
+                    }
+
+                    // System.out.println("+++ PLAY +++");
+                    //if audioTrack has been initialised, first, release any resources
+                    //then null it
+                    if (mAudioTrack != null) {
+                        mAudioTrack.release();
+                        mAudioTrack = null;
+                    }
+
+                    //now create it again, note: use global audioTrack,
+                    //that means remove "final AudioTrack" here
+                    mAudioTrack = new AudioTrack.Builder()
+                            .setAudioAttributes(new AudioAttributes.Builder()
+                                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                    .build())
+                            .setAudioFormat(new AudioFormat.Builder()
+                                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                                    .setSampleRate(sampleRate)
+                                    .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                                    .build())
+                            .setBufferSizeInBytes(mBuffer.length)
+                            .setTransferMode(AudioTrack.MODE_STREAM)
+                            .build();
+                    //mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length, AudioTrack.MODE_STATIC);
+
+                    double amp =( Math.pow(10, volDB/20.0))/1000;
+                    double rms = 0;
+                    for (int i = 0; i < runDuration; i++) {
+                        rms += mBuffer[i] * mBuffer[i];
+                    }
+                    rms = Math.sqrt(rms / runDuration);
+                    double mAlpha = 0.9;
+                    /*Compute a smoothed version for less flickering of the display.*/
+                    double mRmsSmoothed = 0.0;
+                    mRmsSmoothed = mRmsSmoothed * mAlpha + (1 - mAlpha) * rms;
+
+
+                    Log.d("amp", "amp = " + amp);
+                    Log.d("mRmsSmoothed", "mRmsSmoothed = " + mRmsSmoothed);
+
+                    double rmsdB = 20.0 * Math.log10(amp * mRmsSmoothed);
+                    double maxVolDB =  20.0 * Math.log10(mRmsSmoothed * mRmsSmoothed);
+                    float volumePercentage = (float) (rmsdB/maxVolDB);
+
+                    Log.d("rmsdB", "rmsdB = " + rmsdB);
+                    Log.d("maxVolDB", "maxVolDB = " + maxVolDB);
+                    Log.d("volumePercentage", "volumePercentage = " + volumePercentage);
+
+                    if(testSuite == "L"){
+                        mAudioTrack.setStereoVolume(volumePercentage, 0.0f);
+                    }else if(testSuite == "R"){
+                        mAudioTrack.setStereoVolume(0.0f, volumePercentage);
+                    }else{
+                        mAudioTrack.setStereoVolume(volumePercentage, volumePercentage);
+                    }
+
+                    mAudioTrack.write(mBuffer, 0, mBuffer.length);
+                    mAudioTrack.play();
+
+//                }(InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+            }
+        };
+        thread.start();
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void generateTone(int frequency, double durationSec, int volDB, String testSuite){
+
+//        System.out.println("GET TONE");
+        System.out.println("LEK --> F = " + frequency + " DB : " + volDB);
+
+        // int mBufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+
+        int runDuration = (int) durationSec * sampleRate;
+//        System.out.println("runDuration = " + runDuration);
+        double[] samples = new double[runDuration];
+        short[] mBuffer = new short[runDuration];
+
+        for (int i = 0; i < runDuration; i++) {
+            samples[i] = Math.sin(2.0 * Math.PI * i / (sampleRate / frequency)); // Sine wave
+            mBuffer[i] = (short) (samples[i] * Short.MAX_VALUE);  // Higher amplitude increases volume
+        }
+
+        //if audioTrack has been initialised, first, release any resources
+        //then null it
+        if (mAudioTrack != null) {
+            mAudioTrack.stop();
+            mAudioTrack.release();
+            mAudioTrack = null;
+        }
+
+        //now create it again, note: use global audioTrack,
+        //that means remove "final AudioTrack" here
+        mAudioTrack = new AudioTrack.Builder()
+                        .setAudioAttributes(new AudioAttributes.Builder()
+                                .setUsage(AudioAttributes.USAGE_ALARM)
+                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                .build())
+                        .setAudioFormat(new AudioFormat.Builder()
+                                .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                                .setSampleRate(sampleRate)
+                                .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                                .build())
+                        .setBufferSizeInBytes(mBuffer.length)
+                        .setTransferMode(AudioTrack.MODE_STREAM)
+                        .build();
+        //mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length, AudioTrack.MODE_STATIC);
+
+        if (devices  != null){
+            for (AudioDeviceInfo device : devices)
+                if (device.getType() == AudioDeviceInfo.TYPE_WIRED_HEADSET || device.getType() == AudioDeviceInfo.TYPE_WIRED_HEADPHONES ||
+                    device.getType() == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP || device.getType() == AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {
+                    mAudioTrack.setPreferredDevice(device);
+//                    mAudioManager.setWiredHeadsetOn(true);
+                    mAudioManager.setSpeakerphoneOn(false);
+                }
+        }
+
+        double amp =( Math.pow(10, volDB/20.0))/1000;
+        double rms = 0;
+        for (int i = 0; i < runDuration; i++) {
+            rms += mBuffer[i] * mBuffer[i];
+        }
+        rms = Math.sqrt(rms / runDuration);
+        double mAlpha = 0.9;
+        /*Compute a smoothed version for less flickering of the display.*/
+        double mRmsSmoothed = 0.0;
+        mRmsSmoothed = mRmsSmoothed * mAlpha + (1 - mAlpha) * rms;
+
+//
+//        Log.d("amp", "amp = " + amp);
+//        Log.d("mRmsSmoothed", "mRmsSmoothed = " + mRmsSmoothed);
+
+        double rmsdB = 20.0 * Math.log10(amp * mRmsSmoothed);
+        double maxVolDB =  20.0 * Math.log10(mRmsSmoothed * mRmsSmoothed);
+        float volumePercentage = (float) (rmsdB/maxVolDB);
+//
+//        Log.d("rmsdB", "rmsdB = " + rmsdB);
+//        Log.d("maxVolDB", "maxVolDB = " + maxVolDB);
+//        Log.d("volumePercentage", "volumePercentage = " + volumePercentage);
+
+//        DecimalFormat df = new DecimalFormat("0.00");
+//        actualTextView.setText(String.valueOf(df.format(rmsdB)));
+
+        if(testSuite == "L"){
+            mAudioTrack.setStereoVolume(volumePercentage, 0.0f);
+        }else if(testSuite == "R"){
+            mAudioTrack.setStereoVolume(0.0f, volumePercentage);
+        }else{
+            mAudioTrack.setStereoVolume(volumePercentage, volumePercentage);
+        }
+
+        mAudioTrack.write(mBuffer, 0, mBuffer.length);
         mAudioTrack.play();
+
     }
+
+    @Override
+    public void onBackPressed() {
+        System.out.println("LEK Back Pressed");
+        m_PlayThread.interrupt();
+        m_PlayThread = null;
+        return;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        System.out.println("LEK Stop");
+        m_PlayThread.interrupt();
+        m_PlayThread = null;
+    }
+
+
+
 }

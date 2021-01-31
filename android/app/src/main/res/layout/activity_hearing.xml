@@ -6,22 +6,15 @@ android:layout_width="match_parent"
 android:layout_height="match_parent"
 tools:context=".HearingActivity">
 
-    <Button
-        android:id="@+id/canHearBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/testing_can_hear"
-        tools:layout_editor_absoluteX="161dp"
-        tools:layout_editor_absoluteY="384dp"
-        android:onClick="onClickStart"
-        tools:ignore="OnClick" />
-
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="409dp"
-        android:layout_height="160dp"
+        android:layout_height="278dp"
+        android:gravity="center"
         android:orientation="vertical"
-        tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="1dp">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/textView"
@@ -29,7 +22,10 @@ tools:context=".HearingActivity">
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/testing"
-            tools:ignore="MissingConstraints" />
+            android:textSize="18sp"
+            tools:ignore="MissingConstraints"
+            tools:layout_editor_absoluteX="115dp"
+            tools:layout_editor_absoluteY="53dp" />
 
         <TextView
             android:id="@+id/textView2"
@@ -37,7 +33,10 @@ tools:context=".HearingActivity">
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/testing_action_desc_1"
-            tools:ignore="MissingConstraints" />
+            android:textSize="18sp"
+            tools:ignore="MissingConstraints"
+            tools:layout_editor_absoluteX="108dp"
+            tools:layout_editor_absoluteY="73dp" />
 
         <TextView
             android:id="@+id/textView3"
@@ -45,7 +44,144 @@ tools:context=".HearingActivity">
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="@string/testing_action_desc_2"
-            tools:ignore="MissingConstraints" />
+            android:textSize="18sp"
+            tools:ignore="MissingConstraints"
+            tools:layout_editor_absoluteX="150dp"
+            tools:layout_editor_absoluteY="92dp" />
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="413dp"
+        android:layout_height="106dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+        <Button
+            android:id="@+id/start"
+            android:layout_width="158dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:onClick="onClickStart"
+            android:text="@string/start"
+            android:textSize="18sp"
+            tools:ignore="OnClick" />
+
+        <Button
+            android:id="@+id/canHearBtn"
+            android:layout_width="158dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:onClick="onClickCanHear"
+            android:text="@string/testing_can_hear"
+            android:textSize="18sp"
+            android:visibility="invisible"
+            tools:ignore="OnClick" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="409dp"
+        android:layout_height="345dp"
+        android:layout_marginTop="1dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
+        tools:layout_editor_absoluteX="1dp">
+
+        <LinearLayout
+            android:layout_width="409dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            tools:layout_editor_absoluteX="1dp"
+            tools:layout_editor_absoluteY="385dp">
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="40dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:text="Frequency"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/frequency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="409dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            tools:layout_editor_absoluteX="1dp"
+            tools:layout_editor_absoluteY="385dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="40dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:text="Decibel"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/decibel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="409dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            tools:layout_editor_absoluteX="1dp"
+            tools:layout_editor_absoluteY="385dp">
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="40dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:text="Test Suite"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/testSuite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

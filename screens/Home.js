@@ -1,14 +1,33 @@
 import React, { Component } from 'react';
 import { Block, Button, Text, theme } from "galio-framework";
-import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView } from 'react-native';
+import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView,NativeModules } from 'react-native';
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 const { height, width } = Dimensions.get("screen");
+// import SQLite from 'react-native-sqlite-storage';
+
+// let db;
 
 class Home extends Component {
-
+  // constructor(props){
+  //   super(props);
+  //   SQLite.openDatabase({
+  //     name : 'deviceDB.db',
+  //     createFromLocation: 2},
+  //     this.successToOpenDB,
+  //     this.failToOpenDB
+  //   );
+  // }
+  // successToOpenDB(){
+  //   // alert('Success');
+  //   console.log('Open Database Success');
+  // }
+  // failToOpenDB(err){
+  //   console.log(err);
+  // }
   render() {
     const { navigation } = this.props;
+    const pureToneModule = NativeModules.HearingTestModule;
     return (
       <Block flex style={styles.container}>
         <Block flex>
@@ -46,7 +65,8 @@ class Home extends Component {
                         <Block style={styles.row}>
                           <Block style={{width: '100%'}}>
                             <Button style={styles.menuBlockMain} 
-                               onPress={() => navigation.navigate("Login")}
+                               //onPress={() => navigation.navigate("Login")}
+                               onPress={() => pureToneModule.GotoActivity()}
                             >
                               <ImageBackground
                                   source={Images.EarTestMain}
