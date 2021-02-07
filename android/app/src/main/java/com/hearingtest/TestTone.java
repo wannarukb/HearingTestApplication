@@ -13,10 +13,11 @@ public class TestTone {
     public long intervalSleep; // the sleep time in milisecond
     public int testRound;// the test round for each frequency  --> if TestRoundMax > 0 --> this value will be random, otherwise uses the TestRoundMin
     public String testSuite;
+    public int maxResult;
 
     public int remainingRound;
 
-    public TestTone(int index, int frequency, int startDB, double durationMin, double durationMax, int upDB, int downDB, double intervalMin, double intervalMax, int testRoundMin, int testRoundMax, String testSuite){
+    public TestTone(int index, int frequency, int startDB, double durationMin, double durationMax, int upDB, int downDB, double intervalMin, double intervalMax, int testRoundMin, int testRoundMax, String testSuite, int maxResult){
         this.index          = index;
         this.frequency      = frequency;
         this.startDB        = startDB;
@@ -29,6 +30,7 @@ public class TestTone {
         this.testRound      = (testRoundMax != 0) ? ((int)(Math.random() * (testRoundMax - testRoundMin)) + testRoundMin) : testRoundMin;
         this.intervalSleep  = (long) this.interval * 1000;
         this.remainingRound = this.testRound;
+        this.maxResult      = maxResult;
     }
 
     public TestTone(TestTone eachTone){
@@ -44,6 +46,7 @@ public class TestTone {
         this.testRound      = eachTone.testRound;
         this.intervalSleep  = (long) eachTone.interval * 1000;
         this.remainingRound = eachTone.remainingRound - 1;
+        this.maxResult      = eachTone.maxResult;
     }
 
     public void setDecreaseDB(){

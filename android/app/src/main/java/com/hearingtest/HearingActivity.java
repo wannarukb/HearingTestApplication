@@ -66,14 +66,14 @@ public class HearingActivity extends ReactActivity {
         testToneList   = new ArrayList<TestTone>();
 
 
-        testToneList.add(new TestTone(0, 1000, 25, 3, 0,  5,  10,  3,  0,  2,  0, "R"));
-        testToneList.add(new TestTone(1, 2000, 30, 3, 0,  5,  10,  3,  0,  1,  0, "R"));
-        testToneList.add(new TestTone(2, 4000, 35, 3, 0,  5,  10,   3,0 ,  2,  0, "R"));
-        testToneList.add(new TestTone(3, 500, 35, 3, 0,  5,  10,  3,  0,  3,  0, "R"));
-        testToneList.add(new TestTone(4, 1000, 35, 3, 0,  5,  10,  3,  0,  2,  0, "L"));
-        testToneList.add(new TestTone(5, 2000, 35, 3, 0,  5,  10,  3,  0,  3,  0, "L"));
-        testToneList.add(new TestTone(6, 4000, 35, 3, 0,  5,  10,  3,  0,  1,  0, "L"));
-        testToneList.add(new TestTone(7, 500, 35, 3, 0,  5,  10,  3,  0,  4,  0, "L"));
+        testToneList.add(new TestTone(0, 1000, 25, 3, 0,  5,  10,  3,  0,  2,  0, "R", 5));
+        testToneList.add(new TestTone(1, 2000, 30, 3, 0,  5,  10,  3,  0,  1,  0, "R", 5));
+        testToneList.add(new TestTone(2, 4000, 35, 3, 0,  5,  10,   3,0 ,  2,  0, "R", 5));
+        testToneList.add(new TestTone(3, 500, 35, 3, 0,  5,  10,  3,  0,  3,  0, "R", 5));
+        testToneList.add(new TestTone(4, 1000, 35, 3, 0,  5,  10,  3,  0,  2,  0, "L",5));
+        testToneList.add(new TestTone(5, 2000, 35, 3, 0,  5,  10,  3,  0,  3,  0, "L",5));
+        testToneList.add(new TestTone(6, 4000, 35, 3, 0,  5,  10,  3,  0,  1,  0, "L",5));
+        testToneList.add(new TestTone(7, 500, 35, 3, 0,  5,  10,  3,  0,  4,  0, "L", 5));
 
 
         runningIndex        = 0;
@@ -125,38 +125,38 @@ public class HearingActivity extends ReactActivity {
         }else{
             m_bStop = true;
 
-            if (mAudioTrack != null) {
-                mAudioTrack.stop();
-                mAudioTrack.release();
-                mAudioTrack = null;
-            }
+//            if (mAudioTrack != null) {
+//                mAudioTrack.stop();
+//                mAudioTrack.release();
+//                mAudioTrack = null;
+//            }
 
             if (m_PlayThread != null) {
                 try {
-                    m_PlayThread.interrupt();
-                    m_PlayThread.join();
-                    m_PlayThread = null;
+//                    m_PlayThread.interrupt();
+//                    m_PlayThread.join();
+//                    m_PlayThread = null;
 
                     System.out.println("Lek = mAudioTrack = " + mAudioTrack);
                     System.out.println("Lek = m_PlayThread = " + m_PlayThread);
-                    if (m_bStop) {
-                        System.out.println(" STOP AT F = " + currentRunTone.frequency + " DB = " + currentRunTone.runDB);
-                        currentRunTone.setDecreaseDB();
+//                    if (m_bStop) {
+//                        System.out.println(" STOP AT F = " + currentRunTone.frequency + " DB = " + currentRunTone.runDB);
+//                        currentRunTone.setDecreaseDB();
+//
+//
+//                        if (currentRunTone.runDB < MIN_DB) {
+//                            currentRunTone.setDecreaseRemainingRound();
+//                            if (currentRunTone.remainingRound >= 0) {
+//                                testToneList.add(new TestTone(currentRunTone));
+//                            }
+//
+//                            runningIndex = runningIndex + 1;
+//                            currentRunTone = testToneList.get(runningIndex);
+//
+//                        }
 
-
-                        if (currentRunTone.runDB < MIN_DB) {
-                            currentRunTone.setDecreaseRemainingRound();
-                            if (currentRunTone.remainingRound >= 0) {
-                                testToneList.add(new TestTone(currentRunTone));
-                            }
-
-                            runningIndex = runningIndex + 1;
-                            currentRunTone = testToneList.get(runningIndex);
-
-                        }
-
-                        play();
-                    }
+//                        play();
+//                    }
 
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
@@ -202,7 +202,6 @@ public class HearingActivity extends ReactActivity {
 
     synchronized void play() {
         System.out.println("LEK PLAY");
-        m_bStop = false;
 
 
         m_PlayThread = new Thread() {
@@ -216,14 +215,18 @@ public class HearingActivity extends ReactActivity {
                     suiteView.setText(currentRunTone.testSuite);
                     generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.runDB, currentRunTone.testSuite);
 
+
                     synchronized (this) {
 
                         wait(currentRunTone.intervalSleep);
-                        if (!m_bStop) {
+//                        if (!m_bStop) {
+                        if (runningIndex < testToneList.size()) {
 
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    System.out.println("LEK m_bStop = " + m_bStop);
+                                    if(!m_bStop){
 
                                         System.out.println("Thead F = " + currentRunTone.frequency + "DB = " + currentRunTone.runDB);
                                         currentRunTone.setIncreaseDB();
@@ -231,15 +234,29 @@ public class HearingActivity extends ReactActivity {
                                         freqView.setText(""+currentRunTone.frequency);
                                         decibelView.setText(""+currentRunTone.runDB);
                                         suiteView.setText(currentRunTone.testSuite);
-                                        if(currentRunTone.runDB > MAX_DB){
-                                            runningIndex   = runningIndex + 1;
+                                        if(currentRunTone.runDB > MAX_DB) {
+                                            runningIndex = runningIndex + 1;
                                             currentRunTone = testToneList.get(runningIndex);
                                         }
+                                    }else{
+                                        System.out.println(" STOP AT F = " + currentRunTone.frequency + " DB = " + currentRunTone.runDB);
+                                        currentRunTone.setDecreaseDB();
 
 
-                                        m_PlayThread = null;
-                                        play();
+                                        if (currentRunTone.runDB < MIN_DB) {
+                                            currentRunTone.setDecreaseRemainingRound();
+                                            if (currentRunTone.remainingRound >= 0) {
+                                                testToneList.add(new TestTone(currentRunTone));
+                                            }
 
+                                            runningIndex = runningIndex + 1;
+                                            currentRunTone = testToneList.get(runningIndex);
+
+                                        }
+                                        m_bStop = false;
+                                    }
+                                    m_PlayThread = null;
+                                   play();
                                 }
                             });
                         }
