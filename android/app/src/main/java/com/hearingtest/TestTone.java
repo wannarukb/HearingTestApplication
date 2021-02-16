@@ -58,6 +58,6 @@ public class TestTone {
     }
 
     public void setDecreaseRemainingRound(){
-        this.remainingRound  = this.remainingRound + 1;
+        this.remainingRound  = this.remainingRound - 1;
     }
 }

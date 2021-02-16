@@ -15,10 +15,16 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.util.ArrayMap;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 //import android.widget.TextView;
 
@@ -33,6 +39,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.facebook.react.bridge.Callback;
+import com.google.gson.Gson;
+
+import org.json.JSONArray;
 
 public class HearingActivity extends ReactActivity {
 
@@ -44,6 +53,9 @@ public class HearingActivity extends ReactActivity {
     public List<TestResult> testResultList;
     public Boolean          isCanHearClick;
     public TestTone         currentRunTone;
+    public TestResult       currentTestResult;
+    public TestResult       currentBestResult;
+
     public int              runningIndex;
     public int              currentTestRound;
     public Button           startButton, hearButton;
@@ -53,6 +65,7 @@ public class HearingActivity extends ReactActivity {
     Integer noOfClick;
     AudioManager mAudioManager;
     AudioDeviceInfo[] devices;
+    public Integer          playExecuteCount;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -66,17 +79,22 @@ public class HearingActivity extends ReactActivity {
         testToneList   = new ArrayList<TestTone>();
 
 
-        testToneList.add(new TestTone(0, 1000, 25, 3, 0,  5,  10,  3,  0,  2,  0, "R", 5));
-        testToneList.add(new TestTone(1, 2000, 30, 3, 0,  5,  10,  3,  0,  1,  0, "R", 5));
-        testToneList.add(new TestTone(2, 4000, 35, 3, 0,  5,  10,   3,0 ,  2,  0, "R", 5));
-        testToneList.add(new TestTone(3, 500, 35, 3, 0,  5,  10,  3,  0,  3,  0, "R", 5));
-        testToneList.add(new TestTone(4, 1000, 35, 3, 0,  5,  10,  3,  0,  2,  0, "L",5));
-        testToneList.add(new TestTone(5, 2000, 35, 3, 0,  5,  10,  3,  0,  3,  0, "L",5));
-        testToneList.add(new TestTone(6, 4000, 35, 3, 0,  5,  10,  3,  0,  1,  0, "L",5));
-        testToneList.add(new TestTone(7, 500, 35, 3, 0,  5,  10,  3,  0,  4,  0, "L", 5));
+        testToneList.add(new TestTone(0, 1000, 25, 5, 0,  5,  10,  5,  0, 1,  0, "R", 5));
+        testToneList.add(new TestTone(1, 2000, 30, 5, 0,  5,  10,  5,  0,  1,  0, "R", 5));
+        testToneList.add(new TestTone(2, 4000, 35, 5, 0,  5,  10,   5,0 ,  2,  0, "R", 5));
+        testToneList.add(new TestTone(3, 500, 35, 5, 0,  5,  10,  5,  0,  3,  0, "R", 5));
+        testToneList.add(new TestTone(4, 1000, 35, 5, 0,  5,  10,  5,  0,  2,  0, "L",5));
+        testToneList.add(new TestTone(5, 2000, 35, 5, 0,  5,  10,  5,  0,  3,  0, "L",5));
+        testToneList.add(new TestTone(6, 4000, 35, 5, 0,  5,  10,  5,  0,  1,  0, "L",5));
+        testToneList.add(new TestTone(7, 500, 35, 5, 0,  5,  10,  5,  0,  4,  0, "L", 5));
+        testToneList.add(new TestTone(8, 1000, 35, 5, 0,  5,  10,  5,  0,  2,  0, "Both",5));
+        testToneList.add(new TestTone(9, 2000, 35, 5, 0,  5,  10,  5,  0,  3,  0, "Both",5));
+        testToneList.add(new TestTone(10, 4000, 35, 5, 0,  5,  10,  5,  0,  1,  0, "Both", 5));
+        testToneList.add(new TestTone(11, 500, 35, 5, 0,  5,  10,  5,  0,  4,  0, "Both", 5));
 
 
         runningIndex        = 0;
+        playExecuteCount    = 0;
 
         currentRunTone      = testToneList.get(runningIndex);
         currentTestRound    = currentRunTone.testRound;
@@ -95,6 +113,7 @@ public class HearingActivity extends ReactActivity {
         mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
         devices      = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
 
+
     }
 
 
@@ -110,7 +129,6 @@ public class HearingActivity extends ReactActivity {
         startButton.setText("ได้ยิน");
 
         noOfClick += 1;
-
         System.out.println(" no of click = " + noOfClick);
         if(noOfClick == 1){
             try {
@@ -124,39 +142,11 @@ public class HearingActivity extends ReactActivity {
             }
         }else{
             m_bStop = true;
-
-//            if (mAudioTrack != null) {
-//                mAudioTrack.stop();
-//                mAudioTrack.release();
-//                mAudioTrack = null;
-//            }
-
             if (m_PlayThread != null) {
                 try {
-//                    m_PlayThread.interrupt();
-//                    m_PlayThread.join();
-//                    m_PlayThread = null;
 
                     System.out.println("Lek = mAudioTrack = " + mAudioTrack);
                     System.out.println("Lek = m_PlayThread = " + m_PlayThread);
-//                    if (m_bStop) {
-//                        System.out.println(" STOP AT F = " + currentRunTone.frequency + " DB = " + currentRunTone.runDB);
-//                        currentRunTone.setDecreaseDB();
-//
-//
-//                        if (currentRunTone.runDB < MIN_DB) {
-//                            currentRunTone.setDecreaseRemainingRound();
-//                            if (currentRunTone.remainingRound >= 0) {
-//                                testToneList.add(new TestTone(currentRunTone));
-//                            }
-//
-//                            runningIndex = runningIndex + 1;
-//                            currentRunTone = testToneList.get(runningIndex);
-//
-//                        }
-
-//                        play();
-//                    }
 
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
@@ -166,18 +156,7 @@ public class HearingActivity extends ReactActivity {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    public void onClickCanHear(View view)  {
 
-
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                }
-//            }
-//        });
-    }
 
     synchronized void stop() {
         m_bStop = true;
@@ -202,6 +181,7 @@ public class HearingActivity extends ReactActivity {
 
     synchronized void play() {
         System.out.println("LEK PLAY");
+        playExecuteCount += 1;
 
 
         m_PlayThread = new Thread() {
@@ -213,6 +193,10 @@ public class HearingActivity extends ReactActivity {
                     freqView.setText(""+currentRunTone.frequency);
                     decibelView.setText(""+currentRunTone.runDB);
                     suiteView.setText(currentRunTone.testSuite);
+
+                    if(playExecuteCount > 1){
+                        currentTestResult = new TestResult(currentRunTone.index,currentRunTone.frequency, currentRunTone.runDB, currentRunTone.testSuite);
+                    }
                     generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.runDB, currentRunTone.testSuite);
 
 
@@ -228,7 +212,7 @@ public class HearingActivity extends ReactActivity {
                                     System.out.println("LEK m_bStop = " + m_bStop);
                                     if(!m_bStop){
 
-                                        System.out.println("Thead F = " + currentRunTone.frequency + "DB = " + currentRunTone.runDB);
+                                        System.out.println("Thread F = " + currentRunTone.frequency + "DB = " + currentRunTone.runDB);
                                         currentRunTone.setIncreaseDB();
 
                                         freqView.setText(""+currentRunTone.frequency);
@@ -236,27 +220,63 @@ public class HearingActivity extends ReactActivity {
                                         suiteView.setText(currentRunTone.testSuite);
                                         if(currentRunTone.runDB > MAX_DB) {
                                             runningIndex = runningIndex + 1;
-                                            currentRunTone = testToneList.get(runningIndex);
+                                            if(runningIndex < testToneList.size()){
+                                                currentRunTone = testToneList.get(runningIndex);
+                                            }
+
+                                            if(currentBestResult != null){
+                                                testResultList.add(currentBestResult);
+                                            }
                                         }
                                     }else{
+
+                                        currentTestResult.canHear();
+                                        if(currentBestResult != null){
+                                            if(currentBestResult.hearDB > currentTestResult.hearDB){
+                                                currentBestResult = currentTestResult;
+                                            }
+                                        }else{
+                                            currentBestResult = currentTestResult;
+                                        }
+                                        currentTestResult = null;
+
                                         System.out.println(" STOP AT F = " + currentRunTone.frequency + " DB = " + currentRunTone.runDB);
                                         currentRunTone.setDecreaseDB();
 
 
+                                        System.out.println("currentRunTone runDB = " + currentRunTone.runDB);
                                         if (currentRunTone.runDB < MIN_DB) {
                                             currentRunTone.setDecreaseRemainingRound();
-                                            if (currentRunTone.remainingRound >= 0) {
+                                            System.out.println("currentRunTone remainingRound = " + currentRunTone.remainingRound);
+
+                                            if (currentRunTone.remainingRound > 0) {
                                                 testToneList.add(new TestTone(currentRunTone));
                                             }
 
                                             runningIndex = runningIndex + 1;
-                                            currentRunTone = testToneList.get(runningIndex);
+                                            if(runningIndex < testToneList.size()){
+                                                currentRunTone = testToneList.get(runningIndex);
+                                            }
+
+                                            if(currentBestResult != null){
+                                                testResultList.add(currentBestResult);
+                                            }
 
                                         }
                                         m_bStop = false;
                                     }
                                     m_PlayThread = null;
-                                   play();
+                                    System.out.println("Running Indexn = " + runningIndex + ", testToneList = " + testToneList.size());
+                                    if(runningIndex < testToneList.size()){
+                                        play();
+                                    }else{
+                                        try {
+                                            finishActivity();
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+
                                 }
                             });
                         }
@@ -277,183 +297,17 @@ public class HearingActivity extends ReactActivity {
 
     }
 
+    public void finishActivity() throws InterruptedException {
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    synchronized TestTone runTestTone2(TestTone runTone, Boolean canHear){
+        System.out.println("FINISH ACTIVITY");
+        Gson gson = new Gson();
+        String resultJson = gson.toJson(testResultList);
 
-
-        generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.runDB, currentRunTone.testSuite);
-
-        this.isCanHearClick = false;
-        try {
-            Thread.sleep(currentRunTone.intervalSleep);
-            if(canHear == false){
-                currentRunTone.setIncreaseDB();
-
-                freqView.setText(""+currentRunTone.frequency);
-                decibelView.setText(""+currentRunTone.runDB);
-                suiteView.setText(currentRunTone.testSuite);
-
-                if(currentRunTone.runDB > MAX_DB) {
-
-                    runningIndex   = runningIndex + 1;
-                    currentRunTone = testToneList.get(runningIndex);
-                }
-
-                currentRunTone = runTestTone2(currentRunTone, false);
-            }
-
-
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return runTone;
+        Intent intent = new Intent(this, HearingActivityResult.class);
+        intent.putExtra("TestResultList", resultJson);
+        startActivity(intent);
+        finish();
     }
-
-
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    public TestTone runTestTone(TestTone runTone, Boolean canHear){
-
-//        runner = new Runnable() {
-//            @Override
-//            public void run() {
-//                runOnUiThread(new Runnable() {
-//                    @RequiresApi(api = Build.VERSION_CODES.M)
-//                    @Override
-//                    public void run() {
-//
-//                        generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.runDB, currentRunTone.testSuite);
-//                        isCanHearClick = false;
-//                        try {
-//                            Thread.sleep(currentRunTone.intervalSleep);
-//
-//                            try{
-//                                Thread.sleep(currentRunTone.intervalSleep);
-//                                if(isCanHearClick == false){
-//                                    currentRunTone.setIncreaseDB();
-//                                    freqView            = (TextView) findViewById(R.id.frequency);
-//                                    decibelView         = (TextView) findViewById(R.id.decibel);
-//                                    suiteView           = (TextView) findViewById(R.id.testSuite);
-//
-//                                    freqView.setText(""+currentRunTone.frequency);
-//                                    decibelView.setText(""+currentRunTone.runDB);
-//                                    suiteView.setText(currentRunTone.testSuite);
-//
-//                                    if(currentRunTone.runDB > MAX_DB) {
-//
-//                                        runningIndex   = runningIndex + 1;
-//                                        currentRunTone = testToneList.get(runningIndex);
-//                                    }
-//
-//                                    currentRunTone = runTestTone(currentRunTone, false);
-//                                }
-//                            }catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                });
-//            }
-//        };
-//        handler.post(runner);
-//
-
-        return runTone;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    public void generateTone2(int frequency, double durationSec, int volDB, String testSuite){
-        Thread thread = new Thread(){
-            @Override
-            public  void run(){
-//                try{
-                    System.out.println("GET TONE");
-
-                    System.out.println("LEK --> F = " + frequency + " DB : " + volDB);
-                    // int mBufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
-
-                    int runDuration = (int) durationSec * sampleRate;
-                    System.out.println("runDuration = " + runDuration);
-                    double[] samples = new double[runDuration];
-                    short[] mBuffer = new short[runDuration];
-
-                    for (int i = 0; i < runDuration; i++) {
-                        samples[i] = Math.sin(2.0 * Math.PI * i / (sampleRate / frequency)); // Sine wave
-                        mBuffer[i] = (short) (samples[i] * Short.MAX_VALUE);  // Higher amplitude increases volume
-                    }
-
-                    // System.out.println("+++ PLAY +++");
-                    //if audioTrack has been initialised, first, release any resources
-                    //then null it
-                    if (mAudioTrack != null) {
-                        mAudioTrack.release();
-                        mAudioTrack = null;
-                    }
-
-                    //now create it again, note: use global audioTrack,
-                    //that means remove "final AudioTrack" here
-                    mAudioTrack = new AudioTrack.Builder()
-                            .setAudioAttributes(new AudioAttributes.Builder()
-                                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                    .build())
-                            .setAudioFormat(new AudioFormat.Builder()
-                                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                                    .setSampleRate(sampleRate)
-                                    .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-                                    .build())
-                            .setBufferSizeInBytes(mBuffer.length)
-                            .setTransferMode(AudioTrack.MODE_STREAM)
-                            .build();
-                    //mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length, AudioTrack.MODE_STATIC);
-
-                    double amp =( Math.pow(10, volDB/20.0))/1000;
-                    double rms = 0;
-                    for (int i = 0; i < runDuration; i++) {
-                        rms += mBuffer[i] * mBuffer[i];
-                    }
-                    rms = Math.sqrt(rms / runDuration);
-                    double mAlpha = 0.9;
-                    /*Compute a smoothed version for less flickering of the display.*/
-                    double mRmsSmoothed = 0.0;
-                    mRmsSmoothed = mRmsSmoothed * mAlpha + (1 - mAlpha) * rms;
-
-
-                    Log.d("amp", "amp = " + amp);
-                    Log.d("mRmsSmoothed", "mRmsSmoothed = " + mRmsSmoothed);
-
-                    double rmsdB = 20.0 * Math.log10(amp * mRmsSmoothed);
-                    double maxVolDB =  20.0 * Math.log10(mRmsSmoothed * mRmsSmoothed);
-                    float volumePercentage = (float) (rmsdB/maxVolDB);
-
-                    Log.d("rmsdB", "rmsdB = " + rmsdB);
-                    Log.d("maxVolDB", "maxVolDB = " + maxVolDB);
-                    Log.d("volumePercentage", "volumePercentage = " + volumePercentage);
-
-                    if(testSuite == "L"){
-                        mAudioTrack.setStereoVolume(volumePercentage, 0.0f);
-                    }else if(testSuite == "R"){
-                        mAudioTrack.setStereoVolume(0.0f, volumePercentage);
-                    }else{
-                        mAudioTrack.setStereoVolume(volumePercentage, volumePercentage);
-                    }
-
-                    mAudioTrack.write(mBuffer, 0, mBuffer.length);
-                    mAudioTrack.play();
-
-//                }(InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-            }
-        };
-        thread.start();
-    }
-
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void generateTone(int frequency, double durationSec, int volDB, String testSuite){
@@ -559,8 +413,10 @@ public class HearingActivity extends ReactActivity {
     protected void onStop() {
         super.onStop();
         System.out.println("LEK Stop");
-        m_PlayThread.interrupt();
-        m_PlayThread = null;
+        if(m_PlayThread != null){
+            m_PlayThread.interrupt();
+            m_PlayThread = null;
+        }
     }
 
 
