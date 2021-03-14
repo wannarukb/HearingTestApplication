@@ -12,6 +12,7 @@ public class TestResult {
     public Boolean isClickHear;
     public Date startDate;
     public Date endDate;
+    public Integer noOfClick;
 
     public TestResult(int testIndex, int frequency, int dB, String testSuite){
         this.testIndex = testIndex;
@@ -20,6 +21,7 @@ public class TestResult {
         this.testSuite = testSuite;
         this.isClickHear = false;
         this.startDate = Calendar.getInstance().getTime();
+        this.noOfClick = 1;
     }
 
     public void resetStartDate(int newHearDB){
@@ -28,6 +30,10 @@ public class TestResult {
             this.hearDB = newHearDB;
         }
 
+    }
+
+    public void increaseNoOfClick(){
+        this.noOfClick = this.noOfClick + 1;
     }
 
     public void canHear(){

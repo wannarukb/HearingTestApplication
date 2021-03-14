@@ -28,7 +28,7 @@ public class TestTone {
         this.duration       = (durationMax != 0) ? ((Math.random() * (durationMax - durationMin)) + durationMin) : durationMin;
         this.interval       = (intervalMax != 0) ? ((Math.random() * (intervalMax - intervalMin)) + intervalMin) : intervalMin;
         this.testRound      = (testRoundMax != 0) ? ((int)(Math.random() * (testRoundMax - testRoundMin)) + testRoundMin) : testRoundMin;
-        this.intervalSleep  = (long) this.interval * 1000;
+        this.intervalSleep  = (long) (this.interval + this.duration) * 1000;
         this.remainingRound = this.testRound;
         this.maxResult      = maxResult;
     }

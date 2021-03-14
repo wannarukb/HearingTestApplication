@@ -2,9 +2,11 @@ package com.hearingtest;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -12,6 +14,8 @@ import android.widget.TextView;
 import com.facebook.react.ReactActivity;
 import com.google.gson.Gson;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.List;
 
 public class HearingActivityResult extends ReactActivity {
@@ -60,7 +64,7 @@ public class HearingActivityResult extends ReactActivity {
         head_decibel_col.setLayoutParams(params);
         head_decibel_col.setPadding(4, 4, 4, 4);
 
-        head_duration_col.setText("Duration");
+        head_duration_col.setText("Suite");
         head_duration_col.setGravity(Gravity.CENTER);
         head_duration_col.setLayoutParams(params);
         head_duration_col.setPadding(4, 4, 4, 4);
@@ -93,9 +97,14 @@ public class HearingActivityResult extends ReactActivity {
             decibel_col.setLayoutParams(params);
             decibel_col.setPadding(4, 4, 4, 4);
 
-            long diff = eachItem.endDate.getTime() - eachItem.startDate.getTime();
-            long seconds = diff / 1000;
-            duration_col.setText("" + seconds);
+//            long diff = eachItem.endDate.getTime() - eachItem.startDate.getTime();
+//            long seconds = diff / 1000;
+//            duration_col.setText("" + seconds);
+//            duration_col.setGravity(Gravity.CENTER);
+//            duration_col.setLayoutParams(params);
+//            duration_col.setPadding(4, 4, 4, 4);
+
+            duration_col.setText("" + eachItem.testSuite);
             duration_col.setGravity(Gravity.CENTER);
             duration_col.setLayoutParams(params);
             duration_col.setPadding(4, 4, 4, 4);
@@ -107,6 +116,18 @@ public class HearingActivityResult extends ReactActivity {
             tableLayout.addView(tableRow);
 
 
+        }
+    }
+
+
+    private void writeToFile(String data, Context context) {
+
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("config.txt", Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        } catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
         }
     }
 }

@@ -47,7 +47,8 @@ public class HearingActivity extends ReactActivity {
 
     private final int       sampleRate = 44100;
     public final int        MAX_DB     = 90;
-    public final int        MIN_DB     = 5;
+    public final int        MIN_DB     = 0;
+    public final int        MAX_BEST_RESULT = 2;
     public AudioTrack       mAudioTrack;
     public List<TestTone>   testToneList;
     public List<TestResult> testResultList;
@@ -78,19 +79,22 @@ public class HearingActivity extends ReactActivity {
         testResultList = new ArrayList<TestResult>();
         testToneList   = new ArrayList<TestTone>();
 
+        testToneList.add(new TestTone(0, 1000, 15, 10, 0,  5,  10,  5,  0, 1,  0, "R", 5));
+        testToneList.add(new TestTone(1, 1000, 15, 10, 0,  5,  10,  5,  0,  1,  0, "L",5));
+        testToneList.add(new TestTone(2, 1000, 10, 10, 0,  5,  10,  5,  0,  1,  0, "Both",5));
 
-        testToneList.add(new TestTone(0, 1000, 25, 5, 0,  5,  10,  5,  0, 1,  0, "R", 5));
-        testToneList.add(new TestTone(1, 2000, 30, 5, 0,  5,  10,  5,  0,  1,  0, "R", 5));
-        testToneList.add(new TestTone(2, 4000, 35, 5, 0,  5,  10,   5,0 ,  2,  0, "R", 5));
-        testToneList.add(new TestTone(3, 500, 35, 5, 0,  5,  10,  5,  0,  3,  0, "R", 5));
-        testToneList.add(new TestTone(4, 1000, 35, 5, 0,  5,  10,  5,  0,  2,  0, "L",5));
-        testToneList.add(new TestTone(5, 2000, 35, 5, 0,  5,  10,  5,  0,  3,  0, "L",5));
-        testToneList.add(new TestTone(6, 4000, 35, 5, 0,  5,  10,  5,  0,  1,  0, "L",5));
-        testToneList.add(new TestTone(7, 500, 35, 5, 0,  5,  10,  5,  0,  4,  0, "L", 5));
-        testToneList.add(new TestTone(8, 1000, 35, 5, 0,  5,  10,  5,  0,  2,  0, "Both",5));
-        testToneList.add(new TestTone(9, 2000, 35, 5, 0,  5,  10,  5,  0,  3,  0, "Both",5));
-        testToneList.add(new TestTone(10, 4000, 35, 5, 0,  5,  10,  5,  0,  1,  0, "Both", 5));
-        testToneList.add(new TestTone(11, 500, 35, 5, 0,  5,  10,  5,  0,  4,  0, "Both", 5));
+//        testToneList.add(new TestTone(0, 1000, 25, 5, 0,  5,  10,  5,  0, 1,  0, "R", 5));
+//        testToneList.add(new TestTone(1, 2000, 30, 5, 0,  5,  10,  5,  0,  1,  0, "R", 5));
+//        testToneList.add(new TestTone(2, 4000, 35, 5, 0,  5,  10,   5,0 ,  1,  0, "R", 5));
+//        testToneList.add(new TestTone(3, 500, 35, 5, 0,  5,  10,  5,  0,  1,  0, "R", 5));
+//        testToneList.add(new TestTone(4, 1000, 35, 5, 0,  5,  10,  5,  0,  1,  0, "L",5));
+//        testToneList.add(new TestTone(5, 2000, 35, 5, 0,  5,  10,  5,  0,  1,  0, "L",5));
+//        testToneList.add(new TestTone(6, 4000, 35, 5, 0,  5,  10,  5,  0,  1,  0, "L",5));
+//        testToneList.add(new TestTone(7, 500, 35, 5, 0,  5,  10,  5,  0,  1,  0, "L", 5));
+//        testToneList.add(new TestTone(8, 1000, 35, 5, 0,  5,  10,  5,  0,  1,  0, "Both",5));
+//        testToneList.add(new TestTone(9, 2000, 35, 5, 0,  5,  10,  5,  0,  1,  0, "Both",5));
+//        testToneList.add(new TestTone(10, 4000, 35, 5, 0,  5,  10,  5,  0,  1,  0, "Both", 5));
+//        testToneList.add(new TestTone(11, 500, 35, 5, 0,  5,  10,  5,  0,  1,  0, "Both", 5));
 
 
         runningIndex        = 0;
@@ -184,6 +188,7 @@ public class HearingActivity extends ReactActivity {
         playExecuteCount += 1;
 
 
+
         m_PlayThread = new Thread() {
 
 
@@ -198,14 +203,17 @@ public class HearingActivity extends ReactActivity {
                         currentTestResult = new TestResult(currentRunTone.index,currentRunTone.frequency, currentRunTone.runDB, currentRunTone.testSuite);
                     }
                     generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.runDB, currentRunTone.testSuite);
-
+                    synchronized (this) {
+                        try {
+                            Thread.sleep(currentRunTone.intervalSleep);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
                     synchronized (this) {
 
-                        wait(currentRunTone.intervalSleep);
-//                        if (!m_bStop) {
                         if (runningIndex < testToneList.size()) {
-
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -220,12 +228,13 @@ public class HearingActivity extends ReactActivity {
                                         suiteView.setText(currentRunTone.testSuite);
                                         if(currentRunTone.runDB > MAX_DB) {
                                             runningIndex = runningIndex + 1;
-                                            if(runningIndex < testToneList.size()){
-                                                currentRunTone = testToneList.get(runningIndex);
-                                            }
-
                                             if(currentBestResult != null){
                                                 testResultList.add(currentBestResult);
+                                            }
+
+                                            if(runningIndex < testToneList.size()){
+                                                currentRunTone = testToneList.get(runningIndex);
+                                                currentBestResult = null;
                                             }
                                         }
                                     }else{
@@ -234,35 +243,54 @@ public class HearingActivity extends ReactActivity {
                                         if(currentBestResult != null){
                                             if(currentBestResult.hearDB > currentTestResult.hearDB){
                                                 currentBestResult = currentTestResult;
+                                            }else if(currentBestResult.hearDB == currentTestResult.hearDB){
+                                                currentBestResult.increaseNoOfClick();
                                             }
                                         }else{
                                             currentBestResult = currentTestResult;
                                         }
                                         currentTestResult = null;
 
-                                        System.out.println(" STOP AT F = " + currentRunTone.frequency + " DB = " + currentRunTone.runDB);
-                                        currentRunTone.setDecreaseDB();
+                                        if(currentBestResult.noOfClick < MAX_BEST_RESULT){
+                                            System.out.println(" STOP AT F = " + currentRunTone.frequency + " DB = " + currentRunTone.runDB);
+                                            currentRunTone.setDecreaseDB();
 
 
-                                        System.out.println("currentRunTone runDB = " + currentRunTone.runDB);
-                                        if (currentRunTone.runDB < MIN_DB) {
-                                            currentRunTone.setDecreaseRemainingRound();
-                                            System.out.println("currentRunTone remainingRound = " + currentRunTone.remainingRound);
+                                            System.out.println("currentRunTone runDB = " + currentRunTone.runDB);
 
-                                            if (currentRunTone.remainingRound > 0) {
-                                                testToneList.add(new TestTone(currentRunTone));
+                                            if (currentRunTone.runDB < MIN_DB) {
+                                                currentRunTone.setDecreaseRemainingRound();
+                                                System.out.println("currentRunTone remainingRound = " + currentRunTone.remainingRound);
+
+                                                if (currentRunTone.remainingRound > 0) {
+                                                    testToneList.add(new TestTone(currentRunTone));
+                                                }
+
+                                                runningIndex = runningIndex + 1;
+
+                                                if(currentBestResult != null){
+                                                    testResultList.add(currentBestResult);
+                                                }
+
+                                                if(runningIndex < testToneList.size()){
+                                                    currentRunTone = testToneList.get(runningIndex);
+                                                    currentBestResult = null;
+                                                }
+
                                             }
-
+                                        }else{
                                             runningIndex = runningIndex + 1;
-                                            if(runningIndex < testToneList.size()){
-                                                currentRunTone = testToneList.get(runningIndex);
-                                            }
-
                                             if(currentBestResult != null){
                                                 testResultList.add(currentBestResult);
                                             }
 
+                                            if(runningIndex < testToneList.size()){
+                                                currentRunTone = testToneList.get(runningIndex);
+                                                currentBestResult = null;
+                                            }
                                         }
+
+
                                         m_bStop = false;
                                     }
                                     m_PlayThread = null;
@@ -279,6 +307,8 @@ public class HearingActivity extends ReactActivity {
 
                                 }
                             });
+
+
                         }
 
                     }
@@ -317,8 +347,8 @@ public class HearingActivity extends ReactActivity {
 
         // int mBufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
-        int runDuration = (int) durationSec * sampleRate;
-//        System.out.println("runDuration = " + runDuration);
+        int runDuration = (int) durationSec * sampleRate * 2;
+        System.out.println("runDuration = " + runDuration);
         double[] samples = new double[runDuration];
         short[] mBuffer = new short[runDuration];
 
@@ -372,21 +402,14 @@ public class HearingActivity extends ReactActivity {
         /*Compute a smoothed version for less flickering of the display.*/
         double mRmsSmoothed = 0.0;
         mRmsSmoothed = mRmsSmoothed * mAlpha + (1 - mAlpha) * rms;
-
-//
-//        Log.d("amp", "amp = " + amp);
-//        Log.d("mRmsSmoothed", "mRmsSmoothed = " + mRmsSmoothed);
-
-        double rmsdB = 20.0 * Math.log10(amp * mRmsSmoothed);
+        double rmsdB = 20.0 * Math.log10(amp);
         double maxVolDB =  20.0 * Math.log10(mRmsSmoothed * mRmsSmoothed);
         float volumePercentage = (float) (rmsdB/maxVolDB);
+//        float volumePercentage = (float) (volDB/100.0);
 //
-//        Log.d("rmsdB", "rmsdB = " + rmsdB);
-//        Log.d("maxVolDB", "maxVolDB = " + maxVolDB);
-//        Log.d("volumePercentage", "volumePercentage = " + volumePercentage);
-
-//        DecimalFormat df = new DecimalFormat("0.00");
-//        actualTextView.setText(String.valueOf(df.format(rmsdB)));
+        Log.d("rmsdB", "rmsdB = " + rmsdB);
+        Log.d("maxVolDB", "maxVolDB = " + maxVolDB);
+        Log.d("volumePercentage", "volumePercentage = " + volumePercentage);
 
         if(testSuite == "L"){
             mAudioTrack.setStereoVolume(volumePercentage, 0.0f);
