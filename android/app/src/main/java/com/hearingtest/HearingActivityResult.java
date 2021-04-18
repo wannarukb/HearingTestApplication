@@ -64,7 +64,7 @@ public class HearingActivityResult extends ReactActivity {
         head_decibel_col.setLayoutParams(params);
         head_decibel_col.setPadding(4, 4, 4, 4);
 
-        head_duration_col.setText("Suite");
+        head_duration_col.setText("Site");
         head_duration_col.setGravity(Gravity.CENTER);
         head_duration_col.setLayoutParams(params);
         head_duration_col.setPadding(4, 4, 4, 4);
