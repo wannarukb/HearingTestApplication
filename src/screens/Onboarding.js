@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import {
   ImageBackground,
   Image,
@@ -12,10 +12,17 @@ const { height, width } = Dimensions.get("screen");
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 
-class Onboarding extends Component{
-  static navigationOptions = {
-    title: 'Onboarding'
-  };
+import {connect} from 'react-redux';
+import {CommonActions } from '@react-navigation/native';
+
+
+class Onboarding extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+     
+    };
+  }
 
   render() {
     const { navigation } = this.props;
@@ -45,14 +52,23 @@ class Onboarding extends Component{
                 </Block>
                 <Block middle> 
                   <Text style={styles.heading} color={themeColor.COLORS.PRIMARY} size={14} >
-                  ทดสอบประสิทธิภาพทางการได้ยินด้วยตัวคุณเองทุกที่ทุกเวลา
+                    ทดสอบประสิทธิภาพทางการได้ยินด้วยตัวคุณเองทุกที่ทุกเวลา
                   </Text>
                 </Block>
               </Block>
               <Block center>
                 <Button
                   style={styles.createButton}
-                  onPress={() => navigation.navigate("Home")}
+                  // onPress={() => navigation.navigate("Home")}
+                  onPress={() => { 
+                    this.props.navigation.dispatch(
+                     CommonActions.reset({
+                       index: 0,
+                       routes: [
+                         { name: 'Home' },
+                        ],
+                     })
+                   );}}
                 >
                   <Text style={styles.createButtonText}>เริ่มต้นใช้งาน</Text>
                 </Button>
@@ -62,7 +78,6 @@ class Onboarding extends Component{
       </Block>
     );
   };
-  
 };
 
 const styles = StyleSheet.create({
@@ -115,4 +130,17 @@ const styles = StyleSheet.create({
 });
 
 
-export default Onboarding;
+Onboarding.defaultProps = {
+  token: '',
+  id:''
+};
+
+const mapStateToProps = state => {
+  return {
+    token: state.user.token,
+    id: state.user.id,
+    network: state.network,
+  };
+};
+
+export default connect(mapStateToProps, null)(Onboarding);

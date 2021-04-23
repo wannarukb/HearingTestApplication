@@ -4,30 +4,21 @@ import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView,NativeModule
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 const { height, width } = Dimensions.get("screen");
-// import SQLite from 'react-native-sqlite-storage';
+import {connect} from 'react-redux';
+import {CommonActions } from '@react-navigation/native';
 
-// let db;
 
 class Home extends Component {
-  // constructor(props){
-  //   super(props);
-  //   SQLite.openDatabase({
-  //     name : 'deviceDB.db',
-  //     createFromLocation: 2},
-  //     this.successToOpenDB,
-  //     this.failToOpenDB
-  //   );
-  // }
-  // successToOpenDB(){
-  //   // alert('Success');
-  //   console.log('Open Database Success');
-  // }
-  // failToOpenDB(err){
-  //   console.log(err);
-  // }
+  constructor(props) {
+    super(props);
+    this.state = {
+     
+    };
+  }
   render() {
     const { navigation } = this.props;
     const pureToneModule = NativeModules.HearingTestModule;
+    
     return (
       <Block flex style={styles.container}>
         <Block flex>
@@ -65,8 +56,17 @@ class Home extends Component {
                         <Block style={styles.row}>
                           <Block style={{width: '100%'}}>
                             <Button style={styles.menuBlockMain} 
-                               //onPress={() => navigation.navigate("Login")}
-                               onPress={() => pureToneModule.GotoActivity()}
+                              //  onPress={() => navigation.navigate("Login")}
+                              //  onPress={() => pureToneModule.GotoActivity()}
+                              onPress={() => { 
+                                navigation.dispatch(
+                                 CommonActions.reset({
+                                   index: 0,
+                                   routes: [
+                                     { name: 'Login' },
+                                    ],
+                                 })
+                               );}}
                             >
                               <ImageBackground
                                   source={Images.EarTestMain}
@@ -86,7 +86,7 @@ class Home extends Component {
                         <Block style={styles.row}>
                           <Block style={{width: '50%', paddingRight: 2}}>
                             <Button style={styles.menuBlock} 
-                               onPress={() => navigation.navigate("HearingTestResult")}
+                              //  onPress={() => navigation.navigate("HearingTestResult")}
                             >
                               <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
                                 ผลการตรวจ
@@ -95,7 +95,7 @@ class Home extends Component {
                           </Block>
                           <Block style={{width: '50%', paddingLeft: 2}}>
                             <Button style={styles.menuBlock} 
-                               onPress={() => navigation.navigate("Appointment")}
+                              //  onPress={() => navigation.navigate("Appointment")}
                             >
                               <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
                                 ตารางนัดหมาย
@@ -262,4 +262,14 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Home;
+const mapStateToProps = state => {
+  return {
+    Name: state.user.Name,
+    image: state.user.image,
+    network: state.network,
+  };
+};
+
+
+
+export default connect(mapStateToProps, null)(Home);

@@ -10,12 +10,15 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.15.2",
     "@react-native-community/masked-view": "^0.1.10",
+    "@react-native-community/netinfo": "^6.0.0",
     "@react-native-community/picker": "^1.8.1",
     "@react-navigation/compat": "^5.3.10",
     "@react-navigation/drawer": "^5.11.4",
     "@react-navigation/native": "^5.8.10",
     "@react-navigation/stack": "^5.12.8",
+    "apisauce": "^2.1.0",
     "galio-framework": "^0.7.1",
     "mobx": "^6.0.4",
     "mobx-react": "^7.0.5",
@@ -23,14 +26,18 @@
     "react-native": "0.63.4",
     "react-native-elements": "^3.0.0-alpha.1",
     "react-native-gesture-handler": "^1.9.0",
+    "react-native-offline": "^5.8.0",
     "react-native-reanimated": "^1.13.2",
     "react-native-safe-area-context": "^3.1.9",
     "react-native-screens": "^2.15.0",
+    "react-native-size-matters": "^0.4.0",
     "react-native-sqlite-storage": "^5.0.0",
     "react-native-vector-icons": "^7.1.0",
     "react-navigation": "^4.4.3",
-    "react-redux": "^7.2.2",
-    "redux": "^4.0.5"
+    "react-redux": "^7.2.3",
+    "redux": "^4.0.5",
+    "redux-persist": "^6.0.0",
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "7.12.9",

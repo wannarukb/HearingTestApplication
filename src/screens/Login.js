@@ -1,18 +1,133 @@
 import React from 'react';
-import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView ,KeyboardAvoidingView } from 'react-native';
+import {connect} from 'react-redux';
+import Api from '../services/Api';
+import {CommonActions } from '@react-navigation/native';
+
+import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView ,KeyboardAvoidingView ,TextInput} from 'react-native';
 import { Block, Text, theme } from "galio-framework";
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 import { Button, Input } from "../components";
-
-
-
 const { height, width } = Dimensions.get("screen");
 
 class Login extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading:false,
+      UserEmail:'',
+      UserPassword:''
+    };
+  }
+
+  componentDidMount() {
+    this.props.logout();
+  }
+
+  login(){
+    const {UserEmail,UserPassword}=this.state
+    if(UserEmail==""){
+      alert('enter UserEmail')
+    }else if(UserPassword==''){
+      alert('enter UserPassword')
+    }else if(!this.props.network.isConnected){
+      alert('No Internet')    
+    }else{
+      this.UserLoginFunction()
+    }
+  }
+
+  UserLoginFunction = () =>{
+    const { UserEmail ,UserPassword}  = this.state ;
+    Api.login_api(UserEmail,UserPassword)
+    .then(responseJson => {
+      console.log('login', responseJson);
+      this.setState({loading:false})
+      if (responseJson.ok) {
+        this.setState({
+          loading: false,
+        });
+
+        if (responseJson.data != null) {
+          var data = responseJson.data;
+          console.log(data);
+          console.log(data.token);
+          console.log(data.id);
+          this.props.login(data);
+          this.props.navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [
+                { name: 'UserSurvey' },
+              ],
+            })
+          );
+        //   if (responseJson.data.hasOwnProperty('status')) {
+        //     if (responseJson.data.status == 200) {
+        //       if (responseJson.data.hasOwnProperty('message')) {
+          
+        //         alert(responseJson.data.message)
+
+        //         if(responseJson.data.hasOwnProperty("data")){
+        //           if(responseJson.data.data.length>0){
+
+        //         console.log(responseJson.data.data[0]);
+        //             this.props.login(responseJson.data.data[0]);
+        //             this.props.navigation.dispatch(
+        //                 CommonActions.reset({
+        //                   index: 0,
+        //                   routes: [
+        //                     { name: 'UserSurvey' },
+        //                   ],
+        //                 })
+        //               );
+        //           }
+        //         }
+
+        //       }
+        //     } else {
+        //       alert('server error ' + responseJson.data.status)
+        //       if (responseJson.data.hasOwnProperty('message')) {
+        //         alert(responseJson.data.message)
+        //       }
+        //     }
+        //   } else {
+        //     alert('server error status')
+        //   }
+        } else {
+          alert('server error no data')
+        }
+      } else {
+        if (responseJson.problem == 'NETWORK_ERROR') {
+          alert('server error = NETWORK_ERROR')
+          this.setState({
+            loading: false,
+          });
+        } else if (responseJson.problem == 'TIMEOUT_ERROR') {
+          alert('server error = TIMEOUT_ERROR')
+          this.setState({
+            loading: false,
+          });
+        } else {
+          alert('server error responseJson ERROR')
+          this.setState({
+            loading: false,
+          });
+        }
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      this.setState({
+        loading: false,
+      });
+    });
+  }
+
+
   render() {
     const { navigation } = this.props;
-
+    const {loading,UserEmail,UserPassword}=this.state;
     return (
       <Block flex style={styles.container}>
         <Block flex>
@@ -48,28 +163,37 @@ class Login extends React.Component {
                                 enabled
                               >
                                 <Block  style={{ marginBottom: 15 }}>
-                                <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                ชื่อผู้ใช้งาน (Username)
-                                </Text>
-                                  <Input
-                                    borderless
-                                    placeholder="ชื่อผู้ใช้งาน (Username)"
+                                  <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
+                                  ชื่อผู้ใช้งาน (Username)
+                                  </Text>
+                                  <TextInput
+                                    placeholder="Email"
+                                    placeholderTextColor="grey"
+                                    returnKeyType="next"
+                                    onSubmitEditing={() => this.pass_tn.focus()}
+                                    onChangeText={text => this.setState({ UserEmail: text })}
+                                    value={UserEmail}
                                   />
-                                </Block>
+                                  </Block>
                                 <Block >
                                   <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
                                   รหัสผ่าน (Password)
                                   </Text>
-                                  <Input
-                                    password
-                                    borderless
-                                    placeholder=" "
+                                  <TextInput
+                                    ref={(id)=>{this.pass_tn=id}}
+                                    placeholder="Password"
+                                    placeholderTextColor="grey"
+                                    secureTextEntry={true}
+                                    autoCapitalize="none"
+                                    returnKeyType="done"
+                                    onChangeText={text => this.setState({ UserPassword: text })}
+                                    value={UserPassword}
                                   />
                                 </Block>
                                 
                                 <Block middle>
                                   <Button style={styles.createButton}
-                                   onPress={() => navigation.navigate("UserSurvey")}>
+                                   onPress={() => this.login()}>
                                     <Text style={styles.createButtonText}>
                                     เข้าสู่ระบบ
                                     </Text>
@@ -206,5 +330,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
   }
 });
+Login.defaultProps = {
+  id: '',
+  token: ''
+};
 
-export default Login;
+const mapStateToProps = state => {
+  return {
+
+    network: state.network,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  const {actions} = require('../redux/UserRedux');
+
+  return {
+    login: customers => dispatch(actions.login(customers)),
+    logout: () => dispatch(actions.logout()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
