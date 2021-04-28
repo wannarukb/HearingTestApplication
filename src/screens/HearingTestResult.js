@@ -1,531 +1,158 @@
-import React from 'react';
+import React, {Component} from 'react';
+import AsyncStorage  from '@react-native-async-storage/async-storage';
 import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView , KeyboardAvoidingView } from 'react-native';
 import { Block, Text, theme } from "galio-framework";
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
+import Moment from 'moment';
+
+
+
+import {connect} from 'react-redux';
 
 const { height, width } = Dimensions.get("screen");
 
-class HearingTestResult extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      q1 : false,
-      q2 : false,
-      q3 : false
-    };
-  };
+class HearingTestResult extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            testResults : []
+        };
 
-  render() {
-    const { navigation } = this.props;
-    return (
-      <Block flex style={styles.container}>
-        <Block flex>
-          <ImageBackground
-              source={Images.lightBG}
-              style={{ height, width, zIndex: 1 }}
-          >
-            <Block  style={styles.navbar}>
-              <Block style={styles.row}>
-                <Block style={{width: '25%',marginHorizontal: 2, paddingLeft: 10, justifyContent: 'center'}}>
-                  <Text style={styles.backText}  onPress={() => navigation.navigate("Home")}>
-                    {/* <Icon
-                      name="chevron-left"
-                      family="entypo"
-                      size={20}
-                      color={themeColor.COLORS.BTN_SECONDARY}
-                      style={{marginRight: 5}}
-                    />  */}
-                    ย้อนกลับ
-                  </Text>
-                </Block>
-                <Block style={{width: '50%',marginHorizontal: 2, justifyContent: 'center'}}>
-                  <Text  style={styles.navbarText} >
-                    ผลการตรวจ
-                  </Text>
-                </Block>
-                <Block style={{width: '25%',marginHorizontal: 2}}></Block>
-              </Block>
-            </Block>
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                style={{ width, marginTop: '0%' }}
-            >
-                <Block  style={styles.contentContainer}>
-                <Block style={styles.appointmentBlock}>
-                        <Block style={styles.row}>
-                            <Block style={{width: '20%',height: 80, justifyContent: 'center', borderRightWidth: 1, borderColor: themeColor.COLORS.BORDER_COLOR}}>
-                                <Text  style={styles.monthText} >
-                                    ศุกร์
-                                </Text>
-                                <Text  style={styles.dateText} >
-                                    13
-                                </Text>
-                                <Text  style={styles.monthText} >
-                                    เม.ย.
-                                </Text>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingLeft: 15, paddingRight: 10}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความถี่ (Hz)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความดัง (dB)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingRight: 15}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '100%',height: 80}}>
-                                        <Text  style={styles.headingResultText} >
-                                            ผลการทดสอบ
-                                        </Text>
-                                        <Block style={styles.resultVeryGood}>
-                                            <Text  style={styles.resultLabel}  color={themeColor.COLORS.ALERT_SUCCESS_TEXT}>
-                                            ดีมาก
-                                            </Text>
-                                        </Block>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            
-                            
-                        </Block>
-                    </Block>
-
-                    <Block style={styles.appointmentBlock}>
-                        <Block style={styles.row}>
-                            <Block style={{width: '20%',height: 80, justifyContent: 'center', borderRightWidth: 1, borderColor: themeColor.COLORS.BORDER_COLOR}}>
-                                <Text  style={styles.monthText} >
-                                    พฤหัส
-                                </Text>
-                                <Text  style={styles.dateText} >
-                                    12
-                                </Text>
-                                <Text  style={styles.monthText} >
-                                    เม.ย.
-                                </Text>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingLeft: 15, paddingRight: 10}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความถี่ (Hz)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความดัง (dB)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingRight: 15}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '100%',height: 80}}>
-                                        <Text  style={styles.headingResultText} >
-                                            ผลการทดสอบ
-                                        </Text>
-                                        <Block style={styles.resultVeryGood}>
-                                            <Text  style={styles.resultLabel}  color={themeColor.COLORS.ALERT_SUCCESS_TEXT}>
-                                            ดีมาก
-                                            </Text>
-                                        </Block>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            
-                            
-                        </Block>
-                    </Block>
-
-                    <Block style={styles.appointmentBlock}>
-                        <Block style={styles.row}>
-                            <Block style={{width: '20%',height: 80, justifyContent: 'center', borderRightWidth: 1, borderColor: themeColor.COLORS.BORDER_COLOR}}>
-                                <Text  style={styles.monthText} >
-                                    พุธ
-                                </Text>
-                                <Text  style={styles.dateText} >
-                                    11
-                                </Text>
-                                <Text  style={styles.monthText} >
-                                    เม.ย.
-                                </Text>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingLeft: 15, paddingRight: 10}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความถี่ (Hz)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความดัง (dB)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingRight: 15}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '100%',height: 80}}>
-                                        <Text  style={styles.headingResultText} >
-                                            ผลการทดสอบ
-                                        </Text>
-                                        <Block style={styles.resultVeryGood}>
-                                            <Text  style={styles.resultLabel}  color={themeColor.COLORS.ALERT_SUCCESS_TEXT}>
-                                            ดีมาก
-                                            </Text>
-                                        </Block>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            
-                            
-                        </Block>
-                    </Block>
-
-                    <Block style={styles.appointmentBlock}>
-                        <Block style={styles.row}>
-                            <Block style={{width: '20%',height: 80, justifyContent: 'center', borderRightWidth: 1, borderColor: themeColor.COLORS.BORDER_COLOR}}>
-                                <Text  style={styles.monthText} >
-                                    อังคาร
-                                </Text>
-                                <Text  style={styles.dateText} >
-                                    10
-                                </Text>
-                                <Text  style={styles.monthText} >
-                                    เม.ย.
-                                </Text>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingLeft: 15, paddingRight: 10}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความถี่ (Hz)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความดัง (dB)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingRight: 15}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '100%',height: 80}}>
-                                        <Text  style={styles.headingResultText} >
-                                            ผลการทดสอบ
-                                        </Text>
-                                        <Block style={styles.resultVeryGood}>
-                                            <Text  style={styles.resultLabel}  color={themeColor.COLORS.ALERT_SUCCESS_TEXT}>
-                                            ดีมาก
-                                            </Text>
-                                        </Block>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            
-                            
-                        </Block>
-                    </Block>
-
-                    <Block style={styles.appointmentBlock}>
-                        <Block style={styles.row}>
-                            <Block style={{width: '20%',height: 80, justifyContent: 'center', borderRightWidth: 1, borderColor: themeColor.COLORS.BORDER_COLOR}}>
-                                <Text  style={styles.monthText} >
-                                    จันทร์
-                                </Text>
-                                <Text  style={styles.dateText} >
-                                    9
-                                </Text>
-                                <Text  style={styles.monthText} >
-                                    เม.ย.
-                                </Text>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingLeft: 15, paddingRight: 10}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความถี่ (Hz)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความดัง (dB)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingRight: 15}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '100%',height: 80}}>
-                                        <Text  style={styles.headingResultText} >
-                                            ผลการทดสอบ
-                                        </Text>
-                                        <Block style={styles.resultNormal}>
-                                            <Text  style={styles.resultLabel}  color={themeColor.COLORS.ALERT_INFO_TEXT}>
-                                            ปกติ
-                                            </Text>
-                                        </Block>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            
-                            
-                        </Block>
-                    </Block>
-                    
-                    <Block style={styles.appointmentBlock}>
-                        <Block style={styles.row}>
-                            <Block style={{width: '20%',height: 80, justifyContent: 'center', borderRightWidth: 1, borderColor: themeColor.COLORS.BORDER_COLOR}}>
-                                <Text  style={styles.monthText} >
-                                    อาทิตย์
-                                </Text>
-                                <Text  style={styles.dateText} >
-                                    8
-                                </Text>
-                                <Text  style={styles.monthText} >
-                                    เม.ย.
-                                </Text>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingLeft: 15, paddingRight: 10}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความถี่ (Hz)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความดัง (dB)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingRight: 15}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '100%',height: 80}}>
-                                        <Text  style={styles.headingResultText} >
-                                            ผลการทดสอบ
-                                        </Text>
-                                        <Block style={styles.resultWarning}>
-                                            <Text  style={styles.resultLabel}  color={themeColor.COLORS.ALERT_WARNING_TEXT}>
-                                            ปกติแต่มีความเสี่ยง
-                                            </Text>
-                                        </Block>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            
-                            
-                        </Block>
-                    </Block>
-
-
-                    <Block style={styles.appointmentBlock}>
-                        <Block style={styles.row}>
-                            <Block style={{width: '20%',height: 80, justifyContent: 'center', borderRightWidth: 1, borderColor: themeColor.COLORS.BORDER_COLOR}}>
-                                <Text  style={styles.monthText} >
-                                    เสาร์
-                                </Text>
-                                <Text  style={styles.dateText} >
-                                    7
-                                </Text>
-                                <Text  style={styles.monthText} >
-                                    เม.ย.
-                                </Text>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingLeft: 15, paddingRight: 10}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความถี่ (Hz)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความดัง (dB)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingRight: 15}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '100%',height: 80}}>
-                                        <Text  style={styles.headingResultText} >
-                                            ผลการทดสอบ
-                                        </Text>
-                                        <Block style={styles.resultOrange}>
-                                            <Text  style={styles.resultLabel}  color={themeColor.COLORS.ALERT_ORANGE_TEXT}>
-                                            ควรปรึกษาแพทย์
-                                            </Text>
-                                        </Block>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            
-                            
-                        </Block>
-                    </Block>
-
-                    <Block style={styles.appointmentBlock}>
-                        <Block style={styles.row}>
-                            <Block style={{width: '20%',height: 80, justifyContent: 'center', borderRightWidth: 1, borderColor: themeColor.COLORS.BORDER_COLOR}}>
-                                <Text  style={styles.monthText} >
-                                    ศุกร์
-                                </Text>
-                                <Text  style={styles.dateText} >
-                                    6
-                                </Text>
-                                <Text  style={styles.monthText} >
-                                    เม.ย.
-                                </Text>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingLeft: 15, paddingRight: 10}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความถี่ (Hz)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '60%'}}>
-                                        <Text  style={styles.headingText} >
-                                            ความดัง (dB)
-                                        </Text>
-                                    </Block>
-                                    <Block style={{width: '40%'}}>
-                                        <Text  style={styles.resultText} >
-                                                10
-                                        </Text>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingRight: 15}}>
-                                <Block style={styles.row}>
-                                    <Block style={{width: '100%',height: 80}}>
-                                        <Text  style={styles.headingResultText} >
-                                            ผลการทดสอบ
-                                        </Text>
-                                        <Block style={styles.resultAbnormal}>
-                                            <Text  style={styles.resultLabel}  color={themeColor.COLORS.ALERT_TEXT}>
-                                            ควรพบแพทย์โดยด่วน
-                                            </Text>
-                                        </Block>
-                                    </Block>
-                                </Block>
-                            </Block>
-                            
-                            
-                        </Block>
-                    </Block>
-
-                </Block>
-            </ScrollView>
-            
-          </ImageBackground>
-        </Block>
-      </Block>
+        // import DeviceInfo from 'react-native-device-info'
+        // const deviceLocale = DeviceInfo.getDeviceLocale()
+        // moment.locale([deviceLocale, 'en'])
         
-    );
-  }
+        
+        this.getTestResult();
+
+        console.log("Init = " + this.state.testResults);
+    }
+
+    async getTestResult() {
+        console.log("GET TEST RESULT");
+        try {
+          let testResultData = await AsyncStorage.getItem("TestResults");
+          let data = JSON.parse(testResultData);
+          console.log("1 " + data[0].endDate);
+          this.setState({
+            testResults : data
+          });
+          console.log('TestResults = ', this.state);
+        } catch (error) {
+          console.log("Something went wrong, get token = ", error);
+        }
+    }
+    render() {
+        const { navigation } = this.props;
+        return (
+            <Block flex style={styles.container}>
+                <Block flex>
+                    <ImageBackground
+                        source={Images.lightBG}
+                        style={{ height, width, zIndex: 1 }}
+                    >
+                        <Block  style={styles.navbar}>
+                            <Block style={styles.row}>
+                                <Block style={{width: '25%',marginHorizontal: 2, paddingLeft: 10, justifyContent: 'center'}}>
+                                    <Text style={styles.backText}  onPress={() => navigation.navigate("Home")}>
+                                        {/* <Icon
+                                        name="chevron-left"
+                                        family="entypo"
+                                        size={20}
+                                        color={themeColor.COLORS.BTN_SECONDARY}
+                                        style={{marginRight: 5}}
+                                        />  */}
+                                        ย้อนกลับ
+                                    </Text>
+                                </Block>
+                                <Block style={{width: '50%',marginHorizontal: 2, justifyContent: 'center'}}>
+                                    <Text  style={styles.navbarText} >
+                                        ผลการตรวจ
+                                    </Text>
+                                </Block>
+                                <Block style={{width: '25%',marginHorizontal: 2}}></Block>
+                            </Block>
+                        </Block>
+                        <ScrollView
+                            showsVerticalScrollIndicator={false}
+                            style={{ width, marginTop: '0%' }}
+                        >
+                            <Block  style={styles.contentContainer}>
+                                {
+                                    this.state.testResults.map((item) => {
+                                        return (
+                                            <Block style={styles.appointmentBlock}>
+                                                <Block style={styles.row}>
+                                                    <Block style={{width: '20%',height: 80, justifyContent: 'center', borderRightWidth: 1, borderColor: themeColor.COLORS.BORDER_COLOR}}>
+                                                        
+                                                        {/* <Text  style={styles.monthText} >
+                                                            ศุกร์
+                                                        </Text> */}
+                                                        <Text  style={styles.dateText} >
+                                                            {Moment(item.saveDate).format('DD')}
+                                                        </Text>
+                                                        <Text  style={styles.monthText} >
+                                                            {Moment(item.saveDate).format('MMM')}
+                                                        </Text>
+                                                    </Block>
+                                                    <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingLeft: 15, paddingRight: 10}}>
+                                                        <Block style={styles.row}>
+                                                            <Block style={{width: '60%'}}>
+                                                                <Text  style={styles.headingText} >
+                                                                    ความถี่ (Hz)
+                                                                </Text>
+                                                            </Block>
+                                                            <Block style={{width: '40%'}}>
+                                                                <Text  style={styles.resultText} >
+                                                                    {item.frequency}
+                                                                </Text>
+                                                            </Block>
+                                                        </Block>
+                                                        <Block style={styles.row}>
+                                                            <Block style={{width: '60%'}}>
+                                                                <Text  style={styles.headingText} >
+                                                                    ความดัง (dB)
+                                                                </Text>
+                                                            </Block>
+                                                            <Block style={{width: '40%'}}>
+                                                                <Text  style={styles.resultText} >
+                                                                    {item.hearDB}
+                                                                </Text>
+                                                            </Block>
+                                                        </Block>
+                                                    </Block>
+                                                    <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingRight: 15}}>
+                                                        <Block style={styles.row}>
+                                                            <Block style={{width: '100%',height: 80}}>
+                                                                <Text  style={styles.headingResultText} >
+                                                                    หูข้างที่ทดสอบ
+                                                                </Text>
+                                                                <Block style={styles.resultVeryGood}>
+                                                                    <Text  style={styles.resultLabel}  color={themeColor.COLORS.ALERT_SUCCESS_TEXT}>
+                                                                        {item.testSite=="Both" ? "ทั้งสองข้าง" : (item.testSite == "L" ? "ซ้าย" : "ขวา")}
+                                                                    </Text>
+                                                                </Block>
+                                                            </Block>
+                                                        </Block>
+                                                    </Block>
+                                                </Block>
+                                            </Block>
+                                        );
+                                    })
+                                }
+                                
+
+
+                            </Block>
+                        </ScrollView>
+                
+                    </ImageBackground>
+                </Block>
+            </Block>
+            
+        );
+    }
 }
 
 const styles = StyleSheet.create({
@@ -583,7 +210,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: 'Sarabun-Bold',
         color: themeColor.COLORS.PRIMARY,
-        textAlign: "center",
+        textAlign: "left",
     },
     headingText: {
         fontSize: 12,
@@ -827,4 +454,15 @@ const styles = StyleSheet.create({
     }
 });
 
-export default HearingTestResult;
+// export default HearingTestResult;
+const mapStateToProps = state => {
+    return {
+    //   Name: state.user.Name,
+    //   image: state.user.image,
+      network: state.network,
+    };
+  };
+  
+  
+  
+  export default connect(mapStateToProps, null)(HearingTestResult);

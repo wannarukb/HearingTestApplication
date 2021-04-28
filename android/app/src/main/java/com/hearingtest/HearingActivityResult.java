@@ -3,24 +3,36 @@ package com.hearingtest;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.facebook.react.ReactActivity;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.google.gson.Gson;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.URLEncoder;
 import java.util.List;
 
 public class HearingActivityResult extends ReactActivity {
 
     public TestResult[] testResultList;
+    public String userId;
+    public String filePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,13 +43,18 @@ public class HearingActivityResult extends ReactActivity {
         if(extras != null) {
             Gson gson = new Gson();
             String resultJSON = extras.getString("TestResultList");
-             testResultList    = gson.fromJson(resultJSON, TestResult[].class);
+            testResultList    = gson.fromJson(resultJSON, TestResult[].class);
+            userId            = extras.getString("UserId");
+            filePath          = extras.getString("FilePath");
+
         }
 
         for(int i=0; i < testResultList.length; i++){
             TestResult eachResult = testResultList[i];
-            System.out.println("F = " + eachResult.frequency + ", DB = " + eachResult.hearDB + ", Suite = " + eachResult.testSuite + ", Start = " + eachResult.startDate + ", End = " + eachResult.endDate);
+            System.out.println("F = " + eachResult.frequency + ", DB = " + eachResult.hearDB + ", Suite = " + eachResult.testSite + ", Start = " + eachResult.startDate + ", End = " + eachResult.endDate);
         }
+
+
 
         LinearLayout tableLayout = (LinearLayout)findViewById(R.id.resultTable);
 
@@ -104,7 +121,7 @@ public class HearingActivityResult extends ReactActivity {
 //            duration_col.setLayoutParams(params);
 //            duration_col.setPadding(4, 4, 4, 4);
 
-            duration_col.setText("" + eachItem.testSuite);
+            duration_col.setText("" + eachItem.testSite);
             duration_col.setGravity(Gravity.CENTER);
             duration_col.setLayoutParams(params);
             duration_col.setPadding(4, 4, 4, 4);
@@ -119,15 +136,72 @@ public class HearingActivityResult extends ReactActivity {
         }
     }
 
-
-    private void writeToFile(String data, Context context) {
-
+    public void onClickDone(View view) {
         try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("config.txt", Context.MODE_PRIVATE));
-            outputStreamWriter.write(data);
-            outputStreamWriter.close();
+
+            System.out.println(userId);
+            System.out.println(testResultList);
+            if(userId != null && userId != "" && testResultList != null && testResultList.length > 0){
+                Gson gson = new Gson();
+                HearingTestResult resultInfo = new HearingTestResult(userId, testResultList);
+                String data = gson.toJson(resultInfo);
+
+//                String encoded = URLEncoder.encode(data, "UTF-8");
+
+                filePath = filePath + "/" + "HearingTestResult.txt";
+//                FileOutputStream fileOut = new FileOutputStream(filePath);
+//                ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+//                objectOut.writeObject(encoded);
+//                fileOut.getFD().sync();
+
+                File f = new File(filePath);
+                BufferedWriter writer = new BufferedWriter( new OutputStreamWriter(
+                        new FileOutputStream(filePath),"UTF-8"));
+                writer.write(data);
+
+                if (writer != null) writer.close( );
+
+                System.out.println(data);
+//                System.out.println(encoded);
+
+                Intent intent = new Intent(this, ReactResultActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
         } catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
+            e.printStackTrace();
+            System.out.println(e);
         }
+
     }
+
+//
+//    private void writeToFile() {
+//            try {
+//
+//                if(userId != null && userId != "" && testResultList != null && testResultList.length > 0){
+//                    Gson gson = new Gson();
+//                    HearingTestResult resultInfo = new HearingTestResult(userId, testResultList);
+//                    String data = gson.toJson(resultInfo);
+//
+//                    filePath = filePath + "/" + "HearingTestResult.json";
+//                    FileOutputStream fileOut = new FileOutputStream(filePath);
+//                    ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+//                    objectOut.writeObject(data);
+//                    fileOut.getFD().sync();
+//                }
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                System.out.println(e);
+//            }
+////        try {
+////            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("config.txt", Context.MODE_PRIVATE));
+////            outputStreamWriter.write(data);
+////            outputStreamWriter.close();
+////        } catch (IOException e) {
+////            Log.e("Exception", "File write failed: " + e.toString());
+////        }
+//    }
 }

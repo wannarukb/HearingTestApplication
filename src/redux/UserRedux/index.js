@@ -14,7 +14,8 @@ export const actions = {
   
 const initialState = {   
     "token": "",
-    "id": ""
+    "id": "",
+    "isAuthenticated" : false
 };
   
 export const reducer = (state = initialState, action) => {
@@ -25,8 +26,11 @@ export const reducer = (state = initialState, action) => {
   
         case types.LOGIN:
             return Object.assign({}, state, {
-                "token": user.token,
-                "id":user.id
+                ...state,
+                ...action.payload, // this is what we expect to get back from API call and login page input
+                // "token": user.token,
+                // "id":user.id,
+                "isAuthenticated" : true
             });
   
         default:

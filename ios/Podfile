@@ -10,6 +10,8 @@ target 'HearingTest' do
 
   pod 'RNCPicker', :path => '../node_modules/@react-native-community/picker'
 
+  pod 'RNFS', :path => '../node_modules/react-native-fs'
+
   target 'HearingTestTests' do
     inherit! :complete
     # Pods for testing

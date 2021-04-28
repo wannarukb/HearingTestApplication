@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {connect} from 'react-redux';
 import Api from '../services/Api';
 import {CommonActions } from '@react-navigation/native';
+import AsyncStorage  from '@react-native-async-storage/async-storage';
 
 import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView ,KeyboardAvoidingView ,TextInput} from 'react-native';
 import { Block, Text, theme } from "galio-framework";
@@ -21,7 +22,21 @@ class Login extends React.Component {
   }
 
   componentDidMount() {
-    this.props.logout();
+    // this.props.logout();
+    this.getToken();
+  }
+
+  async getToken() {
+    try {
+      let userData = await AsyncStorage.getItem("UserInfo");
+      let data = JSON.parse(userData);
+      console.log('Login get token = ', data);
+      this.setState({
+        userInfo : data
+      });
+    } catch (error) {
+      console.log("Something went wrong, get token = ", error);
+    }
   }
 
   login(){
@@ -37,91 +52,78 @@ class Login extends React.Component {
     }
   }
 
-  UserLoginFunction = () =>{
+  // async storeToken(user) 
+  storeToken = async(user) =>{
+    try {
+      await AsyncStorage.setItem("UserInfo", JSON.stringify(user));
+      console.log("storeToken", "information have been store");
+    } catch (error) {
+      console.log("Something went wrong, store token = ", error);
+    }
+  }
+
+  UserLoginFunction = () => {
     const { UserEmail ,UserPassword}  = this.state ;
-    Api.login_api(UserEmail,UserPassword)
-    .then(responseJson => {
-      console.log('login', responseJson);
-      this.setState({loading:false})
-      if (responseJson.ok) {
+    try {
+      Api.login_api(UserEmail,UserPassword)
+      .then(responseJson => {
+        console.log('login', responseJson);
+        this.setState({loading:false})
+        if (responseJson.ok) {
+          this.setState({
+            loading: false,
+          });
+
+          if (responseJson.data != null) {
+            var data = responseJson.data;
+            let userInfo  = {
+              email : UserEmail,
+              token : data.token,
+              userId : data.id
+            }
+            console.log('userInfo', userInfo);
+            this.storeToken(userInfo);
+            this.props.login(data);
+            this.props.navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [
+                  { name: 'UserSurvey' },
+                ],
+              })
+            );
+          } else {
+            alert('server error no data')
+          }
+        } else {
+          if (responseJson.problem == 'NETWORK_ERROR') {
+            alert('server error = NETWORK_ERROR')
+            this.setState({
+              loading: false,
+            });
+          } else if (responseJson.problem == 'TIMEOUT_ERROR') {
+            alert('server error = TIMEOUT_ERROR')
+            this.setState({
+              loading: false,
+            });
+          } else {
+            alert('server error responseJson ERROR')
+            this.setState({
+              loading: false,
+            });
+          }
+        }
+      })
+      .catch(error => {
+        console.error(error);
         this.setState({
           loading: false,
         });
-
-        if (responseJson.data != null) {
-          var data = responseJson.data;
-          console.log(data);
-          console.log(data.token);
-          console.log(data.id);
-          this.props.login(data);
-          this.props.navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [
-                { name: 'UserSurvey' },
-              ],
-            })
-          );
-        //   if (responseJson.data.hasOwnProperty('status')) {
-        //     if (responseJson.data.status == 200) {
-        //       if (responseJson.data.hasOwnProperty('message')) {
-          
-        //         alert(responseJson.data.message)
-
-        //         if(responseJson.data.hasOwnProperty("data")){
-        //           if(responseJson.data.data.length>0){
-
-        //         console.log(responseJson.data.data[0]);
-        //             this.props.login(responseJson.data.data[0]);
-        //             this.props.navigation.dispatch(
-        //                 CommonActions.reset({
-        //                   index: 0,
-        //                   routes: [
-        //                     { name: 'UserSurvey' },
-        //                   ],
-        //                 })
-        //               );
-        //           }
-        //         }
-
-        //       }
-        //     } else {
-        //       alert('server error ' + responseJson.data.status)
-        //       if (responseJson.data.hasOwnProperty('message')) {
-        //         alert(responseJson.data.message)
-        //       }
-        //     }
-        //   } else {
-        //     alert('server error status')
-        //   }
-        } else {
-          alert('server error no data')
-        }
-      } else {
-        if (responseJson.problem == 'NETWORK_ERROR') {
-          alert('server error = NETWORK_ERROR')
-          this.setState({
-            loading: false,
-          });
-        } else if (responseJson.problem == 'TIMEOUT_ERROR') {
-          alert('server error = TIMEOUT_ERROR')
-          this.setState({
-            loading: false,
-          });
-        } else {
-          alert('server error responseJson ERROR')
-          this.setState({
-            loading: false,
-          });
-        }
-      }
-    })
-    .catch(error => {
-      console.error(error);
-      this.setState({
-        loading: false,
       });
-    });
+      
+    } catch (e) {
+      // saving error
+    }
   }
 
 
@@ -157,11 +159,11 @@ class Login extends React.Component {
                           <Block flex>
                     
                             <Block flex center>
-                              <KeyboardAvoidingView
+                              {/* <KeyboardAvoidingView
                                 style={{ flex: 1 }}
                                 behavior="padding"
                                 enabled
-                              >
+                              > */}
                                 <Block  style={{ marginBottom: 15 }}>
                                   <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
                                   ชื่อผู้ใช้งาน (Username)
@@ -217,7 +219,7 @@ class Login extends React.Component {
                                   </Block>
                                 </Block>
                                 
-                              </KeyboardAvoidingView>
+                              {/* </KeyboardAvoidingView> */}
                             </Block>
                           </Block>
                         </Block>
@@ -337,7 +339,6 @@ Login.defaultProps = {
 
 const mapStateToProps = state => {
   return {
-
     network: state.network,
   };
 };

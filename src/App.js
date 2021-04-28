@@ -13,11 +13,12 @@ enableScreens();
 import Screens from "./navigation/Screens";
 import { themeColor } from "./constants";
 
+
 export default class App extends Component {
 
   render() {
       const per = persistStore(store);
-  
+      
       return (
         <Provider store={store}>
           <PersistGate persistor={per}>

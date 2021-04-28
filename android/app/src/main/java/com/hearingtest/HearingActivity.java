@@ -14,6 +14,7 @@ import android.media.AudioTrack;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.util.ArrayMap;
@@ -30,18 +31,17 @@ import android.widget.TextView;
 
 import com.facebook.react.ReactActivity;
 
-import java.text.DecimalFormat;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.facebook.react.bridge.Callback;
 import com.google.gson.Gson;
-
-import org.json.JSONArray;
 
 public class HearingActivity extends ReactActivity {
 
@@ -69,33 +69,82 @@ public class HearingActivity extends ReactActivity {
     AudioDeviceInfo[] devices;
     public Integer          playExecuteCount;
 
+    public String          userId;
+    public String          saveHearingPath;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-        super.onCreate(null);
+        super.onCreate(savedInstanceState);
+//        super.onCreate(null);
         setContentView(R.layout.activity_hearing);
         this.isCanHearClick = false;
 
+
         testResultList = new ArrayList<TestResult>();
         testToneList   = new ArrayList<TestTone>();
+        runningIndex        = 0;
+        playExecuteCount    = 0;
+        noOfLatestResult    = 0;
+        freqView            = (TextView) findViewById(R.id.frequency);
+        decibelView         = (TextView) findViewById(R.id.decibel);
+        suiteView           = (TextView) findViewById(R.id.testSuite);
+        volumeTextView      = (TextView) findViewById(R.id.volumeText);
 
-//        testToneList.add(new TestTone(0, 1000, 60, 3, 0,  5,  10,  5,  0, 1,  0, "R", 5));
-//        testToneList.add(new TestTone(1, 1000, 65, 3, 0,  5,  10,  5,  0,  1,  0, "L",5));
-//        testToneList.add(new TestTone(2, 1000, 70, 3, 0,  5,  10,  5,  0,  1,  0, "Both",5));
 
-        testToneList.add(new TestTone(0, 1000, 40, 2, 0,  5,  10,  1,  0, 1,  0, "R", 5));
-        testToneList.add(new TestTone(1, 2000, 40, 2, 0,  5,  10,  1,  0,  1,  0, "R", 5));
-        testToneList.add(new TestTone(2, 4000, 40, 2, 0,  5,  10,   1,0 ,  1,  0, "R", 5));
-        testToneList.add(new TestTone(3, 500, 40, 2, 0,  5,  10,  1,  0,  1,  0, "R", 5));
-        testToneList.add(new TestTone(4, 1000, 40, 2, 0,  5,  10,  1,  0,  1,  0, "L",5));
-        testToneList.add(new TestTone(5, 2000, 40, 2, 0,  5,  10,  1,  0,  1,  0, "L",5));
-        testToneList.add(new TestTone(6, 4000, 40, 2, 0,  5,  10,  1,  0,  1,  0, "L",5));
-        testToneList.add(new TestTone(7, 500, 40, 2, 0,  5,  10,  1,  0,  1,  0, "L", 5));
-        testToneList.add(new TestTone(8, 1000, 40, 2, 0,  5,  10,  1,  0,  1,  0, "Both",5));
-        testToneList.add(new TestTone(9, 2000, 40, 2, 0,  5,  10,  1,  0,  1,  0, "Both",5));
-        testToneList.add(new TestTone(10, 4000, 40, 2, 0,  5,  10,  1,  0,  1,  0, "Both", 5));
-        testToneList.add(new TestTone(11, 500, 40, 2, 0,  5,  10,  1,  0,  1,  0, "Both", 5));
+        Bundle extras = getIntent().getExtras();
+        if(extras != null) {
+            Gson gson = new Gson();
+            String testToneJSON = extras.getString("TestToneList");
+            userId              = extras.getString("UserId");
+            saveHearingPath     = extras.getString("FilePath");
+
+            TestTone[] parseTone;
+            parseTone    = gson.fromJson(testToneJSON, TestTone[].class);
+            if(parseTone != null && parseTone.length > 0){
+                for(int i = 0; i < parseTone.length; i++){
+                    TestTone eachTone = parseTone[i];
+                    testToneList.add(new TestTone(eachTone.index, eachTone.frequency,
+                            eachTone.startDB, eachTone.durationMin, eachTone.durationMax,
+                            eachTone.upDB, eachTone.downDB,
+                            eachTone.intervalMin, eachTone.intervalMax,
+                            eachTone.testRoundMin, eachTone.testRoundMax, eachTone.testSite, eachTone.maxResult));
+                }
+            }
+
+            System.out.println("Hearing - testToneList = " + testToneList.size());
+            currentRunTone      = testToneList.get(runningIndex);
+            System.out.println("Hearing - Current Run Tone  = " + currentRunTone.index + ", " + currentRunTone.testSite + ", " + currentRunTone.frequency + ", " + currentRunTone.runDB);
+            currentTestRound    = currentRunTone.testRound;
+
+
+            freqView.setText(""+currentRunTone.frequency);
+            decibelView.setText(""+currentRunTone.runDB);
+            suiteView.setText(currentRunTone.testSite);
+
+            volumeTextView.setText("");
+
+            noOfClick = 0;
+
+
+            mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+            devices      = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
+        }
+
+
+
+//        testToneList.add(new TestTone(0, 1000, 40, 2, 0,  5,  10,  1,  0, 1,  0, "R", 5));
+//        testToneList.add(new TestTone(1, 2000, 40, 2, 0,  5,  10,  1,  0,  1,  0, "R", 5));
+//        testToneList.add(new TestTone(2, 4000, 40, 2, 0,  5,  10,   1,0 ,  1,  0, "R", 5));
+//        testToneList.add(new TestTone(3, 500, 40, 2, 0,  5,  10,  1,  0,  1,  0, "R", 5));
+//        testToneList.add(new TestTone(4, 1000, 40, 2, 0,  5,  10,  1,  0,  1,  0, "L",5));
+//        testToneList.add(new TestTone(5, 2000, 40, 2, 0,  5,  10,  1,  0,  1,  0, "L",5));
+//        testToneList.add(new TestTone(6, 4000, 40, 2, 0,  5,  10,  1,  0,  1,  0, "L",5));
+//        testToneList.add(new TestTone(7, 500, 40, 2, 0,  5,  10,  1,  0,  1,  0, "L", 5));
+//        testToneList.add(new TestTone(8, 1000, 40, 2, 0,  5,  10,  1,  0,  1,  0, "Both",5));
+//        testToneList.add(new TestTone(9, 2000, 40, 2, 0,  5,  10,  1,  0,  1,  0, "Both",5));
+//        testToneList.add(new TestTone(10, 4000, 40, 2, 0,  5,  10,  1,  0,  1,  0, "Both", 5));
+//        testToneList.add(new TestTone(11, 500, 40, 2, 0,  5,  10,  1,  0,  1,  0, "Both", 5));
 
 //        testToneList.add(new TestTone(0, 1000, 25, 5, 0,  5,  10,  5,  0, 1,  0, "R", 5));
 //        testToneList.add(new TestTone(1, 2000, 30, 5, 0,  5,  10,  5,  0,  1,  0, "R", 5));
@@ -111,29 +160,7 @@ public class HearingActivity extends ReactActivity {
 //        testToneList.add(new TestTone(11, 500, 35, 5, 0,  5,  10,  5,  0,  1,  0, "Both", 5));
 
 
-        runningIndex        = 0;
-        playExecuteCount    = 0;
-        noOfLatestResult    = 0;
 
-        currentRunTone      = testToneList.get(runningIndex);
-        currentTestRound    = currentRunTone.testRound;
-
-        freqView            = (TextView) findViewById(R.id.frequency);
-        decibelView         = (TextView) findViewById(R.id.decibel);
-        suiteView           = (TextView) findViewById(R.id.testSuite);
-        volumeTextView      = (TextView) findViewById(R.id.volumeText);
-
-        freqView.setText(""+currentRunTone.frequency);
-        decibelView.setText(""+currentRunTone.runDB);
-        suiteView.setText(currentRunTone.testSuite);
-
-        volumeTextView.setText("");
-
-        noOfClick = 0;
-
-
-        mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        devices      = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
 
 
     }
@@ -215,12 +242,12 @@ public class HearingActivity extends ReactActivity {
                 try {
                     freqView.setText(""+currentRunTone.frequency);
                     decibelView.setText(""+currentRunTone.runDB);
-                    suiteView.setText(currentRunTone.testSuite);
+                    suiteView.setText(currentRunTone.testSite);
 
                     if(playExecuteCount > 1){
-                        currentTestResult = new TestResult(currentRunTone.index,currentRunTone.frequency, currentRunTone.runDB, currentRunTone.testSuite);
+                        currentTestResult = new TestResult(currentRunTone.index,currentRunTone.frequency, currentRunTone.runDB, currentRunTone.testSite);
                     }
-                    generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.runDB, currentRunTone.testSuite);
+                    generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.runDB, currentRunTone.testSite);
                     synchronized (this) {
                         try {
                             Thread.sleep(currentRunTone.intervalSleep);
@@ -244,7 +271,7 @@ public class HearingActivity extends ReactActivity {
 
                                         freqView.setText(""+currentRunTone.frequency);
                                         decibelView.setText(""+currentRunTone.runDB);
-                                        suiteView.setText(currentRunTone.testSuite);
+                                        suiteView.setText(currentRunTone.testSite);
                                         if(currentRunTone.runDB > MAX_DB) {
                                             isEndThisFrequency = true;
                                         }
@@ -268,7 +295,7 @@ public class HearingActivity extends ReactActivity {
                                         }
 
                                         System.out.println("CLICKED noOfLatestResult = " + noOfLatestResult);
-                                        System.out.println("CLICKED STOP AT F = " + currentRunTone.frequency + " DB = " + currentRunTone.runDB + " TS = " + currentRunTone.testSuite);
+                                        System.out.println("CLICKED STOP AT F = " + currentRunTone.frequency + " DB = " + currentRunTone.runDB + " TS = " + currentRunTone.testSite);
                                         if(noOfLatestResult < MAX_BEST_RESULT){
                                             currentRunTone.setDecreaseDB();
                                             if (currentRunTone.runDB < MIN_DB) {
@@ -335,6 +362,8 @@ public class HearingActivity extends ReactActivity {
 
         Intent intent = new Intent(this, HearingActivityResult.class);
         intent.putExtra("TestResultList", resultJson);
+        intent.putExtra("FilePath", saveHearingPath);
+        intent.putExtra("UserId", userId);
         startActivity(intent);
         finish();
     }

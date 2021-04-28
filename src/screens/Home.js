@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import AsyncStorage  from '@react-native-async-storage/async-storage';
+import RNFS from 'react-native-fs';
+
 import { Block, Button, Text, theme } from "galio-framework";
 import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView,NativeModules } from 'react-native';
 import themeColor from "../constants/Theme";
@@ -9,15 +12,79 @@ import {CommonActions } from '@react-navigation/native';
 
 
 class Home extends Component {
+  
   constructor(props) {
     super(props);
+
     this.state = {
      
     };
+
+    this.getToken();
+    this.readJSONFile();
+
   }
+
+  async readJSONFile(){
+    try {
+      var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
+    
+      console.log(path)
+      const fileContent = await RNFS.readFile(path, 'utf8');
+      console.log(fileContent);
+      if(fileContent != null && fileContent != undefined){
+        let resultInfo = JSON.parse(fileContent);
+        console.log(resultInfo.userId);
+        console.log(resultInfo.testResults);
+        this.setState({
+          testResults : resultInfo.testResults
+        })
+
+        await AsyncStorage.setItem("TestResults", JSON.stringify(resultInfo.testResults));
+      }
+    } catch (error) {
+      console.log("Something went wrong, get token = ", error);
+    }
+  }
+
+  async getToken() {
+    try {
+      let userData = await AsyncStorage.getItem("UserInfo");
+      let data = JSON.parse(userData);
+      console.log('Login get token = ', data);
+      this.setState({
+        userInfo : data
+      });
+    } catch (error) {
+      console.log("Something went wrong, get token = ", error);
+    }
+  }
+
+  onClickStartTesting(){
+    let testData = [{"index":0,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":1,"frequency":2000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":2,"frequency":4000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":3,"frequency":500,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":4,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":5,"frequency":2000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":6,"frequency":4000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":7,"frequency":500,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":8,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5},{"index":9,"frequency":2000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5},{"index":10,"frequency":4000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5},{"index":11,"frequency":500,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5}];
+    // let testData = [{"index":0,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5}];
+   
+    if(this.state.userInfo != null && this.state.userInfo.token != null){
+      NativeModules.HearingTestModule.GotoActivity(
+        JSON.stringify(this.state.userInfo.userId),
+        JSON.stringify(testData)
+      );
+
+    }else{
+      this.props.navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [
+            { name: 'Login' },
+          ],
+        })
+      );
+    }
+  }
+
   render() {
-    const { navigation } = this.props;
-    const pureToneModule = NativeModules.HearingTestModule;
+    // const { navigation } = this.props;
+    // const pureToneModule = NativeModules.HearingTestModule;
     
     return (
       <Block flex style={styles.container}>
@@ -58,15 +125,7 @@ class Home extends Component {
                             <Button style={styles.menuBlockMain} 
                               //  onPress={() => navigation.navigate("Login")}
                               //  onPress={() => pureToneModule.GotoActivity()}
-                              onPress={() => { 
-                                navigation.dispatch(
-                                 CommonActions.reset({
-                                   index: 0,
-                                   routes: [
-                                     { name: 'Login' },
-                                    ],
-                                 })
-                               );}}
+                              onPress={() => this.onClickStartTesting()}
                             >
                               <ImageBackground
                                   source={Images.EarTestMain}
@@ -87,6 +146,15 @@ class Home extends Component {
                           <Block style={{width: '50%', paddingRight: 2}}>
                             <Button style={styles.menuBlock} 
                               //  onPress={() => navigation.navigate("HearingTestResult")}
+                              onPress={() => 
+                                this.props.navigation.dispatch(
+                                  CommonActions.reset({
+                                    index: 0,
+                                    routes: [
+                                      { name: 'HearingTestResult' },
+                                    ],
+                                  })
+                                )}
                             >
                               <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
                                 ผลการตรวจ
@@ -264,8 +332,8 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => {
   return {
-    Name: state.user.Name,
-    image: state.user.image,
+    // Name: state.user.Name,
+    // image: state.user.image,
     network: state.network,
   };
 };

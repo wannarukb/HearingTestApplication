@@ -1,4 +1,6 @@
 import React from 'react';
+import AsyncStorage  from '@react-native-async-storage/async-storage';
+
 import { StyleSheet, Dimensions, ImageBackground,  ScrollView  } from 'react-native';
 import { Block, Text, theme } from "galio-framework";
 import themeColor from "../constants/Theme";
@@ -8,6 +10,9 @@ import { Button } from "../components";
 
 
 const { height, width } = Dimensions.get("screen");
+import {connect} from 'react-redux';
+import {CommonActions } from '@react-navigation/native';
+
 
 class UserSurvey extends React.Component {
   constructor(props) {
@@ -17,7 +22,22 @@ class UserSurvey extends React.Component {
       q2 : false,
       q3 : false
     };
+    this.getToken();
   };
+
+  async getToken() {
+    try {
+      let userData = await AsyncStorage.getItem("UserInfo");
+      let data = JSON.parse(userData);
+      console.log('Login get token = ', data);
+      this.setState({
+        userInfo : data
+      });
+    } catch (error) {
+      console.log("Something went wrong, get token = ", error);
+    }
+  }
+  
 
   render() {
     const { navigation } = this.props;
@@ -42,7 +62,7 @@ class UserSurvey extends React.Component {
                       color={themeColor.COLORS.BTN_SECONDARY}
                       style={{marginRight: 5}}
                     />  */}
-                    ย้อนกลับ
+                    ย้อนกลับ {this.props.token}
                   </Text>
                 </Block>
                 <Block style={{width: '50%',marginHorizontal: 2, justifyContent: 'center'}}>
@@ -134,7 +154,17 @@ class UserSurvey extends React.Component {
                 :(
                   <Block middle>
                     <Button style={styles.createButton}
-                      onPress={() => navigation.navigate("HeadsetSelect")}>
+                      // onPress={() => navigation.navigate("HeadsetSelect")}
+                      onPress={() => { 
+                        navigation.dispatch(
+                         CommonActions.reset({
+                           index: 0,
+                           routes: [
+                             { name: 'HeadsetSelect' },
+                            ],
+                         })
+                       );}}
+                      >
                       <Text style={styles.createButtonText}>
                       ถัดไป
                       </Text>

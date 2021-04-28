@@ -6,4 +6,5 @@
     <string name="testing_action_desc_2">เมื่อท่านได้ยินเสียง</string>
     <string name="testing_can_hear">ได้ยิน</string>
     <string name="testing_cannot_hear">ไม่ได้ยิน</string>
+    <string name="done_testing">กลับหน้าหลัก</string>
 </resources>
