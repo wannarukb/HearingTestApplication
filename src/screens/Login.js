@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
-import Api from '../services/Api';
+import AuthService from '../services/AuthService';
+import TestToneService from '../services/TestToneService';
 import {CommonActions } from '@react-navigation/native';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
 
@@ -41,15 +42,26 @@ class Login extends React.Component {
 
   login(){
     const {UserEmail,UserPassword}=this.state
-    if(UserEmail==""){
-      alert('enter UserEmail')
-    }else if(UserPassword==''){
-      alert('enter UserPassword')
+    if(UserEmail == ""){
+      alert('กรุณากรอกอีเมล')
+    }else if( UserPassword == ""){
+      alert('กรุณากรอกรหัสผ่าน')
     }else if(!this.props.network.isConnected){
       alert('No Internet')    
     }else{
       this.UserLoginFunction()
     }
+  }
+
+  goToUserSurveyPage = () =>{ 
+    this.props.navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          { name: 'UserSurvey' },
+        ],
+      })
+    );
   }
 
   // async storeToken(user) 
@@ -62,10 +74,67 @@ class Login extends React.Component {
     }
   }
 
+  // async storeTestToneList(testToneList) 
+  storeTestToneList = async(testToneList) =>{
+    try {
+      await AsyncStorage.setItem("TestToneList", JSON.stringify(testToneList));
+      console.log("storeTestToneList", "information have been store");
+      this.goToUserSurveyPage();
+    } catch (error) {
+      console.log("Something went wrong, store token = ", error);
+    }
+  }
+  
+
+  loadTestTone = (userToken) =>{
+    try {
+      TestToneService.test_tone_api(userToken)
+      .then(responseJson => {
+        console.log('test_tone_api responseJson = ', responseJson.status);
+        if (responseJson.ok) {
+          if (responseJson.data != null) {
+            var data = responseJson.data;
+            // console.log('login load test tone data ' + data);
+            this.props.loadTestToneList(data);
+            this.storeTestToneList(data);
+          } else {
+            alert('server error no data')
+          }
+        } else {
+          if (responseJson.problem == 'NETWORK_ERROR') {
+            alert('server error = NETWORK_ERROR')
+            this.setState({
+              loading: false,
+            });
+          } else if (responseJson.problem == 'TIMEOUT_ERROR') {
+            alert('server error = TIMEOUT_ERROR')
+            this.setState({
+              loading: false,
+            });
+          } else {
+            alert('server error responseJson ERROR')
+            this.setState({
+              loading: false,
+            });
+          }
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      });
+      
+    } catch (e) {
+      console.error(error);
+      this.setState({
+        loading: false,
+      });
+    }
+  }
+
   UserLoginFunction = () => {
     const { UserEmail ,UserPassword}  = this.state ;
     try {
-      Api.login_api(UserEmail,UserPassword)
+      AuthService.login_api(UserEmail,UserPassword)
       .then(responseJson => {
         console.log('login', responseJson);
         this.setState({loading:false})
@@ -76,22 +145,11 @@ class Login extends React.Component {
 
           if (responseJson.data != null) {
             var data = responseJson.data;
-            let userInfo  = {
-              email : UserEmail,
-              token : data.token,
-              userId : data.id
-            }
-            console.log('userInfo', userInfo);
-            this.storeToken(userInfo);
+            console.log('userInfo', data);
+            this.storeToken(data);
             this.props.login(data);
-            this.props.navigation.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [
-                  { name: 'UserSurvey' },
-                ],
-              })
-            );
+            this.loadTestTone(data.token);
+            
           } else {
             alert('server error no data')
           }
@@ -122,11 +180,12 @@ class Login extends React.Component {
       });
       
     } catch (e) {
-      // saving error
+      console.error(error);
+      this.setState({
+        loading: false,
+      });
     }
   }
-
-
   render() {
     const { navigation } = this.props;
     const {loading,UserEmail,UserPassword}=this.state;
@@ -159,16 +218,17 @@ class Login extends React.Component {
                           <Block flex>
                     
                             <Block flex center>
-                              {/* <KeyboardAvoidingView
+                              <KeyboardAvoidingView
                                 style={{ flex: 1 }}
                                 behavior="padding"
                                 enabled
-                              > */}
+                              >
                                 <Block  style={{ marginBottom: 15 }}>
                                   <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                  ชื่อผู้ใช้งาน (Username)
+                                  อีเมล (Email)
                                   </Text>
                                   <TextInput
+                                    style={styles.inputType}
                                     placeholder="Email"
                                     placeholderTextColor="grey"
                                     returnKeyType="next"
@@ -182,6 +242,7 @@ class Login extends React.Component {
                                   รหัสผ่าน (Password)
                                   </Text>
                                   <TextInput
+                                    style={styles.inputType}
                                     ref={(id)=>{this.pass_tn=id}}
                                     placeholder="Password"
                                     placeholderTextColor="grey"
@@ -204,7 +265,16 @@ class Login extends React.Component {
 
                                 <Block  style={styles.row}>
                                   <Block style={{width: '60%', marginLeft: -5, paddingRight: 5}}>
-                                    <Button style={styles.menuButtonRegister} >
+                                    <Button style={styles.menuButtonRegister} 
+                                     onPress={() => this.props.navigation.dispatch(
+                                      CommonActions.reset({
+                                        index: 0,
+                                        routes: [
+                                          { name: 'Register' },
+                                        ],
+                                      })
+                                    )}
+                                    >
                                       <Text style={styles.createButtonText}>
                                       สมัครเลย !
                                       </Text>
@@ -219,7 +289,7 @@ class Login extends React.Component {
                                   </Block>
                                 </Block>
                                 
-                              {/* </KeyboardAvoidingView> */}
+                              </KeyboardAvoidingView>
                             </Block>
                           </Block>
                         </Block>
@@ -311,7 +381,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: '100%',
-    height: 80,
+    height: 60,
     position: 'relative',
     marginTop: '0%',
     marginHorizontal : 'auto'
@@ -330,6 +400,14 @@ const styles = StyleSheet.create({
   formLabel:{
     fontFamily:'Sarabun-Medium',
     fontSize: 14,
+  },
+  inputType:{
+    borderColor: themeColor.COLORS.INPUT,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    backgroundColor: themeColor.COLORS.WHITE
+    // marginTop: 5
   }
 });
 Login.defaultProps = {
@@ -345,10 +423,13 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   const {actions} = require('../redux/UserRedux');
+  const {testToneActions} = require('../redux/TestToneRedux');
+  
 
   return {
     login: customers => dispatch(actions.login(customers)),
     logout: () => dispatch(actions.logout()),
+    loadTestToneList: testToneList => dispatch(testToneActions.loadTestToneList(testToneList))
   };
 };
 

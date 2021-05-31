@@ -11,4 +11,19 @@ const api = create({
   },
 });
 
-export let login_post = (body) => api.post('/Authenticate/', body).then(response => response);
+let login_post = (body) => api.post('/Authenticate/', body).then(response => response);
+let register_post = (body) => api.post('/Users/', body).then(response => response);
+
+let testtone_get = (userToken) =>{ 
+  let token = 'Bearer ' + userToken;
+  api.setHeader('Authorization', token);
+  const response = api.get('/TestTones/');
+  return response;
+}
+
+
+export {
+  login_post,
+  register_post,
+  testtone_get
+}

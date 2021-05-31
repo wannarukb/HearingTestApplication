@@ -3,48 +3,44 @@ import AsyncStorage  from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
 
 import { Block, Button, Text, theme } from "galio-framework";
-import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView, TouchableOpacity, View, LogBox  } from 'react-native';
+import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView,NativeModules } from 'react-native';
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 const { height, width } = Dimensions.get("screen");
 import {connect} from 'react-redux';
 import {CommonActions } from '@react-navigation/native';
-import Modal from "react-native-simple-modal";
 
-LogBox.ignoreAllLogs(true);
+
 class Home extends Component {
   
   constructor(props) {
     super(props);
+
     this.state = {
-      openModal: false 
+     
     };
-   
+
     this.getToken();
     this.readJSONFile();
 
-    console.log(this.props.userInfo);
   }
-  
 
   async readJSONFile(){
     try {
       var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
     
-      if(path != null && path != undefined){
-        console.log(path)
-        const fileContent = await RNFS.readFile(path, 'utf8');
-        console.log(fileContent);
-        if(fileContent != null && fileContent != undefined){
-          let resultInfo = JSON.parse(fileContent);
-          console.log(resultInfo.userId);
-          console.log(resultInfo.testResults);
-          this.setState({
-            testResults : resultInfo.testResults
-          })
+      console.log(path)
+      const fileContent = await RNFS.readFile(path, 'utf8');
+      console.log(fileContent);
+      if(fileContent != null && fileContent != undefined){
+        let resultInfo = JSON.parse(fileContent);
+        console.log(resultInfo.userId);
+        console.log(resultInfo.testResults);
+        this.setState({
+          testResults : resultInfo.testResults
+        })
 
-          await AsyncStorage.setItem("TestResults", JSON.stringify(resultInfo.testResults));
-        }
+        await AsyncStorage.setItem("TestResults", JSON.stringify(resultInfo.testResults));
       }
     } catch (error) {
       console.log("Something went wrong, get token = ", error);
@@ -56,14 +52,19 @@ class Home extends Component {
       let userData = await AsyncStorage.getItem("UserInfo");
       let data = JSON.parse(userData);
       console.log('Login get token = ', data);
+      this.setState({
+        userInfo : data
+      });
     } catch (error) {
       console.log("Something went wrong, get token = ", error);
     }
   }
 
   onClickStartTesting(){
-  
-    if(this.props.userInfo != null && this.props.userInfo.isAuthenticated){
+    let testData = [{"index":0,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":1,"frequency":2000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":2,"frequency":4000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":3,"frequency":500,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":4,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":5,"frequency":2000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":6,"frequency":4000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":7,"frequency":500,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":8,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5},{"index":9,"frequency":2000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5},{"index":10,"frequency":4000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5},{"index":11,"frequency":500,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5}];
+    // let testData = [{"index":0,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5}];
+   
+    if(this.state.userInfo != null && this.state.userInfo.token != null){
       // NativeModules.HearingTestModule.GotoActivity(
       //   JSON.stringify(this.state.userInfo.userId),
       //   JSON.stringify(testData)
@@ -89,107 +90,52 @@ class Home extends Component {
     }
   }
 
-  modalDidOpen = () => console.log("Modal did open.");
-
-  modalDidClose = () => {
-    this.setState({ openModal: false });
-    console.log("Modal did close.");
-  };
-
-
-  openModal = () => this.setState({ openModal: true });
-
-  closeModal = () => this.setState({ openModal: false });
-
-  onClickLogOut = ()=> { 
-    console.log("LOGOUT");
-    this.props.logout();
-    this.resetToken();
-    this.closeModal();
-  }
-
-  // async storeToken(user) 
-  resetToken = async() =>{
-    try {
-      await AsyncStorage.setItem("UserInfo", "");
-      console.log("reset Token", "Token have been reset to undefined");
-    } catch (error) {
-      console.log("Something went wrong, store token = ", error);
-    }
-  }
-
-
-
-  renderWelcomeBlock(){
-    if(this.props.userInfo != null && this.props.userInfo.isAuthenticated == true){
-      return (
-        <Block  style={styles.row}>
-          <Block style={styles.welcomeInfoBlock}>
-            <Text style={styles.subTitle} color={themeColor.COLORS.PRIMARY} >
-              ข้อมูลการทดสอบการได้ยินเป็นของ
-            </Text>
-            <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-              คุณ {this.props.userInfo != null ? this.props.userInfo.user.fn : ""}
-            </Text>
-          </Block>
-          <Block style={{width: '22%'}}>
-            <Button style={styles.menuButtonTry} onPress={this.openModal} >
-              <Text style={styles.createButtonText}>
-                เพิ่มเติม
-              </Text>
-            </Button>
-            
-            
-          </Block>
-        </Block>
-      )
-    }else{
-      return (
-        <Block  style={styles.row}>
-          <Block style={styles.welcomeInfoBlock}>
-            <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-            ยินดีต้อนรับ
-            </Text>
-            <Text style={styles.subTitle} color={themeColor.COLORS.TEXT_SECONDARY} >
-            วันนี้คุณได้ทำการทดสอบการได้ยินหรือยัง ?
-            </Text>
-          </Block>
-          <Block style={{width: '22%'}}>
-          </Block>
-        </Block>
-      )
-    }
-      
-  }
-
-  
   render() {
     // const { navigation } = this.props;
     // const pureToneModule = NativeModules.HearingTestModule;
+    
     return (
-      
       <Block flex style={styles.container}>
         <Block flex>
           <ImageBackground
               source={Images.lightBG}
               style={{ height, width, zIndex: 1 }}
           >
-          
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={{ width, marginTop: '0%' }}
-          >
+            <ScrollView
+                  showsVerticalScrollIndicator={false}
+                  style={{ width, marginTop: '0%' }}
+            >
               <Block flex style={styles.homeContainer}>
                 <Image source={Images.logoFaculty} style={styles.logo} />
                 <Block flex space="around">
                     <Block style={styles.titleBlock}>
-                      <Block style={styles.welcomeBlock}>
-                      {this.renderWelcomeBlock()}  
+                      <Block  style={styles.row}>
+                        <Block style={{width: '80%', marginLeft: 0}}>
+                          <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
+                            ยินดีต้อนรับ
+                          </Text>
+                          <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
+                            {this.state.userInfo != null ? this.state.userInfo.email : ""}
+                          </Text>
+                          <Text style={styles.subTitle} color={themeColor.COLORS.TEXT_SECONDARY} >
+                          วันนี้คุณได้ทำการทดสอบการได้ยินหรือยัง ?
+                          </Text>
+                        </Block>
+                        <Block style={{width: 60}}>
+                          <Image source={Images.avatarGirl} style={styles.avatar} />
+                        </Block>
                       </Block>
+                      {/* <Block style={styles.row}>
+                        <Block style={{width: '33%', borderRadius: 4, marginHorizontal: 2, height: 80, backgroundColor: '#E5E5E5'}}></Block>
+                        <Block style={{width: '33%', borderRadius: 4, marginHorizontal: 2, height: 80, backgroundColor: '#E5E5E5'}}></Block>
+                        <Block style={{width: '33%', borderRadius: 4, marginHorizontal: 2, height: 80, backgroundColor: '#E5E5E5'}}></Block>
+                      </Block> */}
                       <Block style={styles.menuSet}>
                         <Block style={styles.row}>
                           <Block style={{width: '100%'}}>
                             <Button style={styles.menuBlockMain} 
+                              //  onPress={() => navigation.navigate("Login")}
+                              //  onPress={() => pureToneModule.GotoActivity()}
                               onPress={() => this.onClickStartTesting()}
                             >
                               <ImageBackground
@@ -220,7 +166,7 @@ class Home extends Component {
                               )}
                             >
                               <ImageBackground
-                                  source={Images.HearingResult}
+                                  source={Images.EarTestMain}
                                   style={{ height : 100, width: '100%', zIndex: 1 }}
                               >
                                 <Text style={styles.menuTextMain} color={themeColor.COLORS.PRIMARY} >
@@ -314,20 +260,6 @@ class Home extends Component {
                 </Block>
               </Block>
             </ScrollView>
-          <Modal
-            offset={this.state.offset}
-            open={this.state.openModal}
-            modalDidOpen={this.modalDidOpen}
-            modalDidClose={this.modalDidClose}
-            style={{ alignItems: "center" }}
-            
-          >
-            <View style={{ alignItems: "center" }}>
-              <TouchableOpacity style={{ margin: 5 }} onPress={this.onClickLogOut}>
-                <Text>ออกจากระบบ</Text>
-              </TouchableOpacity>
-            </View>
-          </Modal>
           </ImageBackground>
         </Block>
       </Block>
@@ -343,19 +275,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom : 10
   },
-  menuButtonTry:{
-    width: '100%', 
-    alignItems:'center', 
-    justifyContent: 'center',
-    marginVertical: 20,
-    borderRadius: 20,
-    backgroundColor: themeColor.COLORS.BTN_SECONDARY
-  },
-  createButtonText:{
-    fontSize: 16,
-    fontFamily: 'Sarabun-Medium',
-    color: themeColor.COLORS.WHITE
-  },
   avatar: {
     width: 60,
     height: 60,
@@ -364,14 +283,6 @@ const styles = StyleSheet.create({
   row: {
     flex: 1, 
     flexDirection: 'row'
-  },
-  welcomeBlock: {
-    // marginHorizontal : 0,
-    // backgroundColor: '#14468A'
-  },
-  welcomeInfoBlock: {
-    width: '75%', 
-    marginLeft: 0,
   },
   menuSet:{
     marginTop: 0,
@@ -438,14 +349,14 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: '100%',
-    height: 60,
+    height: 80,
     // backgroundColor: '#000000',
     position: 'relative',
     marginTop: '0%',
     marginHorizontal : 'auto'
   },
   titleBlock:{
-    marginTop:'5%',
+    marginTop:'5%'
   },
   title: {
     fontFamily:'Sarabun-SemiBold',
@@ -461,18 +372,10 @@ const mapStateToProps = state => {
   return {
     // Name: state.user.Name,
     // image: state.user.image,
-    userInfo: state.user,
     network: state.network,
   };
 };
 
-const mapDispatchToProps = dispatch => {
-  const {actions} = require('../redux/UserRedux');
-
-  return {
-    logout: () => dispatch(actions.logout()),
-  };
-};
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+export default connect(mapStateToProps, null)(Home);

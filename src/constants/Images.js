@@ -13,6 +13,7 @@ const lightBG = require("../assets/imgs/light-bg.png");
 const logoFaculty = require("../assets/imgs/logo-faculty.png");
 const avatarGirl  = require("../assets/imgs/characters-02.png");
 const Ear  = require("../assets/imgs/ear.png");
+const HearingResult = require("../assets/imgs/hearingResultPic.png");
 
 const EarTestMain  = require("../assets/imgs/hearing.png");
 // internet imgs
@@ -33,5 +34,6 @@ export default {
   avatarGirl,
   Ear,
   MULOGO,
-  EarTestMain
+  EarTestMain,
+  HearingResult
 };

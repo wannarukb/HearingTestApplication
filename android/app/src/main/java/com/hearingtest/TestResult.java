@@ -6,51 +6,48 @@ import java.util.Date;
 
 public class TestResult {
 
-    public int testIndex;
-    public int frequency;
-    public int hearDB;
-    public String testSite;
-    public Boolean isClickHear;
-    public Date startDate;
-    public Date endDate;
-    public Integer noOfClick;
-    public String saveDate;
+    public int TestID;
+    public int UserId;
+    public int Frequency;
+    public int Decibel;
+    public String TestSite;
+    public int IsClickHeard;
+    public String TimeClicked;
+    public long ClickSecFromStart;
+    public long ClickSecFromByTonePlayed;
+    public String TestedDateTime;
+    public String StartDateTime;
+    public String EndDateTime;
+    public int ProtocolId;
 
-    public TestResult(int testIndex, int frequency, int dB, String testSite){
-        this.testIndex = testIndex;
-        this.frequency = frequency;
-        this.hearDB    = dB;
-        this.testSite = testSite;
-        this.isClickHear = false;
-        this.startDate = Calendar.getInstance().getTime();
-        this.noOfClick = 1;
-    }
+    private Calendar startDate;
 
-    public void resetStartDate(int newHearDB){
-        if(newHearDB < this.hearDB){
-            this.startDate = Calendar.getInstance().getTime();
-            this.hearDB = newHearDB;
-        }
-
-    }
-
-    public void increaseNoOfClick(){
-        this.noOfClick = this.noOfClick + 1;
-    }
-
-    public void canHear(){
-        this.endDate   = Calendar.getInstance().getTime();
+    public TestResult(int protocolId, int userId, int testIndex, int frequency, int dB, String testSite){
+        this.TestID         = testIndex;
+        this.Frequency      = frequency;
+        this.Decibel        = dB;
+        this.TestSite       = testSite;
+        this.IsClickHeard   = 0;
+        this.ProtocolId     = protocolId;
+        this.UserId         = userId;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        this.saveDate  =  sdf.format(this.endDate);
-        this.isClickHear = true;
+        Date currentStartDate= Calendar.getInstance().getTime();
+        this.StartDateTime   = sdf.format(currentStartDate);
+        this.TestedDateTime  = this.StartDateTime;
     }
 
-    public void setClickHear(int newHearDB){
-        this.endDate   = Calendar.getInstance().getTime();
-        this.isClickHear = true;
-        if(newHearDB < this.hearDB){
-            this.hearDB = newHearDB;
-        }
+
+    public void setCanHear(String timeClickedType, long clickSecFromStart, long clickSecFromByTonePlayed){
+        this.IsClickHeard = 1;
+        this.TimeClicked  = timeClickedType;
+        this.ClickSecFromStart = clickSecFromStart;
+        this.ClickSecFromByTonePlayed  = clickSecFromByTonePlayed;
+    }
+
+    public void setEndResult(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date currentEndDate  = Calendar.getInstance().getTime();
+        this.EndDateTime     = sdf.format(currentEndDate);
     }
 
 }

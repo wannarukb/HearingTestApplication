@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import Home from "../screens/Home";
 import Onboarding from "../screens/Onboarding";
 import Login from "../screens/Login";
+import Register from "../screens/Register";
 import UserSurvey from "../screens/UserSurvey";
 import Appointment from "../screens/Appointment";
 import HearingTestResult from "../screens/HearingTestResult";
@@ -18,11 +19,14 @@ import HearingTestType from "../screens/HearingTestType"
 const Stack = createStackNavigator();
 
 export default () => {
-  const name = useSelector(state => state.user.token)
+  // const isAuthenticated = useSelector(state => state.userInfo.isAuthenticated);
+  const isAuthenticated = useSelector(state => state.user.isAuthenticated)
+  console.log('Navigation : '  + JSON.stringify(isAuthenticated));
   return (
     <NavigationContainer>
-        <Stack.Navigator headerMode="none">
-            <Stack.Screen name="Onboarding" component={Onboarding} />
+        <Stack.Navigator headerMode="none" initialRouteName={ isAuthenticated === true ? 'Home' : 'Onboarding'}>
+           
+            <Stack.Screen name="Onboarding" component={Onboarding} /> 
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen 
               name="Login" 
@@ -32,6 +36,7 @@ export default () => {
                 headerTransparent: false
               }}
             />
+           
             <Stack.Screen
               name="UserSurvey"
               component={UserSurvey}
@@ -69,6 +74,14 @@ export default () => {
               component={HearingTestType}
               option={{
                 title : "Headset",
+                headerTransparent: false
+              }}
+            />
+             <Stack.Screen 
+              name="Register" 
+              component={Register} 
+              option={{
+                title : "สมัครใช้งาน",
                 headerTransparent: false
               }}
             />

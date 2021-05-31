@@ -1,20 +1,21 @@
-import React from 'react';
+import React, { Component } from 'react';
+import {connect} from 'react-redux';
+import {CommonActions } from '@react-navigation/native';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
+import TestToneService from '../services/TestToneService';
 
-import { StyleSheet, Dimensions, ImageBackground,  ScrollView  } from 'react-native';
+import { StyleSheet, Dimensions, ImageBackground,  ScrollView , NativeModules} from 'react-native';
 import { Block, Text, theme } from "galio-framework";
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 import { Button } from "../components";
-// import CheckBox from '@react-native-community/checkbox';
-
+import CheckBox from '@react-native-community/checkbox';
 
 const { height, width } = Dimensions.get("screen");
-import {connect} from 'react-redux';
-import {CommonActions } from '@react-navigation/native';
 
+class UserSurvey extends Component {
 
-class UserSurvey extends React.Component {
+  
   constructor(props) {
     super(props);
     this.state = {
@@ -22,7 +23,18 @@ class UserSurvey extends React.Component {
       q2 : false,
       q3 : false
     };
-    this.getToken();
+    this.getToken().then( response =>{
+      if(!this.props.network.isConnected){
+        console.log('No Internet');
+        this.getTestToneList();
+      }else{
+        console.log('Internet Connected');
+        let userToken = this.state.userInfo.token;
+        // console.warn(userToken);
+        // console.log(this.props);
+        this.loadTestTone(userToken);
+      }
+    })
   };
 
   async getToken() {
@@ -36,6 +48,120 @@ class UserSurvey extends React.Component {
     } catch (error) {
       console.log("Something went wrong, get token = ", error);
     }
+  }
+
+  async getTestToneList() {
+    try {
+      let testToneListData = await AsyncStorage.getItem("TestToneList");
+      let data = JSON.parse(testToneListData);
+      console.log('TestToneList = ', data.length);
+      this.props.loadTestToneList(data);
+    } catch (error) {
+      console.log("Something went wrong, get token = ", error);
+    }
+  }
+
+  // async storeTestToneList(testToneList) 
+  storeNewTestToneList = async(testToneList) =>{
+    try {
+      await AsyncStorage.setItem("TestToneList", JSON.stringify(testToneList));
+      console.log("storeTestToneList", "information have been store");
+    } catch (error) {
+      console.log("Something went wrong, store token = ", error);
+    }
+  }
+
+  loadTestTone = (userToken) =>{
+    try {
+      TestToneService.test_tone_api(userToken)
+      .then(responseJson => {
+        console.log('test_tone_api responseJson = ', responseJson.status);
+        if (responseJson.ok) {
+          if (responseJson.data != null) {
+            var data = responseJson.data;
+            this.props.loadTestToneList(data);
+            this.storeNewTestToneList(data);
+          } else {
+            alert('server error no data')
+          }
+        } else {
+          if (responseJson.problem == 'NETWORK_ERROR') {
+            alert('server error = NETWORK_ERROR')
+            this.setState({
+              loading: false,
+            });
+          } else if (responseJson.problem == 'TIMEOUT_ERROR') {
+            alert('server error = TIMEOUT_ERROR')
+            this.setState({
+              loading: false,
+            });
+          } else {
+            alert('server error responseJson ERROR')
+            this.setState({
+              loading: false,
+            });
+          }
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      });
+      
+    } catch (e) {
+      console.error(error);
+      this.setState({
+        loading: false,
+      });
+    }
+  }
+
+  backHome(){
+    this.props.navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          { name: 'Home' },
+        ],
+      })
+    );
+  }
+
+  nextButton(){
+    //let testData = [{"index":0,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":1,"frequency":2000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":2,"frequency":4000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":3,"frequency":500,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":4,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":5,"frequency":2000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":6,"frequency":4000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":7,"frequency":500,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":8,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5},{"index":9,"frequency":2000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5},{"index":10,"frequency":4000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5},{"index":11,"frequency":500,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5}];
+    // let testData = [{"index":0,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5}];
+    // console.log(this.props);
+    let testData = this.props.testToneList;
+    let parseTestData = [];
+    
+    if(testData != null && testData != undefined){
+      // console.log(testData);
+      for(let i = 0; i < testData.length; i++){
+        let data = testData[i];
+        let parseTone = {
+          "index": data.testToneId,
+          "frequency": data.frequency,
+          "startDB": data.decibel,
+          "durationMin": data.durationMin,
+          "durationMax":data.durationMax,
+          "upDB": data.updB,
+          "downDB":data.downdB,
+          "intervalMin":data.intervalMin,
+          "intervalMax":data.intervalMax,
+          "testRoundMin": (data.testRoundMin == null ? 0 : data.testRoundMin),
+          "testRoundMax": (data.testRoundMax == null ? 0 : data.testRoundMax),
+          "testSite": data.testSite,
+          "maxResult":1
+        };
+        
+        parseTestData.push(parseTone);
+      }
+    }
+
+    let userID = this.props.userInfo.user.id;
+    NativeModules.HearingTestModule.GotoActivity(
+      JSON.stringify(userID),
+      JSON.stringify(parseTestData)
+    );
   }
   
 
@@ -54,7 +180,7 @@ class UserSurvey extends React.Component {
                   {/* <Button style={styles.backBtn}  onPress={() => navigation.navigate("Home")}>
                     
                   </Button> */}
-                  <Text style={styles.backText}  onPress={() => navigation.navigate("Home")}>
+                  <Text style={styles.backText}  onPress={() => this.backHome()}>
                     {/* <Icon
                       name="chevron-left"
                       family="entypo"
@@ -86,11 +212,12 @@ class UserSurvey extends React.Component {
                       <Text  style={styles.subQuestionText} >ท่านรู้สึกหูอื้อ ?</Text>
                   </Block>
                   <Block style={styles.checkboxBlock}>
-                      {/* <CheckBox
+                    <CheckBox
                       disabled={false}
                       value={this.state.q1}
                       onValueChange={(newValue) => this.setState({ q1: newValue})}
-                      /> */}
+                      style={styles.checkbox}
+                    />
                   </Block>
                   <Block style={styles.subQuestionLabel}>
                       <Text  style={styles.subQuestionText} > ใช่</Text>
@@ -102,11 +229,12 @@ class UserSurvey extends React.Component {
                       <Text  style={styles.subQuestionText} >ท่านไม่สบายเป็นหวัด ?</Text>
                   </Block>
                   <Block style={styles.checkboxBlock}>
-                      {/* <CheckBox
+                    <CheckBox
                       disabled={false}
                       value={this.state.q2}
                       onValueChange={(newValue) => this.setState({ q2: newValue})}
-                      /> */}
+                      style={styles.checkbox}
+                    />
                   </Block>
                   <Block style={styles.subQuestionLabel}>
                       <Text  style={styles.subQuestionText} > ใช่</Text>
@@ -118,11 +246,12 @@ class UserSurvey extends React.Component {
                       <Text  style={styles.subQuestionText} >ท่านมีน้ำไหลในหู ?</Text>
                   </Block>
                   <Block style={styles.checkboxBlock}>
-                      {/* <CheckBox
+                    <CheckBox
                       disabled={false}
                       value={this.state.q3}
                       onValueChange={(newValue) => this.setState({ q3: newValue})}
-                      /> */}
+                      style={styles.checkbox}
+                    />
                   </Block>
                   <Block style={styles.subQuestionLabel}>
                       <Text  style={styles.subQuestionText} > ใช่</Text>
@@ -130,40 +259,41 @@ class UserSurvey extends React.Component {
                 </Block>
               </Block>
 
-              {(this.state.q1 || this.state.q2 || this.state.q3)
-                ? (<Block flex middle>
-                  <Block style={styles.alertBox}>
-                    
-                    <Text style={styles.alertTextHead}>
-                      {/* <Icon
-                        name="md-alert"
-                        family="Ionicon"
-                        size={20}
-                        color={themeColor.COLORS.ALERT_TEXT}
-                      />  */}
-                      สภาพร่างกายของคุณไม่พร้อมที่จะทำการทดสอบ
-                    </Text>
-                    <Text style={styles.alertText}>
-                      โปรดทำการทดสอบในวันอื่น หากท่านทดสอบ 
-                    </Text>
-                    <Text style={styles.alertText}>
-                      อาจทำให้ผลลัพธ์ที่ได้ จะไม่สมบูรณ์ถูกต้อง
-                    </Text>
+              {(this.state.q1 || this.state.q2 || this.state.q3) ? 
+                (
+                  <Block flex middle>
+                    <Block style={styles.alertBox}>
+                      
+                      <Text style={styles.alertTextHead}>
+                        {/* <Icon
+                          name="md-alert"
+                          family="Ionicon"
+                          size={20}
+                          color={themeColor.COLORS.ALERT_TEXT}
+                        />  */}
+                        สภาพร่างกายของคุณไม่พร้อมที่จะทำการทดสอบ
+                      </Text>
+                      <Text style={styles.alertText}>
+                        โปรดทำการทดสอบในวันอื่น หากท่านทดสอบ 
+                      </Text>
+                      <Text style={styles.alertText}>
+                        อาจทำให้ผลลัพธ์ที่ได้ จะไม่สมบูรณ์ถูกต้อง
+                      </Text>
+                    </Block>
+                    <Block middle>
+                      <Button style={styles.backButton}
+                        onPress={() => this.backHome()}>
+                        <Text style={styles.createButtonText}>
+                        ย้อนกลับ
+                        </Text>
+                      </Button>
+                    </Block>
                   </Block>
-                </Block>)
+                )
                 :(
                   <Block middle>
                     <Button style={styles.createButton}
-                      // onPress={() => navigation.navigate("HeadsetSelect")}
-                      onPress={() => { 
-                        navigation.dispatch(
-                         CommonActions.reset({
-                           index: 0,
-                           routes: [
-                             { name: 'HeadsetSelect' },
-                            ],
-                         })
-                       );}}
+                      onPress={() => this.nextButton()}
                       >
                       <Text style={styles.createButtonText}>
                       ถัดไป
@@ -291,7 +421,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: themeColor.COLORS.BORDER_COLOR,
   },
-  
+  checkbox: {
+    alignSelf: "center",
+  },
   subQuestionText:{
     fontSize: 18,
     fontFamily: 'Sarabun-Regular',
@@ -306,6 +438,11 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     borderRadius: 20,
     backgroundColor: themeColor.COLORS.BTN_SECONDARY
+  },
+  backButton:{
+    marginVertical: 20,
+    borderRadius: 20,
+    backgroundColor: themeColor.COLORS.SECONDARY
   },
   createButtonText:{
     fontSize: 16,
@@ -379,4 +516,21 @@ const styles = StyleSheet.create({
   }
 });
 
-export default UserSurvey;
+// export default UserSurvey;
+const mapStateToProps = state => {
+  return {
+    userInfo: state.user,
+    network: state.network,
+    ...state.testToneList
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  const {testToneActions} = require('../redux/TestToneRedux');
+  
+
+  return {
+    loadTestToneList: testToneList => dispatch(testToneActions.loadTestToneList(testToneList))
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(UserSurvey);

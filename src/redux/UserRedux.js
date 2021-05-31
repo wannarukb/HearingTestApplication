@@ -1,6 +1,7 @@
 const types = {
     LOGOUT: 'LOGOUT',
     LOGIN: 'LOGIN_SUCCESS',
+    REGISTER: 'REGISTER'
 };
   
 export const actions = {
@@ -10,29 +11,35 @@ export const actions = {
     logout() {
         return {type: types.LOGOUT};
     },
+    register: user => {
+        return {type: types.REGISTER, user};
+    },
 };
   
 const initialState = {   
-    "token": "",
-    "id": "",
-    "isAuthenticated" : false
+    "isAuthenticated" : false,
+    "user" : {}
 };
   
 export const reducer = (state = initialState, action) => {
     const {type, user} = action;  
     switch (type) {
         case types.LOGOUT:
+            console.log(initialState);
             return Object.assign({}, initialState);
   
         case types.LOGIN:
             return Object.assign({}, state, {
                 ...state,
-                ...action.payload, // this is what we expect to get back from API call and login page input
-                // "token": user.token,
-                // "id":user.id,
+                user,
                 "isAuthenticated" : true
             });
-  
+        case types.REGISTER:
+            return Object.assign({}, state, {
+                ...state,
+                user,
+                "isAuthenticated" : false
+            });
         default:
             return state;
     }

@@ -2,6 +2,7 @@ package com.hearingtest;
 
 public class TestTone {
 
+    public int protocolId;
     public int index;
     public int frequency;
     public int runDB;
@@ -23,7 +24,8 @@ public class TestTone {
     public int testRoundMin;
     public int testRoundMax;
 
-    public TestTone(int index, int frequency, int startDB, double durationMin, double durationMax, int upDB, int downDB, double intervalMin, double intervalMax, int testRoundMin, int testRoundMax, String testSite, int maxResult){
+    public TestTone(int protocolId, int index, int frequency, int startDB, double durationMin, double durationMax, int upDB, int downDB, double intervalMin, double intervalMax, int testRoundMin, int testRoundMax, String testSite, int maxResult){
+        this.protocolId     = protocolId;
         this.index          = index;
         this.frequency      = frequency;
         this.startDB        = startDB;
@@ -31,21 +33,22 @@ public class TestTone {
         this.upDB           = upDB;
         this.downDB         = downDB;
         this.testSite       = testSite;
-        this.durationMin    = durationMin;
+        this.durationMin    = (durationMin != 0) ? durationMin : 1;
         this.durationMax    = durationMax;
-        this.duration       = (durationMax != 0) ? ((Math.random() * (durationMax - durationMin)) + durationMin) : durationMin;
-        this.intervalMin    = intervalMin;
+        this.duration       = (durationMax != 0) ? ((Math.random() * (durationMax - this.durationMin)) + this.durationMin) : this.durationMin;
+        this.intervalMin    = (intervalMin != 0) ? intervalMin : 1;
         this.intervalMax    = intervalMax;
-        this.interval       = (intervalMax != 0) ? ((Math.random() * (intervalMax - intervalMin)) + intervalMin) : intervalMin;
-        this.testRoundMin   = testRoundMin;
+        this.interval       = (intervalMax != 0) ? ((Math.random() * (intervalMax - this.intervalMin )) + this.intervalMin ) : this.intervalMin ;
+        this.testRoundMin   = (testRoundMin != 0) ? testRoundMin : 1;
         this.testRoundMax   = testRoundMax;
-        this.testRound      = (testRoundMax != 0) ? ((int)(Math.random() * (testRoundMax - testRoundMin)) + testRoundMin) : testRoundMin;
+        this.testRound      = (testRoundMax != 0) ? ((int)(Math.random() * (testRoundMax - this.testRoundMin)) + this.testRoundMin) : this.testRoundMin;
         this.intervalSleep  = (long) (this.interval + this.duration) * 1000;
         this.remainingRound = this.testRound;
         this.maxResult      = maxResult;
     }
 
     public TestTone(TestTone eachTone){
+        this.protocolId     = eachTone.protocolId;
         this.index          = eachTone.index;
         this.frequency      = eachTone.frequency;
         this.startDB        = eachTone.startDB;

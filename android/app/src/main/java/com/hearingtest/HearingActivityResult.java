@@ -51,7 +51,7 @@ public class HearingActivityResult extends ReactActivity {
 
         for(int i=0; i < testResultList.length; i++){
             TestResult eachResult = testResultList[i];
-            System.out.println("F = " + eachResult.frequency + ", DB = " + eachResult.hearDB + ", Suite = " + eachResult.testSite + ", Start = " + eachResult.startDate + ", End = " + eachResult.endDate);
+            System.out.println("F = " + eachResult.Frequency + ", DB = " + eachResult.Decibel + ", Suite = " + eachResult.TestSite + ", Start = " + eachResult.StartDateTime + ", End = " + eachResult.EndDateTime);
         }
 
 
@@ -103,25 +103,19 @@ public class HearingActivityResult extends ReactActivity {
             TextView duration_col = new TextView(getApplicationContext());
 
 
-            frequency_col.setText("" + eachItem.frequency);
+            frequency_col.setText("" + eachItem.Frequency);
             frequency_col.setGravity(Gravity.CENTER);
             frequency_col.setLayoutParams(params);
             frequency_col.setPadding(4, 4, 4, 4);
 
 
-            decibel_col.setText("" + eachItem.hearDB);
+            decibel_col.setText("" + eachItem.Decibel);
             decibel_col.setGravity(Gravity.CENTER);
             decibel_col.setLayoutParams(params);
             decibel_col.setPadding(4, 4, 4, 4);
 
-//            long diff = eachItem.endDate.getTime() - eachItem.startDate.getTime();
-//            long seconds = diff / 1000;
-//            duration_col.setText("" + seconds);
-//            duration_col.setGravity(Gravity.CENTER);
-//            duration_col.setLayoutParams(params);
-//            duration_col.setPadding(4, 4, 4, 4);
 
-            duration_col.setText("" + eachItem.testSite);
+            duration_col.setText("" + eachItem.TestSite);
             duration_col.setGravity(Gravity.CENTER);
             duration_col.setLayoutParams(params);
             duration_col.setPadding(4, 4, 4, 4);
@@ -134,9 +128,11 @@ public class HearingActivityResult extends ReactActivity {
 
 
         }
+
+        saveFile();
     }
 
-    public void onClickDone(View view) {
+    private void saveFile(){
         try {
 
             System.out.println(userId);
@@ -162,17 +158,26 @@ public class HearingActivityResult extends ReactActivity {
                 if (writer != null) writer.close( );
 
                 System.out.println(data);
-//                System.out.println(encoded);
 
-                Intent intent = new Intent(this, ReactResultActivity.class);
-                startActivity(intent);
-                finish();
             }
 
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e);
         }
+    }
+
+    public void onClickDone(View view) {
+        System.out.println(userId);
+        System.out.println(testResultList);
+        if(userId != null && userId != "" && testResultList != null && testResultList.length > 0){
+
+            Intent intent = new Intent(this, ReactResultActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+
 
     }
 
