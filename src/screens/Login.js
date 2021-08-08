@@ -53,6 +53,10 @@ class Login extends React.Component {
     }
   }
 
+  tryButton(){
+    //this.goToUserSurveyPage();
+  }
+
   goToUserSurveyPage = () =>{ 
     this.props.navigation.dispatch(
       CommonActions.reset({
@@ -281,7 +285,8 @@ class Login extends React.Component {
                                     </Button>
                                   </Block>
                                   <Block style={{width: '40%', paddingLeft: 5}}>
-                                    <Button style={styles.menuButtonTry}>
+                                    <Button style={styles.menuButtonTry}
+                                    onPress={() => this.tryButton()}>
                                       <Text style={styles.createButtonText}>
                                         ทดลองใช้งาน
                                       </Text>

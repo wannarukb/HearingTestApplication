@@ -7,7 +7,7 @@ import java.util.Date;
 public class TestResult {
 
     public int TestID;
-    public int UserId;
+    public String UserId;
     public int Frequency;
     public int Decibel;
     public String TestSite;
@@ -20,13 +20,14 @@ public class TestResult {
     public String EndDateTime;
     public int ProtocolId;
 
+
     private Calendar startDate;
 
-    public TestResult(int protocolId, int userId, int testIndex, int frequency, int dB, String testSite){
+    public TestResult(int protocolId, String userId, int testIndex, int frequency, int dB, String testSide){
         this.TestID         = testIndex;
         this.Frequency      = frequency;
         this.Decibel        = dB;
-        this.TestSite       = testSite;
+        this.TestSite       = testSide;
         this.IsClickHeard   = 0;
         this.ProtocolId     = protocolId;
         this.UserId         = userId;

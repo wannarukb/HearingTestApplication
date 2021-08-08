@@ -2,7 +2,8 @@
 
 import {persistCombineReducers} from 'redux-persist';
 import {reducer as UserRedux} from './UserRedux';
-import {reducer as TestToneRedux} from './TestToneRedux';
+import {reducer as TestToneRedux} from './TestToneRedux'; 
+import {reducer as TestToneResultRedux} from './TestToneResultRedux';
 import {reducer as network} from 'react-native-offline';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -15,5 +16,6 @@ const persistConfig = {
 export default persistCombineReducers(persistConfig, {
     user: UserRedux,
     network: network,
-    testToneList : TestToneRedux
+    testToneList : TestToneRedux,
+    testToneResultTemp: TestToneResultRedux
 });

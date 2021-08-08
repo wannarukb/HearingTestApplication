@@ -94,44 +94,44 @@ public class BackupHearingLogic extends ReactActivity {
 
 
         Bundle extras = getIntent().getExtras();
-        if(extras != null) {
-            Gson gson = new Gson();
-            String testToneJSON = extras.getString("TestToneList");
-            userId              = extras.getString("UserId");
-            saveHearingPath     = extras.getString("FilePath");
-
-            TestTone[] parseTone;
-            System.out.print(testToneJSON);
-            parseTone    = gson.fromJson(testToneJSON, TestTone[].class);
-            if(parseTone != null && parseTone.length > 0){
-                for(int i = 0; i < parseTone.length; i++){
-                    TestTone eachTone = parseTone[i];
-                    testToneList.add(new TestTone(eachTone.protocolId, eachTone.index, eachTone.frequency,
-                            eachTone.startDB, eachTone.durationMin, eachTone.durationMax,
-                            eachTone.upDB, eachTone.downDB,
-                            eachTone.intervalMin, eachTone.intervalMax,
-                            eachTone.testRoundMin, eachTone.testRoundMax, eachTone.testSite, eachTone.maxResult));
-                }
-            }
-
-            System.out.println("Hearing - testToneList = " + testToneList.size());
-            currentRunTone      = testToneList.get(runningIndex);
-            System.out.println("Hearing - Current Run Tone  = " + currentRunTone.index + ", " + currentRunTone.testSite + ", " + currentRunTone.frequency + ", " + currentRunTone.runDB);
-            currentTestRound    = currentRunTone.testRound;
-
-
-            freqView.setText(""+currentRunTone.frequency);
-            decibelView.setText(""+currentRunTone.runDB);
-            suiteView.setText(currentRunTone.testSite);
-
-            volumeTextView.setText("");
-
-            noOfClick = 0;
-
-
-            mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-            devices      = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
-        }
+//        if(extras != null) {
+//            Gson gson = new Gson();
+//            String testToneJSON = extras.getString("TestToneList");
+//            userId              = extras.getString("UserId");
+//            saveHearingPath     = extras.getString("FilePath");
+//
+//            TestTone[] parseTone;
+//            System.out.print(testToneJSON);
+//            parseTone    = gson.fromJson(testToneJSON, TestTone[].class);
+//            if(parseTone != null && parseTone.length > 0){
+//                for(int i = 0; i < parseTone.length; i++){
+//                    TestTone eachTone = parseTone[i];
+//                    testToneList.add(new TestTone(eachTone.protocolId, eachTone.index, eachTone.frequency,
+//                            eachTone.startDB, eachTone.durationMin, eachTone.durationMax,
+//                            eachTone.upDB, eachTone.downDB,
+//                            eachTone.intervalMin, eachTone.intervalMax,
+//                            eachTone.testRoundMin, eachTone.testRoundMax, eachTone.testSide, eachTone.maxResult));
+//                }
+//            }
+//
+//            System.out.println("Hearing - testToneList = " + testToneList.size());
+//            currentRunTone      = testToneList.get(runningIndex);
+//            System.out.println("Hearing - Current Run Tone  = " + currentRunTone.index + ", " + currentRunTone.testSide + ", " + currentRunTone.frequency + ", " + currentRunTone.runDB);
+//            currentTestRound    = currentRunTone.testRound;
+//
+//
+//            freqView.setText(""+currentRunTone.frequency);
+//            decibelView.setText(""+currentRunTone.runDB);
+//            suiteView.setText(currentRunTone.testSide);
+//
+//            volumeTextView.setText("");
+//
+//            noOfClick = 0;
+//
+//
+//            mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+//            devices      = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
+//        }
 
 
 
@@ -236,121 +236,121 @@ public class BackupHearingLogic extends ReactActivity {
 
 
 
-        m_PlayThread = new Thread() {
-
-
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            public void run() {
-                try {
-                    freqView.setText(""+currentRunTone.frequency);
-                    decibelView.setText(""+currentRunTone.runDB);
-                    suiteView.setText(currentRunTone.testSite);
-
-                    if(playExecuteCount > 1){
-                        currentTestResult = new TestResult(currentRunTone.protocolId, currentRunTone.index,currentRunTone.frequency, currentRunTone.runDB, currentRunTone.testSite);
-                    }
-                    generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.runDB, currentRunTone.testSite);
-                    synchronized (this) {
-                        try {
-                            Thread.sleep(currentRunTone.intervalSleep);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    synchronized (this) {
-
-                        if (runningIndex < testToneList.size()) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    System.out.println("LEK m_bStop = " + m_bStop);
-                                    Boolean isEndThisFrequency = false;
-                                    if(!m_bStop){
-
-                                        System.out.println("Thread F = " + currentRunTone.frequency + "DB = " + currentRunTone.runDB);
-                                        currentRunTone.setIncreaseDB();
-
-                                        freqView.setText(""+currentRunTone.frequency);
-                                        decibelView.setText(""+currentRunTone.runDB);
-                                        suiteView.setText(currentRunTone.testSite);
-                                        if(currentRunTone.runDB > MAX_DB) {
-                                            isEndThisFrequency = true;
-                                        }
-                                    }
-                                    else{
-
-                                        currentTestResult.canHear();
-                                        testResultList.add(currentTestResult);
-                                        System.out.println("CLICKED latestResult = " + latestResult);
-                                        if(latestResult != null){
-                                            System.out.println("CLICKED latestResult.hearDB  = " + latestResult.hearDB  + " currentTestResult = " + currentTestResult.hearDB );
-                                            if(latestResult.hearDB == currentTestResult.hearDB){
-                                                noOfLatestResult += 1;
-                                            }else{
-                                                latestResult = currentTestResult;
-                                            }
-
-                                        }else{
-                                            latestResult = currentTestResult;
-                                            noOfLatestResult = 1;
-                                        }
-
-                                        System.out.println("CLICKED noOfLatestResult = " + noOfLatestResult);
-                                        System.out.println("CLICKED STOP AT F = " + currentRunTone.frequency + " DB = " + currentRunTone.runDB + " TS = " + currentRunTone.testSite);
-                                        if(noOfLatestResult < MAX_BEST_RESULT){
-                                            currentRunTone.setDecreaseDB();
-                                            if (currentRunTone.runDB < MIN_DB) {
-                                                currentRunTone.setDecreaseRemainingRound();
-
-                                                if (currentRunTone.remainingRound > 0) {
-                                                    testToneList.add(new TestTone(currentRunTone));
-                                                }
-                                                isEndThisFrequency = true;
-                                            }
-
-                                        }else{
-                                            isEndThisFrequency = true;
-                                        }
-                                        m_bStop = false;
-                                    }
-
-                                    if(isEndThisFrequency){
-                                        runningIndex = runningIndex + 1;
-                                        if(runningIndex < testToneList.size()){
-                                            currentRunTone = testToneList.get(runningIndex);
-                                            latestResult = null;
-                                        }
-                                    }
-
-                                    m_PlayThread = null;
-                                    if(runningIndex < testToneList.size()){
-                                        play();
-                                    }else{
-                                        try {
-                                            finishActivity();
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-
-                                }
-                            });
-
-
-                        }
-
-                    }
-
-
-                } catch (Exception e) {
-                    Log.e("Tone", e.toString());
-                } catch (OutOfMemoryError e) {
-                    Log.e("Tone", e.toString());
-                }
-
-            }
-        };
+//        m_PlayThread = new Thread() {
+//
+//
+//            @RequiresApi(api = Build.VERSION_CODES.M)
+//            public void run() {
+//                try {
+//                    freqView.setText(""+currentRunTone.frequency);
+//                    decibelView.setText(""+currentRunTone.runDB);
+//                    suiteView.setText(currentRunTone.testSite);
+//
+//                    if(playExecuteCount > 1){
+//                        currentTestResult = new TestResult(currentRunTone.protocolId, currentRunTone.index,currentRunTone.frequency, currentRunTone.runDB, currentRunTone.testSite);
+//                    }
+//                    generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.runDB, currentRunTone.testSite);
+//                    synchronized (this) {
+//                        try {
+//                            Thread.sleep(currentRunTone.intervalSleep);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//
+//                    synchronized (this) {
+//
+//                        if (runningIndex < testToneList.size()) {
+//                            runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    System.out.println("LEK m_bStop = " + m_bStop);
+//                                    Boolean isEndThisFrequency = false;
+//                                    if(!m_bStop){
+//
+//                                        System.out.println("Thread F = " + currentRunTone.frequency + "DB = " + currentRunTone.runDB);
+//                                        currentRunTone.setIncreaseDB();
+//
+//                                        freqView.setText(""+currentRunTone.frequency);
+//                                        decibelView.setText(""+currentRunTone.runDB);
+//                                        suiteView.setText(currentRunTone.testSite);
+//                                        if(currentRunTone.runDB > MAX_DB) {
+//                                            isEndThisFrequency = true;
+//                                        }
+//                                    }
+//                                    else{
+//
+//                                        currentTestResult.canHear();
+//                                        testResultList.add(currentTestResult);
+//                                        System.out.println("CLICKED latestResult = " + latestResult);
+//                                        if(latestResult != null){
+//                                            System.out.println("CLICKED latestResult.hearDB  = " + latestResult.hearDB  + " currentTestResult = " + currentTestResult.hearDB );
+//                                            if(latestResult.hearDB == currentTestResult.hearDB){
+//                                                noOfLatestResult += 1;
+//                                            }else{
+//                                                latestResult = currentTestResult;
+//                                            }
+//
+//                                        }else{
+//                                            latestResult = currentTestResult;
+//                                            noOfLatestResult = 1;
+//                                        }
+//
+//                                        System.out.println("CLICKED noOfLatestResult = " + noOfLatestResult);
+//                                        System.out.println("CLICKED STOP AT F = " + currentRunTone.frequency + " DB = " + currentRunTone.runDB + " TS = " + currentRunTone.testSite);
+//                                        if(noOfLatestResult < MAX_BEST_RESULT){
+//                                            currentRunTone.setDecreaseDB();
+//                                            if (currentRunTone.runDB < MIN_DB) {
+//                                                currentRunTone.setDecreaseRemainingRound();
+//
+//                                                if (currentRunTone.remainingRound > 0) {
+//                                                    testToneList.add(new TestTone(currentRunTone));
+//                                                }
+//                                                isEndThisFrequency = true;
+//                                            }
+//
+//                                        }else{
+//                                            isEndThisFrequency = true;
+//                                        }
+//                                        m_bStop = false;
+//                                    }
+//
+//                                    if(isEndThisFrequency){
+//                                        runningIndex = runningIndex + 1;
+//                                        if(runningIndex < testToneList.size()){
+//                                            currentRunTone = testToneList.get(runningIndex);
+//                                            latestResult = null;
+//                                        }
+//                                    }
+//
+//                                    m_PlayThread = null;
+//                                    if(runningIndex < testToneList.size()){
+//                                        play();
+//                                    }else{
+//                                        try {
+//                                            finishActivity();
+//                                        } catch (InterruptedException e) {
+//                                            e.printStackTrace();
+//                                        }
+//                                    }
+//
+//                                }
+//                            });
+//
+//
+//                        }
+//
+//                    }
+//
+//
+//                } catch (Exception e) {
+//                    Log.e("Tone", e.toString());
+//                } catch (OutOfMemoryError e) {
+//                    Log.e("Tone", e.toString());
+//                }
+//
+//            }
+//        };
         m_PlayThread.start();
 
 

@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
-import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView , KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView, View , KeyboardAvoidingView } from 'react-native';
 import { Block, Text, theme } from "galio-framework";
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 import Moment from 'moment';
-
+import { Table, TableWrapper, Row, Rows, Col, Cols, Cell} from 'react-native-table-component';
 
 
 import {connect} from 'react-redux';
@@ -16,7 +16,9 @@ class HearingTestResult extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            testResults : []
+            // testResults : [],
+            HeadTable: ['Frequency', 'DB', 'Side', 'Is Heard', 'Hear Period'],
+            DataTable: []
         };
 
         // import DeviceInfo from 'react-native-device-info'
@@ -32,13 +34,37 @@ class HearingTestResult extends Component {
     async getTestResult() {
         console.log("GET TEST RESULT");
         try {
-          let testResultData = await AsyncStorage.getItem("TestResults");
-          let data = JSON.parse(testResultData);
-          console.log("1 " + data[0].endDate);
-          this.setState({
-            testResults : data
-          });
-          console.log('TestResults = ', this.state);
+            let testResultData = await AsyncStorage.getItem("TestResults");
+            let data = JSON.parse(testResultData);
+            console.log(data.resultTestTones);
+            var testResult = [];
+            for (let i = 0; i < data.resultTestTones.length; i++) {
+                var eachResult = data.resultTestTones[i];
+                var dataRow = [];
+                dataRow.push(`${eachResult.frequency}`);
+                dataRow.push(`${eachResult.decibel}`);
+                dataRow.push(`${eachResult.testSide}`);
+                if(eachResult.isHeard == 1){
+                    dataRow.push('Yes');
+                }else{
+                    dataRow.push('-');
+                }
+
+                if(eachResult.timeClicked != undefined && eachResult.timeClicked != ""){
+                    dataRow.push(`${eachResult.timeClicked}`);
+                }else{
+                    dataRow.push('-');
+                }
+                
+                testResult.push(dataRow);
+            }
+            
+            this.setState({
+                DataTable : testResult
+            })
+            console.log('TestResults = ', this.state);
+
+          
         } catch (error) {
           console.log("Something went wrong, get token = ", error);
         }
@@ -74,78 +100,26 @@ class HearingTestResult extends Component {
                                 <Block style={{width: '25%',marginHorizontal: 2}}></Block>
                             </Block>
                         </Block>
-                        <ScrollView
-                            showsVerticalScrollIndicator={false}
-                            style={{ width, marginTop: '0%' }}
-                        >
-                            <Block  style={styles.contentContainer}>
+                        <View>
+                            <Table borderStyle={{borderColor: '#C1C0B9'}}>
+                                <Row data={this.state.HeadTable} style={styles.head} textStyle={styles.headText}/>
+                            </Table>
+                            <ScrollView style={styles.dataWrapper}>
+                            <Table borderStyle={{borderColor: '#C1C0B9'}}>
                                 {
-                                    this.state.testResults.map((item) => {
-                                        return (
-                                            <Block style={styles.appointmentBlock}>
-                                                <Block style={styles.row}>
-                                                    <Block style={{width: '20%',height: 80, justifyContent: 'center', borderRightWidth: 1, borderColor: themeColor.COLORS.BORDER_COLOR}}>
-                                                        
-                                                        {/* <Text  style={styles.monthText} >
-                                                            ศุกร์
-                                                        </Text> */}
-                                                        <Text  style={styles.dateText} >
-                                                            {Moment(item.saveDate).format('DD')}
-                                                        </Text>
-                                                        <Text  style={styles.monthText} >
-                                                            {Moment(item.saveDate).format('MMM')}
-                                                        </Text>
-                                                    </Block>
-                                                    <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingLeft: 15, paddingRight: 10}}>
-                                                        <Block style={styles.row}>
-                                                            <Block style={{width: '60%'}}>
-                                                                <Text  style={styles.headingText} >
-                                                                    ความถี่ (Hz)
-                                                                </Text>
-                                                            </Block>
-                                                            <Block style={{width: '40%'}}>
-                                                                <Text  style={styles.resultText} >
-                                                                    {item.frequency}
-                                                                </Text>
-                                                            </Block>
-                                                        </Block>
-                                                        <Block style={styles.row}>
-                                                            <Block style={{width: '60%'}}>
-                                                                <Text  style={styles.headingText} >
-                                                                    ความดัง (dB)
-                                                                </Text>
-                                                            </Block>
-                                                            <Block style={{width: '40%'}}>
-                                                                <Text  style={styles.resultText} >
-                                                                    {item.hearDB}
-                                                                </Text>
-                                                            </Block>
-                                                        </Block>
-                                                    </Block>
-                                                    <Block style={{width: '40%',height: 80, paddingVertical: 7, paddingRight: 15}}>
-                                                        <Block style={styles.row}>
-                                                            <Block style={{width: '100%',height: 80}}>
-                                                                <Text  style={styles.headingResultText} >
-                                                                    หูข้างที่ทดสอบ
-                                                                </Text>
-                                                                <Block style={styles.resultVeryGood}>
-                                                                    <Text  style={styles.resultLabel}  color={themeColor.COLORS.ALERT_SUCCESS_TEXT}>
-                                                                        {item.testSite=="Both" ? "ทั้งสองข้าง" : (item.testSite == "L" ? "ซ้าย" : "ขวา")}
-                                                                    </Text>
-                                                                </Block>
-                                                            </Block>
-                                                        </Block>
-                                                    </Block>
-                                                </Block>
-                                            </Block>
-                                        );
-                                    })
+                                this.state.DataTable.map((dataRow, index) => (
+                                    <Row
+                                    key={index}
+                                    data={dataRow}
+                                    // widthArr={state.widthArr}
+                                    style={[styles.tableRow, index%2 && {backgroundColor: '#ffffff'}]}
+                                    textStyle={styles.text}
+                                    />
+                                ))
                                 }
-                                
-
-
-                            </Block>
-                        </ScrollView>
+                            </Table>
+                            </ScrollView>
+                        </View>
                 
                     </ImageBackground>
                 </Block>
@@ -156,6 +130,28 @@ class HearingTestResult extends Component {
 }
 
 const styles = StyleSheet.create({
+    head: { 
+        height: 50, 
+        backgroundColor: themeColor.COLORS.BTN_SECONDARY
+    },
+    headText:{
+        fontSize: 14,
+        fontFamily: 'Sarabun-Bold',
+        textAlign: "center",
+        color: themeColor.COLORS.WHITE,
+    },
+    text: { 
+        textAlign: 'center', 
+        fontWeight: '200' 
+    },
+    dataWrapper: { 
+        marginTop: -1 
+    },
+    tableRow : {
+        height: 40, 
+        backgroundColor: '#F7F8FA' 
+    },
+
     resultVeryGood : {
         width: '90%',
         borderWidth: 1,

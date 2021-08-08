@@ -3,17 +3,17 @@ package com.hearingtest;
 public class TestTone {
 
     public int protocolId;
-    public int index;
+    public int testToneId;
+    public int orderNo;
     public int frequency;
-    public int runDB;
-    public int startDB;
-    public int upDB; // To increase decibel when user cannot hear the tone
-    public int downDB; // To decrease decibel when user can hear the tone
+    public String decibel;
+    public int upDb; // To increase decibel when user cannot hear the tone
+    public int downDb; // To decrease decibel when user can hear the tone
     public double duration; // run duration --> if DurationMax > 0 --> this value will be random, otherwise uses the DurationMin
     public double interval; // the interval that will use for waiting for the next line. --> if IntervalMax > 0 --> this value will be random, otherwise uses the IntervalMin
     public long intervalSleep; // the sleep time in milisecond
     public int testRound;// the test round for each frequency  --> if TestRoundMax > 0 --> this value will be random, otherwise uses the TestRoundMin
-    public String testSite;
+    public String testSide;
     public int maxResult;
 
     public int remainingRound;
@@ -23,16 +23,24 @@ public class TestTone {
     public double intervalMax;
     public int testRoundMin;
     public int testRoundMax;
+    public int runDB;
 
-    public TestTone(int protocolId, int index, int frequency, int startDB, double durationMin, double durationMax, int upDB, int downDB, double intervalMin, double intervalMax, int testRoundMin, int testRoundMax, String testSite, int maxResult){
+    public int runIndex;
+    public int counter;
+    public int roundNo;
+
+    public TestTone(){
+
+    }
+
+    public TestTone(int protocolId, int index, int frequency, int runDB, double durationMin, double durationMax, int upDB, int downDB, double intervalMin, double intervalMax, int testRoundMin, int testRoundMax, String testSide, int maxResult){
         this.protocolId     = protocolId;
-        this.index          = index;
+        this.testToneId     = index;
         this.frequency      = frequency;
-        this.startDB        = startDB;
-        this.runDB          = this.startDB;
-        this.upDB           = upDB;
-        this.downDB         = downDB;
-        this.testSite       = testSite;
+        this.runDB          = runDB;
+        this.upDb           = upDB;
+        this.downDb         = downDB;
+        this.testSide       = testSide;
         this.durationMin    = (durationMin != 0) ? durationMin : 1;
         this.durationMax    = durationMax;
         this.duration       = (durationMax != 0) ? ((Math.random() * (durationMax - this.durationMin)) + this.durationMin) : this.durationMin;
@@ -45,17 +53,17 @@ public class TestTone {
         this.intervalSleep  = (long) (this.interval + this.duration) * 1000;
         this.remainingRound = this.testRound;
         this.maxResult      = maxResult;
+        this.roundNo        = 1;
     }
 
     public TestTone(TestTone eachTone){
         this.protocolId     = eachTone.protocolId;
-        this.index          = eachTone.index;
+        this.testToneId     = eachTone.testToneId;
         this.frequency      = eachTone.frequency;
-        this.startDB        = eachTone.startDB;
-        this.runDB          = eachTone.startDB;
-        this.upDB           = eachTone.upDB;
-        this.downDB         = eachTone.downDB;
-        this.testSite       = eachTone.testSite;
+        this.runDB          = eachTone.runDB;
+        this.upDb           = eachTone.upDb;
+        this.downDb         = eachTone.downDb;
+        this.testSide       = eachTone.testSide;
         this.duration       = eachTone.duration;
         this.durationMin    = eachTone.durationMin;
         this.durationMax    = eachTone.durationMax;
@@ -65,18 +73,12 @@ public class TestTone {
         this.testRound      = eachTone.testRound;
         this.testRoundMin   = eachTone.testRoundMin;
         this.testRoundMax   = eachTone.testRoundMax;
-        this.intervalSleep  = (long) eachTone.interval * 1000;
-        this.remainingRound = eachTone.remainingRound - 1;
+        this.intervalSleep  = eachTone.intervalSleep;
+        this.remainingRound = eachTone.remainingRound;
         this.maxResult      = eachTone.maxResult;
+        this.roundNo        = eachTone.roundNo + 1;
     }
 
-    public void setDecreaseDB(){
-        this.runDB = this.runDB - this.downDB;
-    }
-
-    public void setIncreaseDB(){
-        this.runDB = this.runDB +this.upDB;
-    }
 
     public void setDecreaseRemainingRound(){
         this.remainingRound  = this.remainingRound - 1;

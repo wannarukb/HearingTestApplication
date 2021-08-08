@@ -11,6 +11,8 @@ import {connect} from 'react-redux';
 import {CommonActions } from '@react-navigation/native';
 import Modal from "react-native-simple-modal";
 
+import TestToneService from '../services/TestToneService';
+
 LogBox.ignoreAllLogs(true);
 class Home extends Component {
   
@@ -21,13 +23,70 @@ class Home extends Component {
     };
    
     this.getToken();
-    this.readJSONFile();
+    this.readResultJSONFile();
 
     console.log(this.props.userInfo);
   }
   
+  postTestToneResult = (testToneResult) => {
+    try {
+        TestToneService.post_testTone_result_api(testToneResult).then(responseJson => {
+          console.log('Post Test Tone API', responseJson);
+          this.setState({loading:false})
+          if (responseJson.ok) {
+              this.setState({
+                  loading: false,
+              });
+  
+              if (responseJson.data != null) {
+                  var data = responseJson.data;
+                  console.log("post_testTone_result_api Success ! " + data);
 
-  async readJSONFile(){
+                  var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
+                  // write the file
+                  RNFS.writeFile(path, '{}', 'utf8')
+                  .then((Writesuccess) => {
+                    console.log('FILE WRITTEN!');
+                  })
+                  .catch((err) => {
+                    console.log(err.message);
+                  });
+
+              } else {
+                  alert('server error no data')
+              }
+          } else {
+            if (responseJson.problem == 'NETWORK_ERROR') {
+                alert('server error = NETWORK_ERROR')
+                this.setState({
+                    loading: false,
+                });
+            } else if (responseJson.problem == 'TIMEOUT_ERROR') {
+                alert('server error = TIMEOUT_ERROR')
+                this.setState({
+                    loading: false,
+                });
+            } else {
+              alert('server error responseJson ERROR')
+              this.setState({
+                  loading: false,
+              });
+            }
+          }
+        }).catch(error => {
+            console.error(error);
+            this.setState({
+                loading: false,
+            });
+        });
+      
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  
+
+  async readResultJSONFile(){
     try {
       var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
     
@@ -36,18 +95,16 @@ class Home extends Component {
         const fileContent = await RNFS.readFile(path, 'utf8');
         console.log(fileContent);
         if(fileContent != null && fileContent != undefined){
-          let resultInfo = JSON.parse(fileContent);
-          console.log(resultInfo.userId);
-          console.log(resultInfo.testResults);
-          this.setState({
-            testResults : resultInfo.testResults
-          })
-
-          await AsyncStorage.setItem("TestResults", JSON.stringify(resultInfo.testResults));
+          let data = JSON.parse(fileContent);
+          let isSyncData = JSON.stringify(data) === JSON.stringify({});
+          if(isSyncData === false){
+            await AsyncStorage.setItem("TestResults", JSON.stringify(data));
+            this.postTestToneResult(data);
+          }
         }
       }
     } catch (error) {
-      console.log("Something went wrong, get token = ", error);
+      console.log("Something went wrong, readResultJSONFile = ", error);
     }
   }
 
@@ -62,13 +119,7 @@ class Home extends Component {
   }
 
   onClickStartTesting(){
-  
-    if(this.props.userInfo != null && this.props.userInfo.isAuthenticated){
-      // NativeModules.HearingTestModule.GotoActivity(
-      //   JSON.stringify(this.state.userInfo.userId),
-      //   JSON.stringify(testData)
-      // );
-      
+    if(this.props.userInfo != null && this.props.userInfo.isAuthenticated){    
       this.props.navigation.dispatch(
         CommonActions.reset({
           index: 0,

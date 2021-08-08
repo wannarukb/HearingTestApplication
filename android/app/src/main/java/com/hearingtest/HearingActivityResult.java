@@ -30,8 +30,8 @@ import java.util.List;
 
 public class HearingActivityResult extends ReactActivity {
 
-    public TestResult[] testResultList;
-    public String userId;
+    public TestResultHeader resultHeader;
+
     public String filePath;
 
     @Override
@@ -43,15 +43,14 @@ public class HearingActivityResult extends ReactActivity {
         if(extras != null) {
             Gson gson = new Gson();
             String resultJSON = extras.getString("TestResultList");
-            testResultList    = gson.fromJson(resultJSON, TestResult[].class);
-            userId            = extras.getString("UserId");
+            resultHeader    = gson.fromJson(resultJSON, TestResultHeader.class);
             filePath          = extras.getString("FilePath");
 
         }
 
-        for(int i=0; i < testResultList.length; i++){
-            TestResult eachResult = testResultList[i];
-            System.out.println("F = " + eachResult.Frequency + ", DB = " + eachResult.Decibel + ", Suite = " + eachResult.TestSite + ", Start = " + eachResult.StartDateTime + ", End = " + eachResult.EndDateTime);
+        for(int i=0; i < resultHeader.resultTestTones.size(); i++){
+            TestResultItem eachResult = resultHeader.resultTestTones.get(i);
+            System.out.println(eachResult.frequency + ", " + eachResult.decibel + ", " + eachResult.testSide + ", " + eachResult.isHeard + ", " + eachResult.timeClicked + ", " + eachResult.clickTimeByTone + ", " + eachResult.clickTimeByTest);
         }
 
 
@@ -64,17 +63,16 @@ public class HearingActivityResult extends ReactActivity {
         headerRow.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
 
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(300, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(225, LinearLayout.LayoutParams.WRAP_CONTENT);
 
         TextView head_frequency_col = new TextView(getApplicationContext());
         TextView head_decibel_col = new TextView(getApplicationContext());
         TextView head_duration_col = new TextView(getApplicationContext());
+        TextView head_canHear_col = new TextView(getApplicationContext());
 
         head_frequency_col.setText("Frequency");
         head_frequency_col.setGravity(Gravity.CENTER);
         head_frequency_col.setLayoutParams(params);
-        head_frequency_col.setPadding(4, 4, 4, 4);
-
 
         head_decibel_col.setText("Decibel");
         head_decibel_col.setGravity(Gravity.CENTER);
@@ -86,14 +84,24 @@ public class HearingActivityResult extends ReactActivity {
         head_duration_col.setLayoutParams(params);
         head_duration_col.setPadding(4, 4, 4, 4);
 
+        head_canHear_col.setText("Is Heard");
+        head_canHear_col.setGravity(Gravity.CENTER);
+        head_canHear_col.setLayoutParams(params);
+        head_canHear_col.setPadding(4, 4, 4, 4);
+
+
+
+
+
         headerRow.addView(head_frequency_col);
         headerRow.addView(head_decibel_col);
         headerRow.addView(head_duration_col);
+        headerRow.addView(head_canHear_col);
 
         tableLayout.addView(headerRow,new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
 
-        for (int index = 0; index < testResultList.length; index++) {
-            TestResult eachItem =  testResultList[index];
+        for(int i=0; i < resultHeader.resultTestTones.size(); i++){
+            TestResultItem eachItem = resultHeader.resultTestTones.get(i);
             LinearLayout tableRow = new LinearLayout(getApplicationContext());
             tableRow.setOrientation(LinearLayout.HORIZONTAL);
             tableRow.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
@@ -101,28 +109,40 @@ public class HearingActivityResult extends ReactActivity {
             TextView frequency_col = new TextView(getApplicationContext());
             TextView decibel_col = new TextView(getApplicationContext());
             TextView duration_col = new TextView(getApplicationContext());
+            TextView canHear_col = new TextView(getApplicationContext());
 
 
-            frequency_col.setText("" + eachItem.Frequency);
+            frequency_col.setText("" + eachItem.frequency);
             frequency_col.setGravity(Gravity.CENTER);
             frequency_col.setLayoutParams(params);
             frequency_col.setPadding(4, 4, 4, 4);
 
 
-            decibel_col.setText("" + eachItem.Decibel);
+            decibel_col.setText("" + eachItem.decibel);
             decibel_col.setGravity(Gravity.CENTER);
             decibel_col.setLayoutParams(params);
             decibel_col.setPadding(4, 4, 4, 4);
 
 
-            duration_col.setText("" + eachItem.TestSite);
+            duration_col.setText("" + eachItem.testSide);
             duration_col.setGravity(Gravity.CENTER);
             duration_col.setLayoutParams(params);
             duration_col.setPadding(4, 4, 4, 4);
 
+            String isHeard = "" + eachItem.isHeard;
+            if(eachItem.timeClicked == "I" || eachItem.timeClicked == "D"){
+                isHeard +=  " - " + eachItem.timeClicked;
+            }
+            canHear_col.setText( isHeard );
+            canHear_col.setGravity(Gravity.LEFT);
+            canHear_col.setLayoutParams(params);
+            canHear_col.setPadding(4, 4, 4, 4);
+
+
             tableRow.addView(frequency_col );
             tableRow.addView(decibel_col);
             tableRow.addView(duration_col);
+            tableRow.addView(canHear_col);
 
             tableLayout.addView(tableRow);
 
@@ -134,13 +154,10 @@ public class HearingActivityResult extends ReactActivity {
 
     private void saveFile(){
         try {
-
-            System.out.println(userId);
-            System.out.println(testResultList);
-            if(userId != null && userId != "" && testResultList != null && testResultList.length > 0){
+            System.out.println(resultHeader);
+            if(resultHeader != null ){
                 Gson gson = new Gson();
-                HearingTestResult resultInfo = new HearingTestResult(userId, testResultList);
-                String data = gson.toJson(resultInfo);
+                String data = gson.toJson(resultHeader);
 
 //                String encoded = URLEncoder.encode(data, "UTF-8");
 
@@ -168,9 +185,8 @@ public class HearingActivityResult extends ReactActivity {
     }
 
     public void onClickDone(View view) {
-        System.out.println(userId);
-        System.out.println(testResultList);
-        if(userId != null && userId != "" && testResultList != null && testResultList.length > 0){
+        System.out.println(resultHeader);
+        if( resultHeader != null ){
 
             Intent intent = new Intent(this, ReactResultActivity.class);
             startActivity(intent);

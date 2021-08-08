@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import {CommonActions } from '@react-navigation/native';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
 import AuthService from '../services/AuthService';
-import TestToneService from '../services/TestToneService';
 
 import { StyleSheet, Dimensions, SafeAreaView,Platform, TouchableWithoutFeedback, Keyboard, ImageBackground, Image, ScrollView, View ,KeyboardAvoidingView ,TextInput} from 'react-native';
 import { Block, Text, theme } from "galio-framework";
@@ -118,7 +117,6 @@ class Register extends React.Component {
                 "password" : UserPassword,
                 "firstName" : UserFirstName,
                 "lastName" : UserLastName,
-                "yearOfBirth" : UserBirthYear,
                 "gender" : UserGender
             }
 
@@ -178,8 +176,6 @@ class Register extends React.Component {
             alert('กรุณากรอกชื่อจริง')
         }else if( UserLastName == "" || UserLastName == null || UserLastName == undefined){
             alert('กรุณากรอกนามสกุล')
-        }else if( UserBirthYear == "" || UserBirthYear == null || UserBirthYear == undefined){
-            alert('กรุณาปีเกิด')
         }else if( UserGender == "" || UserGender == null || UserGender == undefined){
             alert('กรุณากรอกเพศ')
         }else if(!this.props.network.isConnected){
@@ -292,7 +288,7 @@ class Register extends React.Component {
                                                     value={UserLastName}
                                                 />
                                                 </Block>
-                                                <Block  style={{ marginBottom: 15 }}>
+                                                {/* <Block  style={{ marginBottom: 15 }}>
                                                     <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
                                                         ปีเกิด (Year of Birth)
                                                     </Text>
@@ -306,7 +302,7 @@ class Register extends React.Component {
                                                         onChangeText={text => this.setState({ UserBirthYear: text })}
                                                         value={UserBirthYear}
                                                     />
-                                                </Block>
+                                                </Block> */}
                                                 <Block  style={{ marginBottom: 15 }}>
                                                     <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
                                                         เพศ (Gender)

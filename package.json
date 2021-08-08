@@ -37,6 +37,7 @@
     "react-native-simple-modal": "^9.0.1",
     "react-native-size-matters": "^0.4.0",
     "react-native-sqlite-storage": "^5.0.0",
+    "react-native-table-component": "^1.2.1",
     "react-native-vector-icons": "^7.1.0",
     "react-navigation": "^4.4.3",
     "react-redux": "^7.2.3",

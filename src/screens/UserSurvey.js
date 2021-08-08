@@ -134,29 +134,28 @@ class UserSurvey extends Component {
     let parseTestData = [];
     
     if(testData != null && testData != undefined){
-      // console.log(testData);
+      console.log(testData);
       for(let i = 0; i < testData.length; i++){
-        let data = testData[i];
+        var data = testData[i];
         let parseTone = {
           "index": data.testToneId,
           "frequency": data.frequency,
-          "startDB": data.decibel,
+          "runDB": (data.decibel == null || data.decibel == undefined) ? 0 : parseFloat(data.decibel),
           "durationMin": data.durationMin,
           "durationMax":data.durationMax,
-          "upDB": data.updB,
-          "downDB":data.downdB,
+          "upDB": (data.updB == null || data.updB == undefined) ? 0 : data.updB,
+          "downDB":(data.downdB == null || data.downdB == undefined) ? 0 : data.downdB, 
           "intervalMin":data.intervalMin,
           "intervalMax":data.intervalMax,
           "testRoundMin": (data.testRoundMin == null ? 0 : data.testRoundMin),
           "testRoundMax": (data.testRoundMax == null ? 0 : data.testRoundMax),
-          "testSite": data.testSite,
+          "testSide": data.testSide,
           "maxResult":1
         };
-        
         parseTestData.push(parseTone);
       }
     }
-
+    console.log(parseTestData);
     let userID = this.props.userInfo.user.id;
     NativeModules.HearingTestModule.GotoActivity(
       JSON.stringify(userID),
