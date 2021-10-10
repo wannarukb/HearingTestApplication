@@ -93,6 +93,7 @@ class Home extends Component {
       if(path != null && path != undefined){
         console.log(path)
         const fileContent = await RNFS.readFile(path, 'utf8');
+        console.log('my save data');
         console.log(fileContent);
         if(fileContent != null && fileContent != undefined){
           let data = JSON.parse(fileContent);
@@ -180,7 +181,7 @@ class Home extends Component {
               ข้อมูลการทดสอบการได้ยินเป็นของ
             </Text>
             <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-              คุณ {this.props.userInfo != null ? this.props.userInfo.user.fn : ""}
+              คุณ {(this.props.userInfo != null || this.props.userInfo.fn !='DefaultUser' )  ? this.props.userInfo.user.fn : "Guest"}
             </Text>
           </Block>
           <Block style={{width: '22%'}}>

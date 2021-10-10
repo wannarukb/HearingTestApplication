@@ -19,7 +19,7 @@ let register_post = (body) => api.post('/v1/Users/', body).then(response => resp
 let testtone_get = (userToken) =>{ 
   let token = 'Bearer ' + userToken;
   api.setHeader('Authorization', token);
-  const response = api.get('/v1.1/TestTones/1');
+  const response = api.get('/v1.1/TestTones/3');
   return response;
 }
 

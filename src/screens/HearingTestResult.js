@@ -17,7 +17,7 @@ class HearingTestResult extends Component {
         super(props);
         this.state = {
             // testResults : [],
-            HeadTable: ['Frequency', 'DB', 'Side', 'Is Heard', 'Hear Period'],
+            HeadTable: ['Frequency', 'Amp', 'Side', 'Is Heard', 'Hear Period'],
             DataTable: []
         };
 
@@ -42,7 +42,7 @@ class HearingTestResult extends Component {
                 var eachResult = data.resultTestTones[i];
                 var dataRow = [];
                 dataRow.push(`${eachResult.frequency}`);
-                dataRow.push(`${eachResult.decibel}`);
+                dataRow.push(`${eachResult.amplitude}`);
                 dataRow.push(`${eachResult.testSide}`);
                 if(eachResult.isHeard == 1){
                     dataRow.push('Yes');

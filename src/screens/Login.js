@@ -25,6 +25,7 @@ class Login extends React.Component {
   componentDidMount() {
     // this.props.logout();
     this.getToken();
+    
   }
 
   async getToken() {
@@ -55,6 +56,9 @@ class Login extends React.Component {
 
   tryButton(){
     //this.goToUserSurveyPage();
+    this.state.UserEmail = 'DefaultUser';
+    this.UserLoginFunction();
+
   }
 
   goToUserSurveyPage = () =>{ 

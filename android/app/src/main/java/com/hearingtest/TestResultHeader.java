@@ -7,6 +7,7 @@ import java.util.List;
 
 public class TestResultHeader {
 
+   // public int hearingTestId;
     public int protocolId;
     public int userId;
     public String startDateTime;
@@ -14,6 +15,7 @@ public class TestResultHeader {
     public List<TestResultItem> resultTestTones;
 
     public TestResultHeader(int protocolId, int userId ){
+       // this.hearingTestId = hearingTestId;
         this.protocolId = protocolId;
         this.userId     = userId;
 

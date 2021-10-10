@@ -137,7 +137,7 @@ tools:context=".HearingActivity">
                     android:paddingLeft="40dp"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
-                    android:text="Decibel"
+                    android:text="Amplitude"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 

@@ -50,7 +50,7 @@ public class HearingActivityResult extends ReactActivity {
 
         for(int i=0; i < resultHeader.resultTestTones.size(); i++){
             TestResultItem eachResult = resultHeader.resultTestTones.get(i);
-            System.out.println(eachResult.frequency + ", " + eachResult.decibel + ", " + eachResult.testSide + ", " + eachResult.isHeard + ", " + eachResult.timeClicked + ", " + eachResult.clickTimeByTone + ", " + eachResult.clickTimeByTest);
+            System.out.println(eachResult.frequency + ", " + eachResult.amplitude + ", " + eachResult.testSide + ", " + eachResult.isHeard + ", " + eachResult.timeClicked + ", " + eachResult.clickTimeByTone + ", " + eachResult.clickTimeByTest);
         }
 
 
@@ -74,7 +74,7 @@ public class HearingActivityResult extends ReactActivity {
         head_frequency_col.setGravity(Gravity.CENTER);
         head_frequency_col.setLayoutParams(params);
 
-        head_decibel_col.setText("Decibel");
+        head_decibel_col.setText("Amplitude");
         head_decibel_col.setGravity(Gravity.CENTER);
         head_decibel_col.setLayoutParams(params);
         head_decibel_col.setPadding(4, 4, 4, 4);
@@ -118,7 +118,7 @@ public class HearingActivityResult extends ReactActivity {
             frequency_col.setPadding(4, 4, 4, 4);
 
 
-            decibel_col.setText("" + eachItem.decibel);
+            decibel_col.setText("" + eachItem.amplitude);
             decibel_col.setGravity(Gravity.CENTER);
             decibel_col.setLayoutParams(params);
             decibel_col.setPadding(4, 4, 4, 4);

@@ -6,14 +6,14 @@ import java.util.Date;
 
 public class TestResultItem {
 
-    public int hearingTestId;
+  //  public int hearingTestId;
     public int testToneId;
     public int counter;
     public int roundNo;
     public String startDateTime;
     public String endDateTime;
     public int frequency;
-    public int decibel;
+    public double amplitude;
     public double playDuration;
     public double pauseDuration;
     public long clickTimeByTest;
@@ -22,17 +22,22 @@ public class TestResultItem {
     public int isHeard;
     public String timeClicked;
 
-    public TestResultItem(int hearingTestId, int testToneId, int counter, int roundNo, int frequency, int decibel, String testSide, double playDuration, double pauseDuration){
-        this.hearingTestId   = hearingTestId;
+    public double decibel; //dbHl
+    public double dbSpl;
+
+    public TestResultItem(int hearingTestId, int testToneId, int counter, int roundNo, int frequency, double amplitude, String testSide, double playDuration, double pauseDuration, double dbHl, double dbSpl){
+       // this.hearingTestId   = hearingTestId;
         this.testToneId      = testToneId;
         this.counter         = counter;
         this.roundNo         = roundNo;
         this.frequency       = frequency;
-        this.decibel         = decibel;
+        this.amplitude       = amplitude;
         this.testSide        = testSide;
         this.playDuration    = playDuration;
         this.pauseDuration   = pauseDuration;
         this.timeClicked     = "";
+        this.decibel            = dbHl;
+        this.dbSpl           = dbSpl;
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         Date currentStartDate= Calendar.getInstance().getTime();

@@ -135,32 +135,33 @@ class UserSurvey extends Component {
     
     if(testData != null && testData != undefined){
       console.log(testData);
-      for(let i = 0; i < testData.length; i++){
-        var data = testData[i];
-        let parseTone = {
-          "index": data.testToneId,
-          "frequency": data.frequency,
-          "runDB": (data.decibel == null || data.decibel == undefined) ? 0 : parseFloat(data.decibel),
-          "durationMin": data.durationMin,
-          "durationMax":data.durationMax,
-          "upDB": (data.updB == null || data.updB == undefined) ? 0 : data.updB,
-          "downDB":(data.downdB == null || data.downdB == undefined) ? 0 : data.downdB, 
-          "intervalMin":data.intervalMin,
-          "intervalMax":data.intervalMax,
-          "testRoundMin": (data.testRoundMin == null ? 0 : data.testRoundMin),
-          "testRoundMax": (data.testRoundMax == null ? 0 : data.testRoundMax),
-          "testSide": data.testSide,
-          "maxResult":1
-        };
-        parseTestData.push(parseTone);
-      }
+      // for(let i = 0; i < testData.length; i++){
+      //   var data = testData[i];
+      //   let parseTone = {
+      //     "index": data.testToneId,
+      //     "frequency": data.frequency,
+      //     "runDB": (data.decibel == null || data.decibel == undefined) ? 0 : parseFloat(data.decibel),
+      //     "durationMin": data.durationMin,
+      //     "durationMax":data.durationMax,
+      //     "upDB": (data.updB == null || data.updB == undefined) ? 0 : data.updB,
+      //     "downDB":(data.downdB == null || data.downdB == undefined) ? 0 : data.downdB, 
+      //     "intervalMin":data.intervalMin,
+      //     "intervalMax":data.intervalMax,
+      //     "testRoundMin": (data.testRoundMin == null ? 0 : data.testRoundMin),
+      //     "testRoundMax": (data.testRoundMax == null ? 0 : data.testRoundMax),
+      //     "testSide": data.testSide,
+      //     "maxResult":1
+      //   };
+      //   parseTestData.push(parseTone);
+      // }
+      let userID = this.props.userInfo.user.id;
+      NativeModules.HearingTestModule.GotoActivity(
+        JSON.stringify(userID),
+        JSON.stringify(testData)
+      );
     }
-    console.log(parseTestData);
-    let userID = this.props.userInfo.user.id;
-    NativeModules.HearingTestModule.GotoActivity(
-      JSON.stringify(userID),
-      JSON.stringify(parseTestData)
-    );
+   // console.log(parseTestData);
+    
   }
   
 
