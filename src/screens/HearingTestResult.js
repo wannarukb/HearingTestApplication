@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
 import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView, View , KeyboardAvoidingView } from 'react-native';
-import { Block, Text, theme } from "galio-framework";
+import { Block, Icon, Text, theme } from "galio-framework";
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 import Moment from 'moment';
@@ -17,14 +17,10 @@ class HearingTestResult extends Component {
         super(props);
         this.state = {
             // testResults : [],
-            HeadTable: ['Frequency', 'Amp', 'Side', 'Is Heard', 'Hear Period'],
+            HeadTable: ['Frequency', 'DB (HL)', 'Side', 'Is Heard'],
             DataTable: []
         };
 
-        // import DeviceInfo from 'react-native-device-info'
-        // const deviceLocale = DeviceInfo.getDeviceLocale()
-        // moment.locale([deviceLocale, 'en'])
-        
         
         this.getTestResult();
 
@@ -42,19 +38,24 @@ class HearingTestResult extends Component {
                 var eachResult = data.resultTestTones[i];
                 var dataRow = [];
                 dataRow.push(`${eachResult.frequency}`);
-                dataRow.push(`${eachResult.amplitude}`);
+                dataRow.push(`${eachResult.decibel}`);
                 dataRow.push(`${eachResult.testSide}`);
                 if(eachResult.isHeard == 1){
-                    dataRow.push('Yes');
+                    if(eachResult.timeClicked != undefined && eachResult.timeClicked != ""){
+                        if(eachResult.timeClicked  == 'D' || eachResult.timeClicked  =='d'){
+                            dataRow.push('Yes');
+                        }else{
+                            dataRow.push('-');
+                        }
+                    }else{
+                        dataRow.push('-');
+                    }
+                   
                 }else{
                     dataRow.push('-');
                 }
 
-                if(eachResult.timeClicked != undefined && eachResult.timeClicked != ""){
-                    dataRow.push(`${eachResult.timeClicked}`);
-                }else{
-                    dataRow.push('-');
-                }
+               
                 
                 testResult.push(dataRow);
             }
