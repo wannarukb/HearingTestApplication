@@ -201,6 +201,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation "android.arch.work:work-runtime:2.0.1"
     implementation "com.android.support:multidex:2.0.1"
+    
     implementation project(':react-native-fs')
 
 

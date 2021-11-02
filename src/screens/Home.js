@@ -154,10 +154,32 @@ class Home extends Component {
   closeModal = () => this.setState({ openModal: false });
 
   onClickLogOut = ()=> { 
-    console.log("LOGOUT");
-    this.props.logout();
-    this.resetToken();
-    this.closeModal();
+    // if(this.props.userInfo.user.fn == 'DefaultUser'){
+    //   this.props.navigation.dispatch(
+    //     CommonActions.reset({
+    //       index: 0,
+    //       routes: [
+    //         { name: 'Login' },
+    //       ],
+    //     })
+    //   );
+    // }else{
+      console.log("LOGOUT");
+      this.props.logout();
+      this.resetToken();
+      var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
+      var data = {};
+      AsyncStorage.setItem("TestResults", JSON.stringify(data));
+      // write the file
+      RNFS.writeFile(path, '{}', 'utf8')
+      .then((Writesuccess) => {
+        console.log('FILE WRITTEN!');
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+      this.closeModal();
+    // }
   }
 
   // async storeToken(user) 
@@ -174,27 +196,51 @@ class Home extends Component {
 
   renderWelcomeBlock(){
     if(this.props.userInfo != null && this.props.userInfo.isAuthenticated == true){
-      return (
-        <Block  style={styles.row}>
-          <Block style={styles.welcomeInfoBlock}>
-            <Text style={styles.subTitle} color={themeColor.COLORS.PRIMARY} >
-              ข้อมูลการทดสอบการได้ยินเป็นของ
-            </Text>
-            <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-              คุณ {(this.props.userInfo != null || this.props.userInfo.fn !='DefaultUser' )  ? this.props.userInfo.user.fn : "Guest"}
-            </Text>
-          </Block>
-          <Block style={{width: '22%'}}>
-            <Button style={styles.menuButtonTry} onPress={this.openModal} >
-              <Text style={styles.createButtonText}>
-                เพิ่มเติม
+      if(this.props.userInfo.user.fn == 'DefaultUser'){
+        return (
+          <Block  style={styles.row}>
+            <Block style={styles.welcomeInfoBlock}>
+              <Text style={styles.subTitle} color={themeColor.COLORS.PRIMARY} >
+                ข้อมูลการทดสอบการได้ยินเป็นของ
               </Text>
-            </Button>
-            
-            
+              <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
+                Guest
+              </Text>
+            </Block>
+            <Block style={{width: '22%'}}>
+              <Button style={styles.menuButtonTry} onPress={this.openModal} >
+                <Text style={styles.createButtonText}>
+                  เพิ่มเติม
+                </Text>
+              </Button>
+              
+              
+            </Block>
           </Block>
-        </Block>
-      )
+        )
+      }else{
+        return (
+          <Block  style={styles.row}>
+            <Block style={styles.welcomeInfoBlock}>
+              <Text style={styles.subTitle} color={themeColor.COLORS.PRIMARY} >
+                ข้อมูลการทดสอบการได้ยินเป็นของ
+              </Text>
+              <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
+                คุณ {this.props.userInfo.user.fn}
+              </Text>
+            </Block>
+            <Block style={{width: '22%'}}>
+              <Button style={styles.menuButtonTry} onPress={this.openModal} >
+                <Text style={styles.createButtonText}>
+                  เพิ่มเติม
+                </Text>
+              </Button>
+              
+              
+            </Block>
+          </Block>
+        )
+      }
     }else{
       return (
         <Block  style={styles.row}>
@@ -376,7 +422,7 @@ class Home extends Component {
           >
             <View style={{ alignItems: "center" }}>
               <TouchableOpacity style={{ margin: 5 }} onPress={this.onClickLogOut}>
-                <Text>ออกจากระบบ</Text>
+                <Text>{ (this.props.userInfo.user.fn != 'DefaultUser') ? 'ออกจากระบบ': 'ออกจากระบบ'}</Text>
               </TouchableOpacity>
             </View>
           </Modal>

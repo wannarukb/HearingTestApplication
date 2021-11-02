@@ -23,8 +23,9 @@ let testtone_get = (userToken) =>{
   return response;
 }
 
+//https://www3.ict.mahidol.ac.th/test/hearing/api/api/v1.1/UserHearingTests/
 
-let testtone_result_post = (body) => api.post('/v1/ResultTestTones/', body).then(response => response);
+let testtone_result_post = (body) => api.post('/v1.1/UserHearingTests/', body).then(response => response);
 
 export {
   login_post,
