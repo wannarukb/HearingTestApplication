@@ -59,13 +59,43 @@ tools:context=".HearingActivity">
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/intro_button"
+            android:id="@+id/animateLayout"
             android:layout_width="413dp"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/intro">
+
+            <com.skyfishjy.library.RippleBackground
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/content"
+                app:rb_color="#0099CC"
+                app:rb_radius="32dp"
+                app:rb_rippleAmount="4"
+                app:rb_duration="3000"
+                app:rb_scale="6">
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/centerImage"
+                    android:src="@drawable/abc_vector_test"/>
+            </com.skyfishjy.library.RippleBackground>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/intro_button"
+            android:layout_width="413dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/animateLayout">
 
             <Button
                 android:id="@+id/start"
@@ -302,8 +332,6 @@ tools:context=".HearingActivity">
         </LinearLayout>
 
     </LinearLayout>
-
-
 
 
 

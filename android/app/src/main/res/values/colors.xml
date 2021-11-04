@@ -1,2 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <color name="text_default" >#172B4D</color>
+    <color name="primary" >#242A38</color>
+    <color name="primary_btn_success" >#14468A</color>
+    <color name="btn_register" >#29887E</color>
+    <color name="btn_secondary" >#6291CA</color>
+    <color name="secondary" >#4E596F</color>
+    <color name="label" >#FE2472</color>
+    <color name="info" >#11CDEF</color>
+    <color name="error" >#F5365C</color>
+    <color name="success" >#2DCE89</color>
+    <color name="warning" >#FB6340</color>
+    <color name="text_secondary" >#9D9D9D</color>
+    <color name="text_inverse" >#FFFFFF</color>
+</resources>

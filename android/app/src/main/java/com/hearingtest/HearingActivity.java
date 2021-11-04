@@ -4,15 +4,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.media.AudioAttributes;
 import android.media.AudioDeviceInfo;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.media.MediaRecorder;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +30,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -47,6 +53,7 @@ import java.util.ListIterator;
 
 import com.facebook.react.bridge.Callback;
 import com.google.gson.Gson;
+import com.skyfishjy.library.RippleBackground;
 
 import org.w3c.dom.Text;
 
@@ -79,13 +86,12 @@ public class HearingActivity extends ReactActivity {
     public long     startPlayToneByTonePlayed;
     public TestResultHeader userHearingTest;
 
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        super.onCreate(null);
-        setContentView(R.layout.activity_hearing);
+        setContentView(R.layout.activity_hearing_tone_play);
+
         this.isCanHearClick = false;
 
 
@@ -172,10 +178,9 @@ public class HearingActivity extends ReactActivity {
     }
 
 
-
     /*
-        When Click start --> system will play the set of frequency
-     */
+       When Click start --> system will play the set of frequency
+    */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onClickStart(View view) {
         startButton         = (Button) findViewById(R.id.start);
@@ -186,6 +191,9 @@ public class HearingActivity extends ReactActivity {
         if(noOfClick == 1){
             System.out.println("++++++++++++ Start ++++++++++++ ");
             try {
+                final RippleBackground rippleBackground=(RippleBackground)findViewById(R.id.content);
+                rippleBackground.startRippleAnimation();
+
                 play();
                 m_PlayThread.interrupt();
                 m_PlayThread.join();
@@ -217,7 +225,6 @@ public class HearingActivity extends ReactActivity {
         }
 
     }
-
 
 
     synchronized void stop() {
@@ -382,31 +389,31 @@ public class HearingActivity extends ReactActivity {
         //now create it again, note: use global audioTrack,
         //that means remove "final AudioTrack" here
         mAudioTrack = new AudioTrack.Builder()
-                        .setAudioAttributes(new AudioAttributes.Builder()
-                                .setUsage(AudioAttributes.USAGE_ALARM)
-                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                .build())
-                        .setAudioFormat(new AudioFormat.Builder()
-                                .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                                .setSampleRate(sampleRate)
-                                .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-                                .build())
-                        .setBufferSizeInBytes(mBuffer.length)
-                        .setTransferMode(AudioTrack.MODE_STREAM)
-                        .build();
+                .setAudioAttributes(new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_ALARM)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build())
+                .setAudioFormat(new AudioFormat.Builder()
+                        .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                        .setSampleRate(sampleRate)
+                        .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                        .build())
+                .setBufferSizeInBytes(mBuffer.length)
+                .setTransferMode(AudioTrack.MODE_STREAM)
+                .build();
         //mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length, AudioTrack.MODE_STATIC);
 
         if (devices  != null){
             for (AudioDeviceInfo device : devices)
                 if (device.getType() == AudioDeviceInfo.TYPE_WIRED_HEADSET || device.getType() == AudioDeviceInfo.TYPE_WIRED_HEADPHONES ||
-                    device.getType() == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP || device.getType() == AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {
+                        device.getType() == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP || device.getType() == AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {
                     mAudioTrack.setPreferredDevice(device);
 //                    mAudioManager.setWiredHeadsetOn(true);
                     mAudioManager.setSpeakerphoneOn(false);
                 }
         }
 
-       // double amp =( Math.pow(10, volDB/20.0));
+        // double amp =( Math.pow(10, volDB/20.0));
         double amp = amplitude;
 //        double max_amp = Math.pow(10, 100/20.0);
 //        double rmsdB = 20.0 * Math.log10(amp);
@@ -444,6 +451,7 @@ public class HearingActivity extends ReactActivity {
         System.out.println("LEK Stop");
         stop();
     }
+
 
 
 

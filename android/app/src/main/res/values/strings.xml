@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">HearingTest</string>
+    <string name="noiseDetecting">ตรวจสอบเสียงรบกวน</string>
+    <string name="noiseDetectingSub">ระบบจะทำการตรวจสอบเสียงรบกวนเพื่อความแม่นจำในการทดสอบ กรุณาอยู่ที่เสียงเงียบ</string>
+    <string name="startNoiseDetection">วัดเสียงรบกวน</string>
     <string name="start">เริ่มทดสอบ</string>
     <string name="testing">กำลังอยู่ในกระบวนการทดสอบ</string>
     <string name="testing_action_desc_1">โปรดกดปุ่ม \"ได้ยิน\" แล้วกดปล่อย</string>
@@ -7,4 +10,5 @@
     <string name="testing_can_hear">ได้ยิน</string>
     <string name="testing_cannot_hear">ไม่ได้ยิน</string>
     <string name="done_testing">กลับหน้าหลัก</string>
+    <string name="title_activity_hearing_tone_play">HearingTonePlayActivity</string>
 </resources>

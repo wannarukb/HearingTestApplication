@@ -3,8 +3,8 @@
     package="com.hearingtest">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".MainApplication"
@@ -12,9 +12,10 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:windowSoftInputMode="adjustResize"
-        android:theme="@style/AppTheme">
-        <activity android:name=".HearingActivityResult"></activity>
+        android:theme="@style/AppTheme"
+        android:windowSoftInputMode="adjustResize">
+        <activity android:name=".HearingTonePlayActivity"></activity>
+        <activity android:name=".HearingActivityResult" />
         <activity android:name=".HearingActivity" />
         <activity
             android:name=".MainActivity"
