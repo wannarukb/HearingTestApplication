@@ -71,7 +71,7 @@ public class HearingActivity extends ReactActivity {
     public int              runningIndex;
     public int              currentTestRound;
     public Button           startButton;
-    public TextView         freqView, decibelView, suiteView,volumeTextView, durationView, intervalView, testRoundView;
+//    public TextView         freqView, decibelView, suiteView,volumeTextView, durationView, intervalView, testRoundView;
     Thread m_PlayThread = null;
     boolean m_bStop = false;
     Integer noOfClick;
@@ -100,13 +100,13 @@ public class HearingActivity extends ReactActivity {
         runningIndex        = 0;
         playExecuteCount    = 0;
         noOfLatestResult    = 0;
-        freqView            = (TextView) findViewById(R.id.frequency);
-        decibelView         = (TextView) findViewById(R.id.decibel);
-        suiteView           = (TextView) findViewById(R.id.testSuite);
-        volumeTextView      = (TextView) findViewById(R.id.volumeText);
-        durationView        = (TextView) findViewById(R.id.durationText);
-        intervalView        = (TextView) findViewById(R.id.intervalText);
-        testRoundView       = (TextView) findViewById(R.id.testRoundText);
+//        freqView            = (TextView) findViewById(R.id.frequency);
+//        decibelView         = (TextView) findViewById(R.id.decibel);
+//        suiteView           = (TextView) findViewById(R.id.testSuite);
+//        volumeTextView      = (TextView) findViewById(R.id.volumeText);
+//        durationView        = (TextView) findViewById(R.id.durationText);
+//        intervalView        = (TextView) findViewById(R.id.intervalText);
+//        testRoundView       = (TextView) findViewById(R.id.testRoundText);
 
 
         Bundle extras = getIntent().getExtras();
@@ -160,14 +160,14 @@ public class HearingActivity extends ReactActivity {
             currentTestRound    = currentRunTone.testRound;
 
 
-            freqView.setText(playExecuteCount + " - "+currentRunTone.frequency);
-            decibelView.setText(""+currentRunTone.amplitude);
-            suiteView.setText(currentRunTone.testSide);
-            durationView.setText(""+currentRunTone.duration);
-            intervalView.setText(""+currentRunTone.interval);
-            testRoundView.setText(""+currentRunTone.testRound);
-
-            volumeTextView.setText("");
+//            freqView.setText(playExecuteCount + " - "+currentRunTone.frequency);
+//            decibelView.setText(""+currentRunTone.amplitude);
+//            suiteView.setText(currentRunTone.testSide);
+//            durationView.setText(""+currentRunTone.duration);
+//            intervalView.setText(""+currentRunTone.interval);
+//            testRoundView.setText(""+currentRunTone.testRound);
+//
+//            volumeTextView.setText("");
 
             noOfClick = 0;
 
@@ -191,8 +191,7 @@ public class HearingActivity extends ReactActivity {
         if(noOfClick == 1){
             System.out.println("++++++++++++ Start ++++++++++++ ");
             try {
-                final RippleBackground rippleBackground=(RippleBackground)findViewById(R.id.content);
-                rippleBackground.startRippleAnimation();
+
 
                 play();
                 m_PlayThread.interrupt();
@@ -260,12 +259,12 @@ public class HearingActivity extends ReactActivity {
             public void run() {
                 try {
 
-                    freqView.setText((playExecuteCount -1 )+" - "+currentRunTone.frequency);
-                    decibelView.setText(""+currentRunTone.amplitude);
-                    suiteView.setText(currentRunTone.testSide);
-                    durationView.setText(""+currentRunTone.duration);
-                    intervalView.setText(""+currentRunTone.interval);
-                    testRoundView.setText(""+currentRunTone.testRound);
+//                    freqView.setText((playExecuteCount -1 )+" - "+currentRunTone.frequency);
+//                    decibelView.setText(""+currentRunTone.amplitude);
+//                    suiteView.setText(currentRunTone.testSide);
+//                    durationView.setText(""+currentRunTone.duration);
+//                    intervalView.setText(""+currentRunTone.interval);
+//                    testRoundView.setText(""+currentRunTone.testRound);
 
 
                     if(playExecuteCount > 1){
@@ -423,7 +422,7 @@ public class HearingActivity extends ReactActivity {
 //        System.out.println("LEK max_amp = " + max_amp);
 //        System.out.println("LEK volumePercentage = " + volumePercentage);
         float volumePercentage = (float) (amp);
-        volumeTextView.setText(""+volumePercentage);
+      //  volumeTextView.setText(""+volumePercentage);
 
         if(earSide == "L"){
             mAudioTrack.setStereoVolume(volumePercentage, 0.0f);

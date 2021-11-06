@@ -3,7 +3,7 @@ import AsyncStorage  from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
 
 import { Block, Button, Text, theme } from "galio-framework";
-import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView, TouchableOpacity, View, LogBox  } from 'react-native';
+import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView, TouchableOpacity, View, LogBox , I18nManager } from 'react-native';
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 const { height, width } = Dimensions.get("screen");
@@ -13,11 +13,45 @@ import Modal from "react-native-simple-modal";
 
 import TestToneService from '../services/TestToneService';
 
+import * as RNLocalize from 'react-native-localize';
+import i18n from 'i18n-js';
+import memoize from 'lodash.memoize';
+
+
+const translationGetters = {
+  // lazy requires (metro bundler does not support symlinks)
+  en: () => require('../translations/en.json'),
+  th: () => require('../translations/th.json'),
+};
+
+const translate = memoize(
+  (key, config) => i18n.t(key, config),
+  (key, config) => (config ? key + JSON.stringify(config) : key)
+);
+
+
+const setI18nConfig = () => {
+  // fallback if no available language fits
+  const fallback = { languageTag: 'en', isRTL: false };
+
+  const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(translationGetters)) || fallback;
+
+  // clear translation cache
+  translate.cache.clear();
+  // update layout direction
+  I18nManager.forceRTL(isRTL);
+  // set i18n-js config
+  i18n.translations = { [languageTag]: translationGetters[languageTag]() };
+  i18n.locale = languageTag;
+};
+
+
 LogBox.ignoreAllLogs(true);
 class Home extends Component {
   
   constructor(props) {
     super(props);
+    setI18nConfig(); // set initial config
     this.state = {
       openModal: false 
     };
@@ -26,6 +60,7 @@ class Home extends Component {
     this.readResultJSONFile();
 
     console.log(this.props.userInfo);
+    
   }
   
   postTestToneResult = (testToneResult) => {
@@ -201,7 +236,7 @@ class Home extends Component {
           <Block  style={styles.row}>
             <Block style={styles.welcomeInfoBlock}>
               <Text style={styles.subTitle} color={themeColor.COLORS.PRIMARY} >
-                ข้อมูลการทดสอบการได้ยินเป็นของ
+                {translate('hello')}ข้อมูลการทดสอบการได้ยินเป็นของ
               </Text>
               <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
                 Guest

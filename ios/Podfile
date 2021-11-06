@@ -12,6 +12,8 @@ target 'HearingTest' do
 
   pod 'RNFS', :path => '../node_modules/react-native-fs'
 
+  pod 'RNLocalize', :path => '../node_modules/react-native-localize'
+
   target 'HearingTestTests' do
     inherit! :complete
     # Pods for testing
