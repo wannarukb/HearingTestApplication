@@ -59,7 +59,9 @@ import org.w3c.dom.Text;
 
 public class HearingActivity extends ReactActivity {
 
-    private final int       sampleRate = 44100;
+    private final int       SAMPLE_RATE = 44100;
+    private final int       RESULT_VALIDATION_DECEIBEL = 35; //dB HL
+    private final int       PASS_RESULT_CRITERIA = 2;
     public AudioTrack       mAudioTrack;
     public List<TestTone>   testToneList;
     public List<TestResultItem> testResultList;
@@ -71,7 +73,6 @@ public class HearingActivity extends ReactActivity {
     public int              runningIndex;
     public int              currentTestRound;
     public Button           startButton;
-//    public TextView         freqView, decibelView, suiteView,volumeTextView, durationView, intervalView, testRoundView;
     Thread m_PlayThread = null;
     boolean m_bStop = false;
     Integer noOfClick;
@@ -86,6 +87,8 @@ public class HearingActivity extends ReactActivity {
     public long     startPlayToneByTonePlayed;
     public TestResultHeader userHearingTest;
     public ImageView testToneImage;
+
+    public Integer  result_pass_validation_time;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -102,14 +105,6 @@ public class HearingActivity extends ReactActivity {
         playExecuteCount    = 0;
         noOfLatestResult    = 0;
         testToneImage       = (ImageView) findViewById(R.id.testToneImage);
-//        freqView            = (TextView) findViewById(R.id.frequency);
-//        decibelView         = (TextView) findViewById(R.id.decibel);
-//        suiteView           = (TextView) findViewById(R.id.testSuite);
-//        volumeTextView      = (TextView) findViewById(R.id.volumeText);
-//        durationView        = (TextView) findViewById(R.id.durationText);
-//        intervalView        = (TextView) findViewById(R.id.intervalText);
-//        testRoundView       = (TextView) findViewById(R.id.testRoundText);
-
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
@@ -160,22 +155,12 @@ public class HearingActivity extends ReactActivity {
             currentRunTone      = testToneList.get(runningIndex);
             System.out.println("Hearing - Current Run Tone  = " + currentRunTone.testToneId + ", " + currentRunTone.testSide + ", " + currentRunTone.frequency + ", " + currentRunTone.amplitude);
             currentTestRound    = currentRunTone.testRound;
-
-
-//            freqView.setText(playExecuteCount + " - "+currentRunTone.frequency);
-//            decibelView.setText(""+currentRunTone.amplitude);
-//            suiteView.setText(currentRunTone.testSide);
-//            durationView.setText(""+currentRunTone.duration);
-//            intervalView.setText(""+currentRunTone.interval);
-//            testRoundView.setText(""+currentRunTone.testRound);
-//
-//            volumeTextView.setText("");
-
             noOfClick = 0;
 
 
             mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
             devices      = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
+            result_pass_validation_time = 0;
         }
     }
 
@@ -218,6 +203,9 @@ public class HearingActivity extends ReactActivity {
 
                     System.out.println("RESULTJA :  "+ (playExecuteCount - 1) + " : " + currentRunTone.frequency  + ", " + currentRunTone.amplitude  + ", "+ currentRunTone.testSide  + ", " + clickSecFromStart + ", " + clickSecFromByTonePlayedInt + ", " + timeClickedType);
                     currentTestResult.setCanHear(timeClickedType, clickSecFromStart, clickSecFromByTonePlayed);
+                    if(currentRunTone.dbHl <= RESULT_VALIDATION_DECEIBEL){
+                        result_pass_validation_time++;
+                    }
 
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
@@ -251,7 +239,7 @@ public class HearingActivity extends ReactActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     synchronized void play() {
-        System.out.println("LEK PLAY");
+        System.out.println("TONE PLAY");
         playExecuteCount += 1;
 
         m_PlayThread = new Thread() {
@@ -261,12 +249,6 @@ public class HearingActivity extends ReactActivity {
             public void run() {
                 try {
 
-//                    freqView.setText((playExecuteCount -1 )+" - "+currentRunTone.frequency);
-//                    decibelView.setText(""+currentRunTone.amplitude);
-//                    suiteView.setText(currentRunTone.testSide);
-//                    durationView.setText(""+currentRunTone.duration);
-//                    intervalView.setText(""+currentRunTone.interval);
-//                    testRoundView.setText(""+currentRunTone.testRound);
 
                     if(currentRunTone.testSide == "L"){
                         testToneImage.setImageResource(R.drawable.tone_left);
@@ -286,7 +268,6 @@ public class HearingActivity extends ReactActivity {
                                 currentRunTone.counter,currentRunTone.roundNo, currentRunTone.frequency, currentRunTone.amplitude,
                                 currentRunTone.testSide, currentRunTone.duration, currentRunTone.interval,
                                 currentRunTone.dbHl, currentRunTone.dbSpl);
-                        //currentTestResult = new TestResult(currentRunTone.protocolId, userId, currentRunTone.index, currentRunTone.frequency, currentRunTone.runDB, currentRunTone.testSide);
                     }
                     startPlayToneByTonePlayed = System.currentTimeMillis();
                     generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.amplitude, currentRunTone.testSide);
@@ -355,6 +336,7 @@ public class HearingActivity extends ReactActivity {
 
         System.out.println("FINISH ACTIVITY");
         userHearingTest.endTestResult(testResultList);
+        if(result_pass_validation_time >= PASS_RESULT_CRITERIA) userHearingTest.setTestResultSummary("Good");
         Gson gson = new Gson();
         String resultJson = gson.toJson(userHearingTest);
 
@@ -376,13 +358,13 @@ public class HearingActivity extends ReactActivity {
 
         // int mBufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
-        int runDuration = (int) durationSec * sampleRate * 2;
+        int runDuration = (int) durationSec * SAMPLE_RATE * 2;
         System.out.println("runDuration = " + runDuration);
         double[] samples = new double[runDuration];
         short[] mBuffer = new short[runDuration];
 
         for (int i = 0; i < runDuration; i++) {
-            samples[i] = Math.sin(2.0 * Math.PI * i / (sampleRate / frequency)); // Sine wave
+            samples[i] = Math.sin(2.0 * Math.PI * i / (SAMPLE_RATE / frequency)); // Sine wave
             mBuffer[i] = (short) (samples[i] * Short.MAX_VALUE);  // Higher amplitude increases volume
         }
 
@@ -403,7 +385,7 @@ public class HearingActivity extends ReactActivity {
                         .build())
                 .setAudioFormat(new AudioFormat.Builder()
                         .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                        .setSampleRate(sampleRate)
+                        .setSampleRate(SAMPLE_RATE)
                         .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
                         .build())
                 .setBufferSizeInBytes(mBuffer.length)
@@ -449,14 +431,14 @@ public class HearingActivity extends ReactActivity {
     @Override
     public void onBackPressed() {
 
-        System.out.println("LEK Back Pressed");
+        System.out.println("Android - HearingActivity Back Pressed");
         stop();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        System.out.println("LEK Stop");
+        System.out.println("Android - HearingActivity - Stop");
         stop();
     }
 

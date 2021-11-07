@@ -313,18 +313,18 @@ public class HearingTonePlayActivity extends AppCompatActivity {
     public void finishActivity() throws InterruptedException {
 
         System.out.println("FINISH ACTIVITY");
-        userHearingTest.endTestResult(testResultList);
-        Gson gson = new Gson();
-        String resultJson = gson.toJson(userHearingTest);
-
-        System.out.print("result" + resultJson);
-
-        Intent intent = new Intent(this, HearingActivityResult.class);
-        intent.putExtra("TestResultList", resultJson);
-        intent.putExtra("FilePath", saveHearingPath);
-        intent.putExtra("UserId", userId);
-        startActivity(intent);
-        finish();
+//        userHearingTest.endTestResult(testResultList);
+//        Gson gson = new Gson();
+//        String resultJson = gson.toJson(userHearingTest);
+//
+//        System.out.print("result" + resultJson);
+//
+//        Intent intent = new Intent(this, HearingActivityResult.class);
+//        intent.putExtra("TestResultList", resultJson);
+//        intent.putExtra("FilePath", saveHearingPath);
+//        intent.putExtra("UserId", userId);
+//        startActivity(intent);
+//        finish();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
