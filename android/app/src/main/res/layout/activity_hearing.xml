@@ -4,6 +4,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
 xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
+android:background="@color/backround_default"
 tools:context=".HearingActivity">
 
     <LinearLayout
@@ -14,10 +15,11 @@ tools:context=".HearingActivity">
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
         >
+
         <LinearLayout
             android:id="@+id/intro"
             android:layout_width="409dp"
-            android:layout_height="278dp"
+            android:layout_height="197dp"
             android:gravity="center"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
@@ -28,9 +30,11 @@ tools:context=".HearingActivity">
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/sarabun_bold"
                 android:gravity="center_horizontal"
                 android:text="@string/testing"
-                android:textSize="18sp"
+                android:textColor="@color/text_default"
+                android:textSize="22sp"
                 tools:ignore="MissingConstraints"
                 tools:layout_editor_absoluteX="115dp"
                 tools:layout_editor_absoluteY="53dp" />
@@ -39,41 +43,35 @@ tools:context=".HearingActivity">
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/sarabun_regular"
                 android:gravity="center_horizontal"
                 android:text="@string/testing_action_desc_1"
-                android:textSize="18sp"
+                android:textColor="@color/text_default"
+                android:textSize="16sp"
                 tools:ignore="MissingConstraints"
                 tools:layout_editor_absoluteX="108dp"
                 tools:layout_editor_absoluteY="73dp" />
 
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:text="@string/testing_action_desc_2"
-                android:textSize="18sp"
-                tools:ignore="MissingConstraints"
-                tools:layout_editor_absoluteX="150dp"
-                tools:layout_editor_absoluteY="92dp" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/animateLayout"
-            android:layout_width="413dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
+            android:paddingTop="30dp"
+            android:paddingBottom="30dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/intro">
 
 
-                <ImageView
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_centerInParent="true"
-                    android:id="@+id/centerImage"
-                    android:src="@drawable/abc_vector_test"/>
+            <ImageView
+                android:id="@+id/testToneImage"
+                android:layout_width="wrap_content"
+                android:layout_height="249dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/tone_none" />
 
         </LinearLayout>
 
@@ -83,18 +81,20 @@ tools:context=".HearingActivity">
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
+            android:paddingTop="30dp"
+            android:paddingBottom="20dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/animateLayout">
 
             <Button
                 android:id="@+id/start"
-                android:layout_width="158dp"
+                android:layout_width="250dp"
                 android:layout_height="wrap_content"
-                android:text="@string/start"
                 android:background="@color/primary_btn_success"
                 android:fontFamily="@font/sarabun_medium"
                 android:gravity="center"
                 android:onClick="onClickStart"
+                android:text="@string/start"
                 android:textColor="@color/text_inverse"
                 android:textColorHighlight="@color/text_inverse"
                 android:textColorHint="@color/text_inverse"

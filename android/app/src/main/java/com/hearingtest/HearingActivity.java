@@ -85,12 +85,13 @@ public class HearingActivity extends ReactActivity {
     public long     startPlayToneFromStart;
     public long     startPlayToneByTonePlayed;
     public TestResultHeader userHearingTest;
+    public ImageView testToneImage;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_hearing_tone_play);
+        setContentView(R.layout.activity_hearing);
 
         this.isCanHearClick = false;
 
@@ -100,6 +101,7 @@ public class HearingActivity extends ReactActivity {
         runningIndex        = 0;
         playExecuteCount    = 0;
         noOfLatestResult    = 0;
+        testToneImage       = (ImageView) findViewById(R.id.testToneImage);
 //        freqView            = (TextView) findViewById(R.id.frequency);
 //        decibelView         = (TextView) findViewById(R.id.decibel);
 //        suiteView           = (TextView) findViewById(R.id.testSuite);
@@ -266,6 +268,13 @@ public class HearingActivity extends ReactActivity {
 //                    intervalView.setText(""+currentRunTone.interval);
 //                    testRoundView.setText(""+currentRunTone.testRound);
 
+                    if(currentRunTone.testSide == "L"){
+                        testToneImage.setImageResource(R.drawable.tone_left);
+                    }else if(  currentRunTone.testSide == "R"){
+                        testToneImage.setImageResource(R.drawable.tone_left);
+                    }else{
+                        testToneImage.setImageResource(R.drawable.tone_both);
+                    }
 
                     if(playExecuteCount > 1){
                         if(currentTestResult != null){

@@ -13,4 +13,6 @@
     <color name="warning" >#FB6340</color>
     <color name="text_secondary" >#9D9D9D</color>
     <color name="text_inverse" >#FFFFFF</color>
+    <color name="background_white" >#FFFFFF</color>
+    <color name="backround_default" >#F3F7FB</color>
 </resources>

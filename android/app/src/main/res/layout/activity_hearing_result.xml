@@ -17,33 +17,78 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
+            android:id="@+id/intro"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:padding="12dp">
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/textView8"
-                android:layout_width="196dp"
-                android:layout_height="84dp"
-                android:layout_weight="1"
-                android:text="สรุปผลการทดสอบ การได้ยินเสียง"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/testing"
+                android:textSize="18sp"
+                android:fontFamily="@font/sarabun_bold"
+                android:textColor="@color/text_default"
+                tools:ignore="MissingConstraints"
+                tools:layout_editor_absoluteX="115dp"
+                tools:layout_editor_absoluteY="53dp" />
 
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="118dp"
-                android:layout_height="84dp"
-                android:layout_weight="1"
-                tools:srcCompat="@tools:sample/avatars" />
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/testing_action_desc_1"
+                android:textSize="14sp"
+                android:fontFamily="@font/sarabun_light"
+                android:textColor="@color/text_default"
+                tools:ignore="MissingConstraints"
+                tools:layout_editor_absoluteX="108dp"
+                tools:layout_editor_absoluteY="73dp" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/testing_action_desc_2"
+                android:textSize="20sp"
+                android:fontFamily="@font/sarabun_bold"
+                android:textColor="@color/text_default"
+                tools:ignore="MissingConstraints"
+                tools:layout_editor_absoluteX="150dp"
+                tools:layout_editor_absoluteY="92dp" />
         </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/animateLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/result_intro">
+
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            android:layout_centerInParent="true"
+            android:id="@+id/centerImage"
+            android:src="@drawable/result_normalcase"/>
+
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/resultPage"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="300dp"
         android:layout_marginTop="5dp"
         android:orientation="vertical"
         android:visibility="visible"
@@ -77,13 +122,20 @@
 
         <Button
             android:id="@+id/doneTesting"
-            android:layout_width="158dp"
-            android:layout_height="wrap_content"
             android:gravity="center"
             android:onClick="onClickDone"
             android:text="@string/done_testing"
+            android:layout_width="158dp"
+            android:layout_height="wrap_content"
+            android:background="@color/primary_btn_success"
+            android:fontFamily="@font/sarabun_medium"
+            android:textColor="@color/text_inverse"
+            android:textColorHighlight="@color/text_inverse"
+            android:textColorHint="@color/text_inverse"
+            android:textColorLink="@color/text_inverse"
             android:textSize="18sp"
-            tools:ignore="OnClick" />
+            tools:ignore="OnClick"
+            />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
