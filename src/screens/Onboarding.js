@@ -4,7 +4,8 @@ import {
   Image,
   StyleSheet,
   StatusBar,
-  Dimensions
+  Dimensions,
+  I18nManager
 } from "react-native";
 import { Block, Button, Text, theme } from "galio-framework";
 
@@ -16,9 +17,49 @@ import {connect} from 'react-redux';
 import {CommonActions } from '@react-navigation/native';
 
 
+
+import * as RNLocalize from 'react-native-localize';
+import i18n from 'i18n-js';
+import memoize from 'lodash.memoize';
+
+const translationGetters = {
+  // lazy requires (metro bundler does not support symlinks)
+  en: () => require('../translations/en.json'),
+  th: () => require('../translations/th.json'),
+};
+
+const translate = memoize(
+  (key, config) => i18n.t(key, config),
+  (key, config) => (config ? key + JSON.stringify(config) : key)
+);
+
+const setI18nConfig = (lang) => {
+  // fallback if no available language fits
+  const fallback = { languageTag: lang, isRTL: false };
+
+  var { languageTag, isRTL } =  fallback || RNLocalize.findBestAvailableLanguage(Object.keys(translationGetters));
+
+  if(lang){
+    languageTag = fallback.languageTag;
+    isRTL       = fallback.isRTL;
+  }
+
+  // clear translation cache
+  translate.cache.clear();
+  // update layout direction
+  I18nManager.forceRTL(isRTL);
+  // set i18n-js config
+  i18n.translations = { [languageTag]: translationGetters[languageTag]() };
+  i18n.locale = languageTag;
+};
+
+
+
+
 class Onboarding extends React.Component {
   constructor(props) {
     super(props);
+    setI18nConfig('en');
     this.state = {
      
     };
@@ -47,12 +88,12 @@ class Onboarding extends React.Component {
               <Block style={styles.title} style={{marginTop: 20}}>
                 <Block middle>
                   <Text style={styles.heading} color={themeColor.COLORS.PRIMARY} size={18} bold>
-                    Hearing test by yourself
+                    {translate('AppConcept')}
                   </Text>
                 </Block>
                 <Block middle> 
                   <Text style={styles.heading} color={themeColor.COLORS.PRIMARY} size={14} >
-                    ทดสอบประสิทธิภาพทางการได้ยินด้วยตัวคุณเองทุกที่ทุกเวลา
+                    {translate('AppConceptSubDesc')}
                   </Text>
                 </Block>
               </Block>
@@ -70,7 +111,9 @@ class Onboarding extends React.Component {
                      })
                    );}}
                 >
-                  <Text style={styles.createButtonText}>เริ่มต้นใช้งาน</Text>
+                  <Text style={styles.createButtonText}>
+                    {translate('StartOnBoardingButton')}
+                  </Text>
                 </Button>
               </Block>
           </Block>

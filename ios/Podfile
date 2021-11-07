@@ -14,6 +14,8 @@ target 'HearingTest' do
 
   pod 'RNLocalize', :path => '../node_modules/react-native-localize'
 
+  pod 'react-native-restart', :path => '../node_modules/react-native-restart'
+
   target 'HearingTestTests' do
     inherit! :complete
     # Pods for testing

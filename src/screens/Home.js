@@ -10,13 +10,11 @@ const { height, width } = Dimensions.get("screen");
 import {connect} from 'react-redux';
 import {CommonActions } from '@react-navigation/native';
 import Modal from "react-native-simple-modal";
-
 import TestToneService from '../services/TestToneService';
 
 import * as RNLocalize from 'react-native-localize';
 import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
-
 
 const translationGetters = {
   // lazy requires (metro bundler does not support symlinks)
@@ -29,12 +27,16 @@ const translate = memoize(
   (key, config) => (config ? key + JSON.stringify(config) : key)
 );
 
-
-const setI18nConfig = () => {
+const setI18nConfig = (lang) => {
   // fallback if no available language fits
-  const fallback = { languageTag: 'en', isRTL: false };
+  const fallback = { languageTag: lang, isRTL: false };
 
-  const { languageTag, isRTL } = RNLocalize.findBestAvailableLanguage(Object.keys(translationGetters)) || fallback;
+  var { languageTag, isRTL } =  fallback || RNLocalize.findBestAvailableLanguage(Object.keys(translationGetters));
+
+  if(lang){
+    languageTag = fallback.languageTag;
+    isRTL       = fallback.isRTL;
+  }
 
   // clear translation cache
   translate.cache.clear();
@@ -48,17 +50,20 @@ const setI18nConfig = () => {
 
 LogBox.ignoreAllLogs(true);
 class Home extends Component {
-  
+
   constructor(props) {
     super(props);
-    setI18nConfig(); // set initial config
+
     this.state = {
       openModal: false 
     };
+
+    this.readLanguage();
    
     this.getToken();
     this.readResultJSONFile();
 
+    console.log("Home information")
     console.log(this.props.userInfo);
     
   }
@@ -120,6 +125,24 @@ class Home extends Component {
     }
   }
   
+  
+
+  async readLanguage(){
+    var lang = 'en';
+    try {
+      let languageInfo = await AsyncStorage.getItem("Language");
+      let data = JSON.parse(languageInfo);
+      lang = data.applicationLanguage;
+      console.log('readLanguage get token = ', data);
+      setI18nConfig(lang);
+    } catch (error) {
+      console.log("Something went wrong, get token = ", error);
+      
+    }
+
+
+    
+  }
 
   async readResultJSONFile(){
     try {
@@ -228,6 +251,27 @@ class Home extends Component {
   }
 
 
+  onClickChangeLanguage = () => {
+    
+    
+    this.handleLocalizationChange('en');
+    this.closeModal();
+  };
+
+  handleLocalizationChange = async(lang) =>{
+    try {
+      var langInfo = {
+        applicationLanguage : lang,
+      }
+      await AsyncStorage.setItem("Language", JSON.stringify(langInfo));
+  
+      console.log("handleLocalizationChange", "language change to = " + langInfo.applicationLanguage);
+      setI18nConfig(lang);
+      this.forceUpdate();
+    } catch (error) {
+      console.log("Something went wrong, store token = ", error);
+    }
+  }
 
   renderWelcomeBlock(){
     if(this.props.userInfo != null && this.props.userInfo.isAuthenticated == true){
@@ -236,7 +280,7 @@ class Home extends Component {
           <Block  style={styles.row}>
             <Block style={styles.welcomeInfoBlock}>
               <Text style={styles.subTitle} color={themeColor.COLORS.PRIMARY} >
-                {translate('hello')}ข้อมูลการทดสอบการได้ยินเป็นของ
+                {translate('Introduction')}
               </Text>
               <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
                 Guest
@@ -245,7 +289,7 @@ class Home extends Component {
             <Block style={{width: '22%'}}>
               <Button style={styles.menuButtonTry} onPress={this.openModal} >
                 <Text style={styles.createButtonText}>
-                  เพิ่มเติม
+                  {translate('SetupButton')}
                 </Text>
               </Button>
               
@@ -258,16 +302,16 @@ class Home extends Component {
           <Block  style={styles.row}>
             <Block style={styles.welcomeInfoBlock}>
               <Text style={styles.subTitle} color={themeColor.COLORS.PRIMARY} >
-                ข้อมูลการทดสอบการได้ยินเป็นของ
+                {translate('Introduction')}
               </Text>
               <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-                คุณ {this.props.userInfo.user.fn}
+                {this.props.userInfo.user.fn}
               </Text>
             </Block>
             <Block style={{width: '22%'}}>
               <Button style={styles.menuButtonTry} onPress={this.openModal} >
                 <Text style={styles.createButtonText}>
-                  เพิ่มเติม
+                  {translate('SetupButton')}
                 </Text>
               </Button>
               
@@ -281,10 +325,10 @@ class Home extends Component {
         <Block  style={styles.row}>
           <Block style={styles.welcomeInfoBlock}>
             <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-            ยินดีต้อนรับ
+              {translate('Welcome')}
             </Text>
             <Text style={styles.subTitle} color={themeColor.COLORS.TEXT_SECONDARY} >
-            วันนี้คุณได้ทำการทดสอบการได้ยินหรือยัง ?
+              {translate('WelcomeSubInfo')}
             </Text>
           </Block>
           <Block style={{width: '22%'}}>
@@ -330,10 +374,10 @@ class Home extends Component {
                                   style={{ height : 100, width: '100%', zIndex: 1 }}
                               >
                                 <Text style={styles.menuTextMain} color={themeColor.COLORS.PRIMARY} >
-                                  ทดสอบการได้ยิน
+                                  {translate('TestingButton')}
                                 </Text>
                                 <Text style={styles.menuSubTextMain} color={themeColor.COLORS.PRIMARY} >
-                                  ด้วยการฟังโทนเสียงแบบสุ่ม
+                                  {translate('TestingButtonDesc')}
                                 </Text>
                               </ImageBackground>
                               
@@ -357,10 +401,10 @@ class Home extends Component {
                                   style={{ height : 100, width: '100%', zIndex: 1 }}
                               >
                                 <Text style={styles.menuTextMain} color={themeColor.COLORS.PRIMARY} >
-                                  ผลทดสอบการได้ยิน
+                                  {translate('ResultButton')}
                                 </Text>
                                 <Text style={styles.menuSubTextMain} color={themeColor.COLORS.PRIMARY} >
-                                  ด้วยการฟังโทนเสียงแบบสุ่ม
+                                  {translate('ResultButtonDesc')}
                                 </Text>
                               </ImageBackground>
                               
@@ -396,7 +440,7 @@ class Home extends Component {
                             </Button>
                           </Block>
                         </Block> */}
-                        <Block style={styles.row}>
+                        {/* <Block style={styles.row}>
                           <Block style={{width: '33.33%', paddingRight: 2}}>
                             <Block style={styles.menuBlock}>
                               <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
@@ -441,7 +485,7 @@ class Home extends Component {
                               </Text>
                             </Block>
                           </Block>
-                        </Block>
+                        </Block> */}
                       </Block>
                     </Block>
                 </Block>
@@ -456,8 +500,15 @@ class Home extends Component {
             
           >
             <View style={{ alignItems: "center" }}>
+              
+              <TouchableOpacity style={{ margin: 5 }} onPress={this.onClickChangeLanguage}>
+                <Text>{translate('EnglishLabel')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={{ margin: 5 }} onPress={this.onClickChangeLanguage}>
+                <Text>{translate('ThaiLabel')}</Text>
+              </TouchableOpacity>
               <TouchableOpacity style={{ margin: 5 }} onPress={this.onClickLogOut}>
-                <Text>{ (this.props.userInfo.user.fn != 'DefaultUser') ? 'ออกจากระบบ': 'ออกจากระบบ'}</Text>
+                <Text>{ (this.props.userInfo.user.fn != 'DefaultUser') ? translate('Logout'): translate('Logout')}</Text>
               </TouchableOpacity>
             </View>
           </Modal>

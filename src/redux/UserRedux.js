@@ -18,7 +18,6 @@ export const actions = {
   
 const initialState = {   
     "isAuthenticated" : false,
-    "language" : "en",
     "user" : {}
 };
   
