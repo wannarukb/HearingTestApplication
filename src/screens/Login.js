@@ -12,6 +12,14 @@ import Images from "../constants/Images";
 import { Button, Input } from "../components";
 const { height, width } = Dimensions.get("screen");
 
+import i18n from 'i18n-js';
+import memoize from 'lodash.memoize';
+
+translate = memoize(
+    (key, config) => i18n.t(key, config),
+    (key, config) => (config ? key + JSON.stringify(config) : key)
+)
+
 class Login extends React.Component {
   constructor(props) {
     super(props);
@@ -216,7 +224,7 @@ class Login extends React.Component {
                         <Block flex middle style={{ paddingVertical: 30}}>
                           <Image source={Images.Ear} style={styles.earImg} />
                           <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-                          เข้าสู่ระบบ
+                            {translate('Login')}
                           </Text>
                         </Block>
                       </Block>
@@ -233,7 +241,7 @@ class Login extends React.Component {
                               >
                                 <Block  style={{ marginBottom: 15 }}>
                                   <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                  อีเมล (Email)
+                                    {translate('EmailLabel')}
                                   </Text>
                                   <TextInput
                                     style={styles.inputType}
@@ -247,7 +255,7 @@ class Login extends React.Component {
                                   </Block>
                                 <Block >
                                   <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                  รหัสผ่าน (Password)
+                                    {translate('PasswordLabel')}
                                   </Text>
                                   <TextInput
                                     style={styles.inputType}
@@ -266,7 +274,7 @@ class Login extends React.Component {
                                   <Button style={styles.createButton}
                                    onPress={() => this.login()}>
                                     <Text style={styles.createButtonText}>
-                                    เข้าสู่ระบบ
+                                      {translate('Login')}
                                     </Text>
                                   </Button>
                                 </Block>
@@ -284,7 +292,7 @@ class Login extends React.Component {
                                     )}
                                     >
                                       <Text style={styles.createButtonText}>
-                                      สมัครเลย !
+                                        {translate('RegisterButton')}
                                       </Text>
                                     </Button>
                                   </Block>
@@ -292,7 +300,7 @@ class Login extends React.Component {
                                     <Button style={styles.menuButtonTry}
                                     onPress={() => this.tryButton()}>
                                       <Text style={styles.createButtonText}>
-                                        ทดลองใช้งาน
+                                        {translate('LoginAsGuest')}
                                       </Text>
                                     </Button>
                                   </Block>

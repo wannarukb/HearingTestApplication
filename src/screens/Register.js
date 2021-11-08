@@ -13,6 +13,14 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import CheckBox from '@react-native-community/checkbox';
 
 
+import i18n, { translate } from 'i18n-js';
+import memoize from 'lodash.memoize';
+
+translate = memoize(
+    (key, config) => i18n.t(key, config),
+    (key, config) => (config ? key + JSON.stringify(config) : key)
+)
+
 const { height, width } = Dimensions.get("screen");
 class Register extends React.Component {
     constructor(props) {
@@ -221,7 +229,7 @@ class Register extends React.Component {
                                             <Block flex middle style={{ paddingVertical: 20}}>
                                                 <Image source={Images.Ear} style={styles.earImg} />
                                                 <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-                                                    สมัครเข้าใช้งาน
+                                                    {translate('RegisterHeaderLabel')}
                                                 </Text>
                                             </Block>
                                         </Block>
@@ -232,7 +240,7 @@ class Register extends React.Component {
                                             <Block style={{width: '100%'}} >
                                                 <Block style={styles.row} style={{ marginBottom: 15}} >
                                                     <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                                    อีเมล (Email)
+                                                        {translate('EmailLabel')}
                                                     </Text>
                                                     <TextInput
                                                         style={styles.inputType}
@@ -247,7 +255,7 @@ class Register extends React.Component {
                                                 </Block>
                                                 <Block style={{ marginBottom: 15 }}>
                                                 <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                                    รหัสผ่าน (Password)
+                                                    {translate('PasswordLabel')}
                                                 </Text>
                                                 <TextInput
                                                     style={styles.inputType}
@@ -264,7 +272,7 @@ class Register extends React.Component {
                                                 </Block>
                                                 <Block  style={{ marginBottom: 15 }}>
                                                 <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                                    ชื่อจริง (First Name)
+                                                    {translate('FirstNameLabel')}
                                                 </Text>
                                                 <TextInput
                                                     style={styles.inputType}
@@ -277,7 +285,7 @@ class Register extends React.Component {
                                                 </Block>
                                                 <Block  style={{ marginBottom: 15 }}>
                                                 <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                                    นามสกุล (Last Name)
+                                                    {translate('LastNameLabel')}
                                                 </Text>
                                                 <TextInput
                                                     style={styles.inputType}
@@ -305,7 +313,7 @@ class Register extends React.Component {
                                                 </Block> */}
                                                 <Block  style={{ marginBottom: 15 }}>
                                                     <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                                        เพศ (Gender)
+                                                        {translate('GenderLabel')}
                                                     </Text>
                                                     <Block style={styles.row}>
                                                         <Block style={styles.checkboxBlock}>
@@ -316,7 +324,7 @@ class Register extends React.Component {
                                                             />
                                                         </Block>
                                                         <Block style={styles.subQuestionLabel}>
-                                                            <Text  style={styles.subQuestionText} > หญิง</Text>
+                                                            <Text  style={styles.subQuestionText} > {translate('FemaleLabel')}</Text>
                                                         </Block>
                                                         <Block style={styles.checkboxBlock}>
                                                             <CheckBox
@@ -326,7 +334,7 @@ class Register extends React.Component {
                                                             />
                                                         </Block>
                                                         <Block style={styles.subQuestionLabel}>
-                                                            <Text  style={styles.subQuestionText} > ชาย</Text>
+                                                            <Text  style={styles.subQuestionText} > {translate('MaleLabel')}</Text>
                                                         </Block>
 
                                                         
@@ -336,7 +344,7 @@ class Register extends React.Component {
                                                     <Block style={{width: '100%'}}>
                                                         <Button style={styles.createButton} onPress={() => this.onSubmitRegister()}>
                                                             <Text style={styles.createButtonText}>
-                                                                ยืนยันการสมัคร
+                                                                {translate('ConfirmRegisterButton')}
                                                             </Text>
                                                         </Button>
                                                     </Block>

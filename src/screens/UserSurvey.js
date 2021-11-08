@@ -11,6 +11,14 @@ import Images from "../constants/Images";
 import { Button } from "../components";
 import CheckBox from '@react-native-community/checkbox';
 
+import i18n, { translate } from 'i18n-js';
+import memoize from 'lodash.memoize';
+
+translate = memoize(
+    (key, config) => i18n.t(key, config),
+    (key, config) => (config ? key + JSON.stringify(config) : key)
+)
+
 const { height, width } = Dimensions.get("screen");
 
 class UserSurvey extends Component {
@@ -188,12 +196,12 @@ class UserSurvey extends Component {
                       color={themeColor.COLORS.BTN_SECONDARY}
                       style={{marginRight: 5}}
                     />  */}
-                    ย้อนกลับ {this.props.token}
+                    {translate('BackButton')} {this.props.token}
                   </Text>
                 </Block>
                 <Block style={{width: '50%',marginHorizontal: 2, justifyContent: 'center'}}>
                   <Text  style={styles.navbarText} >
-                    แบบสอบถาม
+                    {translate('UserSurveyHeaderLabel')}
                   </Text>
                 </Block>
                 <Block style={{width: '25%',marginHorizontal: 2}}></Block>
@@ -205,11 +213,11 @@ class UserSurvey extends Component {
             >
               <Block  style={styles.contentContainer}>
                 <Block  style={{ paddingVertical: 15, justifyContent: "space-around", height: 30,alignItems: "center", marginBottom: 30}}>
-                  <Text  style={styles.mainQuestionText} >ท่านมีอาการดังต่อไปนี้หรือไม่</Text>
+                  <Text  style={styles.mainQuestionText} >{translate('MainPageQuestion')}</Text>
                 </Block>
                 <Block style={styles.questionRow}>
                   <Block style={styles.subQuestion}>
-                      <Text  style={styles.subQuestionText} >ท่านรู้สึกหูอื้อ ?</Text>
+                      <Text  style={styles.subQuestionText} >{translate('FirstQuestion')}</Text>
                   </Block>
                   <Block style={styles.checkboxBlock}>
                     <CheckBox
@@ -220,13 +228,13 @@ class UserSurvey extends Component {
                     />
                   </Block>
                   <Block style={styles.subQuestionLabel}>
-                      <Text  style={styles.subQuestionText} > ใช่</Text>
+                      <Text  style={styles.subQuestionText} > {translate('YesLabel')}</Text>
                   </Block>
                 </Block>
 
                 <Block style={styles.questionRow}>
                   <Block style={styles.subQuestion}>
-                      <Text  style={styles.subQuestionText} >ท่านไม่สบายเป็นหวัด ?</Text>
+                      <Text  style={styles.subQuestionText} >{translate('SecondQuestion')}</Text>
                   </Block>
                   <Block style={styles.checkboxBlock}>
                     <CheckBox
@@ -237,13 +245,13 @@ class UserSurvey extends Component {
                     />
                   </Block>
                   <Block style={styles.subQuestionLabel}>
-                      <Text  style={styles.subQuestionText} > ใช่</Text>
+                      <Text  style={styles.subQuestionText} > {translate('YesLabel')}</Text>
                   </Block>
                 </Block>
 
                 <Block style={styles.questionRow}>
                   <Block style={styles.subQuestion}>
-                      <Text  style={styles.subQuestionText} >ท่านมีน้ำไหลในหู ?</Text>
+                      <Text  style={styles.subQuestionText} >{translate('ThirdQuestion')}</Text>
                   </Block>
                   <Block style={styles.checkboxBlock}>
                     <CheckBox
@@ -254,7 +262,7 @@ class UserSurvey extends Component {
                     />
                   </Block>
                   <Block style={styles.subQuestionLabel}>
-                      <Text  style={styles.subQuestionText} > ใช่</Text>
+                      <Text  style={styles.subQuestionText} > {translate('YesLabel')}</Text>
                   </Block>
                 </Block>
               </Block>
@@ -265,26 +273,17 @@ class UserSurvey extends Component {
                     <Block style={styles.alertBox}>
                       
                       <Text style={styles.alertTextHead}>
-                        {/* <Icon
-                          name="md-alert"
-                          family="Ionicon"
-                          size={20}
-                          color={themeColor.COLORS.ALERT_TEXT}
-                        />  */}
-                        สภาพร่างกายของคุณไม่พร้อมที่จะทำการทดสอบ
+                        {translate('SurveyResult')}
                       </Text>
                       <Text style={styles.alertText}>
-                        โปรดทำการทดสอบในวันอื่น หากท่านทดสอบ 
-                      </Text>
-                      <Text style={styles.alertText}>
-                        อาจทำให้ผลลัพธ์ที่ได้ จะไม่สมบูรณ์ถูกต้อง
+                        {translate('SurveySuggest')}
                       </Text>
                     </Block>
                     <Block middle>
                       <Button style={styles.backButton}
                         onPress={() => this.backHome()}>
                         <Text style={styles.createButtonText}>
-                        ย้อนกลับ
+                          {translate('BackButton')}
                         </Text>
                       </Button>
                     </Block>
@@ -296,7 +295,7 @@ class UserSurvey extends Component {
                       onPress={() => this.nextButton()}
                       >
                       <Text style={styles.createButtonText}>
-                      ถัดไป
+                      {translate('NextButton')}
                       </Text>
                     </Button>
                   </Block>

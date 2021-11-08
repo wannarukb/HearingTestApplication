@@ -28,6 +28,7 @@
     "ConfirmRegisterButton": "ยืนยันการสมัคร",
     "BackButton": "ย้อนกลับ",
     "NextButton": "ถัดไป",
+    "UserSurveyHeaderLabel" : "แบบสอบถาม",
     "MainPageQuestion": "ท่านมีอาการดังต่อไปนี้หรือไม่",
     "FirstQuestion": "ท่านรู้สึกหูอื้อ ?",
     "SecondQuestion": "ท่านไม่สบายเป็นหวัด ?",

@@ -10,6 +10,15 @@ import { Table, TableWrapper, Row, Rows, Col, Cols, Cell} from 'react-native-tab
 
 import {connect} from 'react-redux';
 
+import i18n, { translate } from 'i18n-js';
+import memoize from 'lodash.memoize';
+
+translate = memoize(
+    (key, config) => i18n.t(key, config),
+    (key, config) => (config ? key + JSON.stringify(config) : key)
+)
+
+
 const { height, width } = Dimensions.get("screen");
 
 class HearingTestResult extends Component {
@@ -90,12 +99,12 @@ class HearingTestResult extends Component {
                                         color={themeColor.COLORS.BTN_SECONDARY}
                                         style={{marginRight: 5}}
                                         />  */}
-                                        ย้อนกลับ
+                                        {translate('BackButton')}
                                     </Text>
                                 </Block>
                                 <Block style={{width: '50%',marginHorizontal: 2, justifyContent: 'center'}}>
                                     <Text  style={styles.navbarText} >
-                                        ผลการตรวจ
+                                        {translate('TestResultInfoLabel')}
                                     </Text>
                                 </Block>
                                 <Block style={{width: '25%',marginHorizontal: 2}}></Block>
@@ -106,19 +115,19 @@ class HearingTestResult extends Component {
                                 <Row data={this.state.HeadTable} style={styles.head} textStyle={styles.headText}/>
                             </Table>
                             <ScrollView style={styles.dataWrapper}>
-                            <Table borderStyle={{borderColor: '#C1C0B9'}}>
-                                {
-                                this.state.DataTable.map((dataRow, index) => (
-                                    <Row
-                                    key={index}
-                                    data={dataRow}
-                                    // widthArr={state.widthArr}
-                                    style={[styles.tableRow, index%2 && {backgroundColor: '#ffffff'}]}
-                                    textStyle={styles.text}
-                                    />
-                                ))
-                                }
-                            </Table>
+                                <Table borderStyle={{borderColor: '#C1C0B9'}}>
+                                    {
+                                        this.state.DataTable.map((dataRow, index) => (
+                                            <Row
+                                            key={index}
+                                            data={dataRow}
+                                            // widthArr={state.widthArr}
+                                            style={[styles.tableRow, index%2 && {backgroundColor: '#ffffff'}]}
+                                            textStyle={styles.text}
+                                            />
+                                        ))
+                                    }
+                                </Table>
                             </ScrollView>
                         </View>
                 

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
-
 import { Block, Button, Text, theme } from "galio-framework";
 import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView, TouchableOpacity, View, LogBox , I18nManager } from 'react-native';
 import themeColor from "../constants/Theme";
@@ -12,90 +11,69 @@ import {CommonActions } from '@react-navigation/native';
 import Modal from "react-native-simple-modal";
 import TestToneService from '../services/TestToneService';
 
-import * as RNLocalize from 'react-native-localize';
+import DeviceInfo from 'react-native-device-info';
+import {LanguageService} from "../services/LanguageService";
 import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
 
-const translationGetters = {
-  // lazy requires (metro bundler does not support symlinks)
-  en: () => require('../translations/en.json'),
-  th: () => require('../translations/th.json'),
-};
-
-const translate = memoize(
-  (key, config) => i18n.t(key, config),
-  (key, config) => (config ? key + JSON.stringify(config) : key)
-);
-
-const setI18nConfig = (lang) => {
-  // fallback if no available language fits
-  const fallback = { languageTag: lang, isRTL: false };
-
-  var { languageTag, isRTL } =  fallback || RNLocalize.findBestAvailableLanguage(Object.keys(translationGetters));
-
-  if(lang){
-    languageTag = fallback.languageTag;
-    isRTL       = fallback.isRTL;
-  }
-
-  // clear translation cache
-  translate.cache.clear();
-  // update layout direction
-  I18nManager.forceRTL(isRTL);
-  // set i18n-js config
-  i18n.translations = { [languageTag]: translationGetters[languageTag]() };
-  i18n.locale = languageTag;
-};
+translate = memoize(
+    (key, config) => i18n.t(key, config),
+    (key, config) => (config ? key + JSON.stringify(config) : key)
+)
 
 
 LogBox.ignoreAllLogs(true);
 class Home extends Component {
 
-  constructor(props) {
+constructor(props) {
     super(props);
 
     this.state = {
-      openModal: false 
+        openModal: false 
     };
 
-    this.readLanguage();
-   
+
     this.getToken();
     this.readResultJSONFile();
 
-    console.log("Home information")
+    console.log("Home information");
+    console.log(this.props.deviceInfo);
     console.log(this.props.userInfo);
+    let lang = (this.props.deviceInfo.language) ? this.props.deviceInfo.language : 'en';
+    this.setDeviceLanguage(lang);
     
-  }
-  
-  postTestToneResult = (testToneResult) => {
+    
+    
+}
+
+postTestToneResult = (testToneResult) => {
     try {
         TestToneService.post_testTone_result_api(testToneResult).then(responseJson => {
-          console.log('Post Test Tone API', responseJson);
-          this.setState({loading:false})
-          if (responseJson.ok) {
-              this.setState({
-                  loading: false,
-              });
-  
-              if (responseJson.data != null) {
-                  var data = responseJson.data;
-                  console.log("post_testTone_result_api Success ! " + data);
+        console.log('Post Test Tone API', responseJson);
+        this.setState({loading:false})
+        if (responseJson.ok) {
+            this.setState({
+                loading: false,
+            });
 
-                  var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
-                  // write the file
-                  RNFS.writeFile(path, '{}', 'utf8')
-                  .then((Writesuccess) => {
+            if (responseJson.data != null) {
+                var data = responseJson.data;
+                console.log("post_testTone_result_api Success ! " + data);
+
+                var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
+                // write the file
+                RNFS.writeFile(path, '{}', 'utf8')
+                .then((Writesuccess) => {
                     console.log('FILE WRITTEN!');
-                  })
-                  .catch((err) => {
+                })
+                .catch((err) => {
                     console.log(err.message);
-                  });
+                });
 
-              } else {
-                  alert('server error no data')
-              }
-          } else {
+            } else {
+                alert('server error no data')
+            }
+        } else {
             if (responseJson.problem == 'NETWORK_ERROR') {
                 alert('server error = NETWORK_ERROR')
                 this.setState({
@@ -107,111 +85,104 @@ class Home extends Component {
                     loading: false,
                 });
             } else {
-              alert('server error responseJson ERROR')
-              this.setState({
-                  loading: false,
-              });
+            alert('server error responseJson ERROR')
+            this.setState({
+                loading: false,
+            });
             }
-          }
+        }
         }).catch(error => {
             console.error(error);
             this.setState({
                 loading: false,
             });
         });
-      
+    
     } catch (e) {
-      console.error(e);
+    console.error(e);
     }
-  }
-  
-  
+}
 
-  async readLanguage(){
-    var lang = 'en';
-    try {
-      let languageInfo = await AsyncStorage.getItem("Language");
-      let data = JSON.parse(languageInfo);
-      lang = data.applicationLanguage;
-      console.log('readLanguage get token = ', data);
-      setI18nConfig(lang);
-    } catch (error) {
-      console.log("Something went wrong, get token = ", error);
-      
-    }
-
-
+setDeviceLanguage(lang){
+    console.log("SET DEVICE Language = " + lang);
+    let deviceJSON = {};
+    deviceJSON.uniqueId = DeviceInfo.getUniqueId();
+    deviceJSON.brand = DeviceInfo.getBrand();
+    deviceJSON.model = DeviceInfo.getModel();
+    deviceJSON.language = (lang) ? lang : 'en';
+    this.props.setupDeviceInfo(deviceJSON);
+    LanguageService.getInstance().changeLanguage(lang);
     
-  }
+}
 
-  async readResultJSONFile(){
+async readResultJSONFile(){
     try {
-      var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
-    
-      if(path != null && path != undefined){
-        console.log(path)
-        const fileContent = await RNFS.readFile(path, 'utf8');
-        console.log('my save data');
-        console.log(fileContent);
-        if(fileContent != null && fileContent != undefined){
-          let data = JSON.parse(fileContent);
-          let isSyncData = JSON.stringify(data) === JSON.stringify({});
-          if(isSyncData === false){
-            await AsyncStorage.setItem("TestResults", JSON.stringify(data));
-            this.postTestToneResult(data);
-          }
+        var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
+        
+        if(path != null && path != undefined){
+            console.log(path)
+            const fileContent = await RNFS.readFile(path, 'utf8');
+            console.log('my save data');
+            console.log(fileContent);
+            if(fileContent != null && fileContent != undefined){
+                let data = JSON.parse(fileContent);
+                let isSyncData = JSON.stringify(data) === JSON.stringify({});
+                if(isSyncData === false){
+                    await AsyncStorage.setItem("TestResults", JSON.stringify(data));
+                    this.postTestToneResult(data);
+                }
+            }
         }
-      }
     } catch (error) {
-      console.log("Something went wrong, readResultJSONFile = ", error);
+        console.log("Something went wrong, readResultJSONFile = ", error);
     }
-  }
+}
 
-  async getToken() {
+async getToken() {
     try {
-      let userData = await AsyncStorage.getItem("UserInfo");
-      let data = JSON.parse(userData);
-      console.log('Login get token = ', data);
+        let userData = await AsyncStorage.getItem("UserInfo");
+        let data = JSON.parse(userData);
+        console.log('Login get token = ', data);
     } catch (error) {
-      console.log("Something went wrong, get token = ", error);
+        console.log("Something went wrong, get token = ", error);
     }
-  }
+}
 
-  onClickStartTesting(){
+onClickStartTesting(){
     if(this.props.userInfo != null && this.props.userInfo.isAuthenticated){    
-      this.props.navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [
-            { name: 'UserSurvey' },
-          ],
-        })
-      );
+        this.props.navigation.dispatch(
+            CommonActions.reset({
+            index: 0,
+            routes: [
+                { name: 'UserSurvey' },
+            ],
+            })
+        );
     }else{
-      this.props.navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [
-            { name: 'Login' },
-          ],
-        })
-      );
+        this.props.navigation.dispatch(
+            CommonActions.reset({
+            index: 0,
+            routes: [
+                { name: 'Login' },
+            ],
+            })
+        );
     }
-  }
+}
 
-  modalDidOpen = () => console.log("Modal did open.");
+modalDidOpen = () => console.log("Modal did open.");
 
-  modalDidClose = () => {
+modalDidClose = () => {
     this.setState({ openModal: false });
     console.log("Modal did close.");
-  };
+};
 
 
-  openModal = () => this.setState({ openModal: true });
+openModal = () => this.setState({ openModal: true });
 
-  closeModal = () => this.setState({ openModal: false });
+closeModal = () => this.setState({ openModal: false });
 
-  onClickLogOut = ()=> { 
+onClickLogOut = ()=> { 
     // if(this.props.userInfo.user.fn == 'DefaultUser'){
     //   this.props.navigation.dispatch(
     //     CommonActions.reset({
@@ -222,302 +193,264 @@ class Home extends Component {
     //     })
     //   );
     // }else{
-      console.log("LOGOUT");
-      this.props.logout();
-      this.resetToken();
-      var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
-      var data = {};
-      AsyncStorage.setItem("TestResults", JSON.stringify(data));
-      // write the file
-      RNFS.writeFile(path, '{}', 'utf8')
-      .then((Writesuccess) => {
+    console.log("LOGOUT");
+    this.props.logout();
+    this.resetToken();
+    var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
+    var data = {};
+    AsyncStorage.setItem("TestResults", JSON.stringify(data));
+    // write the file
+    RNFS.writeFile(path, '{}', 'utf8')
+    .then((Writesuccess) => {
         console.log('FILE WRITTEN!');
-      })
-      .catch((err) => {
+    })
+    .catch((err) => {
         console.log(err.message);
-      });
-      this.closeModal();
-    // }
-  }
-
-  // async storeToken(user) 
-  resetToken = async() =>{
-    try {
-      await AsyncStorage.setItem("UserInfo", "");
-      console.log("reset Token", "Token have been reset to undefined");
-    } catch (error) {
-      console.log("Something went wrong, store token = ", error);
-    }
-  }
-
-
-  onClickChangeLanguage = () => {
-    
-    
-    this.handleLocalizationChange('en');
+    });
     this.closeModal();
-  };
+    // }
+}
 
-  handleLocalizationChange = async(lang) =>{
+// async storeToken(user) 
+resetToken = async() =>{
     try {
-      var langInfo = {
-        applicationLanguage : lang,
-      }
-      await AsyncStorage.setItem("Language", JSON.stringify(langInfo));
-  
-      console.log("handleLocalizationChange", "language change to = " + langInfo.applicationLanguage);
-      setI18nConfig(lang);
-      this.forceUpdate();
+        await AsyncStorage.setItem("UserInfo", "");
+        console.log("reset Token", "Token have been reset to undefined");
     } catch (error) {
-      console.log("Something went wrong, store token = ", error);
+        console.log("Something went wrong, store token = ", error);
     }
-  }
+}
 
-  renderWelcomeBlock(){
+
+onClickChangeLanguage = (lang) => {
+    this.setDeviceLanguage(lang);
+    this.closeModal();
+};
+
+renderWelcomeBlock(){
     if(this.props.userInfo != null && this.props.userInfo.isAuthenticated == true){
-      if(this.props.userInfo.user.fn == 'DefaultUser'){
         return (
-          <Block  style={styles.row}>
-            <Block style={styles.welcomeInfoBlock}>
-              <Text style={styles.subTitle} color={themeColor.COLORS.PRIMARY} >
-                {translate('Introduction')}
-              </Text>
-              <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-                Guest
-              </Text>
-            </Block>
-            <Block style={{width: '22%'}}>
-              <Button style={styles.menuButtonTry} onPress={this.openModal} >
-                <Text style={styles.createButtonText}>
-                  {translate('SetupButton')}
+            <Block  style={styles.row}>
+                <Block style={styles.welcomeInfoBlock}>
+                <Text style={styles.subTitle} color={themeColor.COLORS.PRIMARY} >
+                    {translate('Introduction')}
                 </Text>
-              </Button>
-              
-              
-            </Block>
-          </Block>
-        )
-      }else{
-        return (
-          <Block  style={styles.row}>
-            <Block style={styles.welcomeInfoBlock}>
-              <Text style={styles.subTitle} color={themeColor.COLORS.PRIMARY} >
-                {translate('Introduction')}
-              </Text>
-              <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-                {this.props.userInfo.user.fn}
-              </Text>
-            </Block>
-            <Block style={{width: '22%'}}>
-              <Button style={styles.menuButtonTry} onPress={this.openModal} >
-                <Text style={styles.createButtonText}>
-                  {translate('SetupButton')}
+                <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
+                    {(this.props.userInfo.user.fn == 'DefaultUser') ? 'Guest' : this.props.userInfo.user.fn}
                 </Text>
-              </Button>
-              
-              
+                </Block>
+                <Block style={{width: '22%'}}>
+                    <Button style={styles.menuButtonTry} onPress={this.openModal} >
+                        <Text style={styles.createButtonText}>
+                        {translate('SetupButton')}
+                        </Text>
+                    </Button>
+                </Block>
             </Block>
-          </Block>
         )
-      }
     }else{
-      return (
-        <Block  style={styles.row}>
-          <Block style={styles.welcomeInfoBlock}>
-            <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-              {translate('Welcome')}
-            </Text>
-            <Text style={styles.subTitle} color={themeColor.COLORS.TEXT_SECONDARY} >
-              {translate('WelcomeSubInfo')}
-            </Text>
-          </Block>
-          <Block style={{width: '22%'}}>
-          </Block>
-        </Block>
-      )
+        return (
+            <Block  style={styles.row}>
+                <Block style={styles.welcomeInfoBlock}>
+                    <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
+                    {translate('Welcome')}
+                    </Text>
+                    <Text style={styles.subTitle} color={themeColor.COLORS.TEXT_SECONDARY} >
+                    {translate('WelcomeSubInfo')}
+                    </Text>
+                </Block>
+                <Block style={{width: '22%'}}>
+                    <Button style={styles.menuButtonTry} onPress={this.openModal} >
+                        <Text style={styles.createButtonText}>
+                        {translate('SetupButton')}
+                        </Text>
+                    </Button>
+                </Block>
+            </Block>
+        )
     }
-      
-  }
+    
+}
 
-  
-  render() {
+
+render() {
     // const { navigation } = this.props;
     // const pureToneModule = NativeModules.HearingTestModule;
     return (
-      
-      <Block flex style={styles.container}>
+    
+    <Block flex style={styles.container}>
         <Block flex>
-          <ImageBackground
-              source={Images.lightBG}
-              style={{ height, width, zIndex: 1 }}
-          >
-          
-          <ScrollView
+        <ImageBackground
+            source={Images.lightBG}
+            style={{ height, width, zIndex: 1 }}
+        >
+        
+        <ScrollView
             showsVerticalScrollIndicator={false}
             style={{ width, marginTop: '0%' }}
-          >
-              <Block flex style={styles.homeContainer}>
+        >
+            <Block flex style={styles.homeContainer}>
                 <Image source={Images.logoFaculty} style={styles.logo} />
                 <Block flex space="around">
                     <Block style={styles.titleBlock}>
-                      <Block style={styles.welcomeBlock}>
-                      {this.renderWelcomeBlock()}  
-                      </Block>
-                      <Block style={styles.menuSet}>
+                    <Block style={styles.welcomeBlock}>
+                    {this.renderWelcomeBlock()}  
+                    </Block>
+                    <Block style={styles.menuSet}>
                         <Block style={styles.row}>
-                          <Block style={{width: '100%'}}>
+                        <Block style={{width: '100%'}}>
                             <Button style={styles.menuBlockMain} 
-                              onPress={() => this.onClickStartTesting()}
+                            onPress={() => this.onClickStartTesting()}
                             >
-                              <ImageBackground
-                                  source={Images.EarTestMain}
-                                  style={{ height : 100, width: '100%', zIndex: 1 }}
-                              >
+                            <ImageBackground
+                                source={Images.EarTestMain}
+                                style={{ height : 100, width: '100%', zIndex: 1 }}
+                            >
                                 <Text style={styles.menuTextMain} color={themeColor.COLORS.PRIMARY} >
-                                  {translate('TestingButton')}
+                                {translate('TestingButton')}
                                 </Text>
                                 <Text style={styles.menuSubTextMain} color={themeColor.COLORS.PRIMARY} >
-                                  {translate('TestingButtonDesc')}
+                                {translate('TestingButtonDesc')}
                                 </Text>
-                              </ImageBackground>
-                              
+                            </ImageBackground>
+                            
                             </Button>
-                          </Block>
+                        </Block>
                         </Block>
                         <Block style={styles.row}>
-                          <Block style={{width: '100%'}}>
+                        <Block style={{width: '100%'}}>
                             <Button style={styles.menuBlockMain} 
-                              onPress={() => this.props.navigation.dispatch(
+                            onPress={() => this.props.navigation.dispatch(
                                 CommonActions.reset({
-                                  index: 0,
-                                  routes: [
+                                index: 0,
+                                routes: [
                                     { name: 'HearingTestResult' },
-                                  ],
+                                ],
                                 })
-                              )}
+                            )}
                             >
-                              <ImageBackground
-                                  source={Images.HearingResult}
-                                  style={{ height : 100, width: '100%', zIndex: 1 }}
-                              >
+                            <ImageBackground
+                                source={Images.HearingResult}
+                                style={{ height : 100, width: '100%', zIndex: 1 }}
+                            >
                                 <Text style={styles.menuTextMain} color={themeColor.COLORS.PRIMARY} >
-                                  {translate('ResultButton')}
+                                {translate('ResultButton')}
                                 </Text>
                                 <Text style={styles.menuSubTextMain} color={themeColor.COLORS.PRIMARY} >
-                                  {translate('ResultButtonDesc')}
+                                {translate('ResultButtonDesc')}
                                 </Text>
-                              </ImageBackground>
-                              
+                            </ImageBackground>
+                            
                             </Button>
-                          </Block>
+                        </Block>
                         </Block>
                         {/* <Block style={styles.row}>
-                          <Block style={{width: '50%', paddingRight: 2}}>
+                        <Block style={{width: '50%', paddingRight: 2}}>
                             <Button style={styles.menuBlock} 
-                              //  onPress={() => navigation.navigate("HearingTestResult")}
-                              onPress={() => 
+                            //  onPress={() => navigation.navigate("HearingTestResult")}
+                            onPress={() => 
                                 this.props.navigation.dispatch(
-                                  CommonActions.reset({
+                                CommonActions.reset({
                                     index: 0,
                                     routes: [
-                                      { name: 'HearingTestResult' },
+                                    { name: 'HearingTestResult' },
                                     ],
-                                  })
+                                })
                                 )}
                             >
-                              <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
+                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
                                 ผลการตรวจ
-                              </Text>
+                            </Text>
                             </Button>
-                          </Block>
-                          <Block style={{width: '50%', paddingLeft: 2}}>
+                        </Block>
+                        <Block style={{width: '50%', paddingLeft: 2}}>
                             <Button style={styles.menuBlock} 
-                              //  onPress={() => navigation.navigate("Appointment")}
+                            //  onPress={() => navigation.navigate("Appointment")}
                             >
-                              <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
+                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
                                 ตารางนัดหมาย
-                              </Text>
+                            </Text>
                             </Button>
-                          </Block>
+                        </Block>
                         </Block> */}
                         {/* <Block style={styles.row}>
-                          <Block style={{width: '33.33%', paddingRight: 2}}>
+                        <Block style={{width: '33.33%', paddingRight: 2}}>
                             <Block style={styles.menuBlock}>
-                              <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
+                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
                                 เรื่องหูที่ควรรู้
-                              </Text>
+                            </Text>
                             </Block>
-                          </Block>
-                          <Block style={{width: '33.33%', paddingLeft: 2, paddingRight: 2}}>
+                        </Block>
+                        <Block style={{width: '33.33%', paddingLeft: 2, paddingRight: 2}}>
                             <Block style={styles.menuBlock}>
-                              <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
+                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
                                 คู่มือการใช้งาน
-                              </Text>
+                            </Text>
                             </Block>
-                          </Block>
-                          <Block style={{width: '33.33%', paddingLeft: 2}}>
+                        </Block>
+                        <Block style={{width: '33.33%', paddingLeft: 2}}>
                             <Block style={styles.menuBlock}>
-                              <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
+                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
                                 บริการของเรา
-                              </Text>
+                            </Text>
                             </Block>
-                          </Block>
+                        </Block>
                         </Block>
                         <Block style={styles.row}>
-                          <Block style={{width: '33.33%', paddingRight: 2}}>
+                        <Block style={{width: '33.33%', paddingRight: 2}}>
                             <Block style={styles.menuBlock}>
-                              <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
+                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
                                 ข้อเสนอแนะ
-                              </Text>
+                            </Text>
                             </Block>
-                          </Block>
-                          <Block style={{width: '33.33%', paddingLeft: 2, paddingRight: 2}}>
+                        </Block>
+                        <Block style={{width: '33.33%', paddingLeft: 2, paddingRight: 2}}>
                             <Block style={styles.menuBlock}>
-                              <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
+                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
                                 ตั้งค่าอุปกรณ์
-                              </Text>
+                            </Text>
                             </Block>
-                          </Block>
-                          <Block style={{width: '33.33%', paddingLeft: 2}}>
+                        </Block>
+                        <Block style={{width: '33.33%', paddingLeft: 2}}>
                             <Block style={styles.menuBlock}>
-                              <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
+                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
                                 เกี่ยวกับเรา
-                              </Text>
+                            </Text>
                             </Block>
-                          </Block>
+                        </Block>
                         </Block> */}
-                      </Block>
+                    </Block>
                     </Block>
                 </Block>
-              </Block>
+            </Block>
             </ScrollView>
-          <Modal
+        <Modal
             offset={this.state.offset}
             open={this.state.openModal}
             modalDidOpen={this.modalDidOpen}
             modalDidClose={this.modalDidClose}
             style={{ alignItems: "center" }}
             
-          >
+        >
             <View style={{ alignItems: "center" }}>
-              
-              <TouchableOpacity style={{ margin: 5 }} onPress={this.onClickChangeLanguage}>
+            
+            <TouchableOpacity style={{ margin: 5 }} onPress={() => this.onClickChangeLanguage('en')}>
                 <Text>{translate('EnglishLabel')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={{ margin: 5 }} onPress={this.onClickChangeLanguage}>
+            </TouchableOpacity>
+            <TouchableOpacity style={{ margin: 5 }} onPress={() => this.onClickChangeLanguage('th')}>
                 <Text>{translate('ThaiLabel')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={{ margin: 5 }} onPress={this.onClickLogOut}>
+            </TouchableOpacity>
+            <TouchableOpacity style={{ margin: 5 }} onPress={this.onClickLogOut}>
                 <Text>{ (this.props.userInfo.user.fn != 'DefaultUser') ? translate('Logout'): translate('Logout')}</Text>
-              </TouchableOpacity>
+            </TouchableOpacity>
             </View>
-          </Modal>
-          </ImageBackground>
+        </Modal>
+        </ImageBackground>
         </Block>
-      </Block>
+    </Block>
         
     );
-  }
+}
 }
 
 const styles = StyleSheet.create({
@@ -642,20 +575,23 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => {
-  return {
-    // Name: state.user.Name,
-    // image: state.user.image,
-    userInfo: state.user,
-    network: state.network,
-  };
+    return {
+        // Name: state.user.Name,
+        // image: state.user.image,
+        userInfo: state.user,
+        network: state.network,
+        deviceInfo : state.deviceInfo
+    };
 };
 
 const mapDispatchToProps = dispatch => {
-  const {actions} = require('../redux/UserRedux');
+    const {actions} = require('../redux/UserRedux');
+    const {deviceInfoActions} = require('../redux/DeviceRedux');
 
-  return {
-    logout: () => dispatch(actions.logout()),
-  };
+    return {
+        logout: () => dispatch(actions.logout()),
+        setupDeviceInfo: deviceInfo => dispatch(deviceInfoActions.setupDeviceInfo(deviceInfo))
+    };
 };
 
 
