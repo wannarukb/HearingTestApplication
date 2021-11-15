@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {  I18nManager } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import i18n from 'i18n-js';
+import memoize from 'lodash.memoize';
 
 
 const translationGetters = {
@@ -9,7 +10,8 @@ const translationGetters = {
     en: () => require('../translations/en.json'),
     th: () => require('../translations/th.json'),
 };
-  
+
+
 // export default LanguageService;
 export class LanguageService extends Component {
     static myInstance = null;
@@ -23,13 +25,16 @@ export class LanguageService extends Component {
 
         var { languageTag, isRTL } =  fallback || RNLocalize.findBestAvailableLanguage(Object.keys(translationGetters));
 
+        console.log('LEKK = ' + lang);
         if(lang){
             languageTag = fallback.languageTag;
             isRTL       = fallback.isRTL;
         }
 
+        console.log('LEKK = languageTag = ' + languageTag);
+
         // clear translation cache
-        translate.cache.clear();
+        // translate.cache.clear();
         // update layout direction
         I18nManager.forceRTL(isRTL);
         // set i18n-js config

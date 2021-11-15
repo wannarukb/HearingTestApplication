@@ -1,38 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://schemas.android.com/tools"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:background="@color/backround_default"
-tools:context=".HearingActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal|center_vertical"
+    android:background="@color/background_white"
+    tools:context=".HearingActivity">
 
     <LinearLayout
         android:id="@+id/intro_page"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="1dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
         android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        >
+        app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
             android:id="@+id/intro"
-            android:layout_width="409dp"
-            android:layout_height="197dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="40dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/textView"
-                android:layout_width="wrap_content"
+                android:id="@+id/tonePlayHeaderLabel"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/sarabun_bold"
                 android:gravity="center_horizontal"
-                android:text="@string/testing"
+                android:text="Text"
                 android:textColor="@color/text_default"
                 android:textSize="22sp"
                 tools:ignore="MissingConstraints"
@@ -40,17 +43,15 @@ tools:context=".HearingActivity">
                 tools:layout_editor_absoluteY="53dp" />
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/tonePlayDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/sarabun_regular"
                 android:gravity="center_horizontal"
-                android:text="@string/testing_action_desc_1"
+                android:text="text"
                 android:textColor="@color/text_default"
                 android:textSize="16sp"
-                tools:ignore="MissingConstraints"
-                tools:layout_editor_absoluteX="108dp"
-                tools:layout_editor_absoluteY="73dp" />
+                tools:ignore="MissingConstraints" />
 
         </LinearLayout>
 
@@ -60,8 +61,8 @@ tools:context=".HearingActivity">
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingTop="30dp"
-            android:paddingBottom="30dp"
+
+            android:padding="20dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/intro">
 
@@ -69,7 +70,7 @@ tools:context=".HearingActivity">
             <ImageView
                 android:id="@+id/testToneImage"
                 android:layout_width="wrap_content"
-                android:layout_height="249dp"
+                android:layout_height="200dp"
                 android:layout_centerInParent="true"
                 android:src="@drawable/tone_none" />
 
@@ -77,12 +78,11 @@ tools:context=".HearingActivity">
 
         <LinearLayout
             android:id="@+id/intro_button"
-            android:layout_width="413dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingTop="30dp"
-            android:paddingBottom="20dp"
+            android:padding="30dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/animateLayout">
 
@@ -94,241 +94,236 @@ tools:context=".HearingActivity">
                 android:fontFamily="@font/sarabun_medium"
                 android:gravity="center"
                 android:onClick="onClickStart"
-                android:text="@string/start"
+                android:text="I CAN HEAR"
                 android:textColor="@color/text_inverse"
-                android:textColorHighlight="@color/text_inverse"
-                android:textColorHint="@color/text_inverse"
-                android:textColorLink="@color/text_inverse"
                 android:textSize="18sp"
                 tools:ignore="OnClick" />
 
         </LinearLayout>
 
-<!--        <LinearLayout-->
-<!--            android:id="@+id/intro_result"-->
-<!--            android:layout_width="409dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="1dp"-->
-<!--            android:orientation="vertical"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/intro_button"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            tools:layout_editor_absoluteX="1dp">-->
+        <!--        <LinearLayout-->
+        <!--            android:id="@+id/intro_result"-->
+        <!--            android:layout_width="409dp"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginTop="1dp"-->
+        <!--            android:orientation="vertical"-->
+        <!--            app:layout_constraintTop_toBottomOf="@+id/intro_button"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            tools:layout_editor_absoluteX="1dp">-->
 
-<!--            <LinearLayout-->
-<!--                android:layout_width="409dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:orientation="horizontal"-->
-<!--                tools:layout_editor_absoluteX="1dp"-->
-<!--                tools:layout_editor_absoluteY="385dp">-->
+        <!--            <LinearLayout-->
+        <!--                android:layout_width="409dp"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:orientation="horizontal"-->
+        <!--                tools:layout_editor_absoluteX="1dp"-->
+        <!--                tools:layout_editor_absoluteY="385dp">-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/textView4"-->
-<!--                    android:layout_width="20dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:paddingLeft="40dp"-->
-<!--                    android:paddingTop="10dp"-->
-<!--                    android:paddingBottom="10dp"-->
-<!--                    android:text="Frequency"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
+        <!--                <TextView-->
+        <!--                    android:id="@+id/textView4"-->
+        <!--                    android:layout_width="20dp"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:paddingLeft="40dp"-->
+        <!--                    android:paddingTop="10dp"-->
+        <!--                    android:paddingBottom="10dp"-->
+        <!--                    android:text="Frequency"-->
+        <!--                    android:textSize="18sp"-->
+        <!--                    android:textStyle="bold" />-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/frequency"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:paddingTop="10dp"-->
-<!--                    android:paddingBottom="10dp"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
-<!--            </LinearLayout>-->
+        <!--                <TextView-->
+        <!--                    android:id="@+id/frequency"-->
+        <!--                    android:layout_width="wrap_content"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:paddingTop="10dp"-->
+        <!--                    android:paddingBottom="10dp"-->
+        <!--                    android:textSize="18sp"-->
+        <!--                    android:textStyle="bold" />-->
+        <!--            </LinearLayout>-->
 
-<!--            <LinearLayout-->
-<!--                android:layout_width="409dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:orientation="horizontal"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintStart_toStartOf="parent"-->
-<!--                app:layout_constraintTop_toBottomOf="@+id/intro_button"-->
-<!--                tools:layout_editor_absoluteX="1dp"-->
-<!--                tools:layout_editor_absoluteY="385dp">-->
+        <!--            <LinearLayout-->
+        <!--                android:layout_width="409dp"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:orientation="horizontal"-->
+        <!--                app:layout_constraintEnd_toEndOf="parent"-->
+        <!--                app:layout_constraintStart_toStartOf="parent"-->
+        <!--                app:layout_constraintTop_toBottomOf="@+id/intro_button"-->
+        <!--                tools:layout_editor_absoluteX="1dp"-->
+        <!--                tools:layout_editor_absoluteY="385dp">-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/textView5"-->
-<!--                    android:layout_width="20dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:paddingLeft="40dp"-->
-<!--                    android:paddingTop="10dp"-->
-<!--                    android:paddingBottom="10dp"-->
-<!--                    android:text="Amplitude"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
+        <!--                <TextView-->
+        <!--                    android:id="@+id/textView5"-->
+        <!--                    android:layout_width="20dp"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:paddingLeft="40dp"-->
+        <!--                    android:paddingTop="10dp"-->
+        <!--                    android:paddingBottom="10dp"-->
+        <!--                    android:text="Amplitude"-->
+        <!--                    android:textSize="18sp"-->
+        <!--                    android:textStyle="bold" />-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/decibel"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:paddingTop="10dp"-->
-<!--                    android:paddingBottom="10dp"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
-<!--            </LinearLayout>-->
+        <!--                <TextView-->
+        <!--                    android:id="@+id/decibel"-->
+        <!--                    android:layout_width="wrap_content"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:paddingTop="10dp"-->
+        <!--                    android:paddingBottom="10dp"-->
+        <!--                    android:textSize="18sp"-->
+        <!--                    android:textStyle="bold" />-->
+        <!--            </LinearLayout>-->
 
-<!--            <LinearLayout-->
-<!--                android:layout_width="409dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:orientation="horizontal"-->
-<!--                tools:layout_editor_absoluteX="1dp"-->
-<!--                tools:layout_editor_absoluteY="385dp">-->
+        <!--            <LinearLayout-->
+        <!--                android:layout_width="409dp"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:orientation="horizontal"-->
+        <!--                tools:layout_editor_absoluteX="1dp"-->
+        <!--                tools:layout_editor_absoluteY="385dp">-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/textView6"-->
-<!--                    android:layout_width="20dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:paddingLeft="40dp"-->
-<!--                    android:paddingTop="10dp"-->
-<!--                    android:paddingBottom="10dp"-->
-<!--                    android:text="Test Side"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
+        <!--                <TextView-->
+        <!--                    android:id="@+id/textView6"-->
+        <!--                    android:layout_width="20dp"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:paddingLeft="40dp"-->
+        <!--                    android:paddingTop="10dp"-->
+        <!--                    android:paddingBottom="10dp"-->
+        <!--                    android:text="Test Side"-->
+        <!--                    android:textSize="18sp"-->
+        <!--                    android:textStyle="bold" />-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/testSuite"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:paddingTop="10dp"-->
-<!--                    android:paddingBottom="10dp"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
-<!--            </LinearLayout>-->
+        <!--                <TextView-->
+        <!--                    android:id="@+id/testSuite"-->
+        <!--                    android:layout_width="wrap_content"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:paddingTop="10dp"-->
+        <!--                    android:paddingBottom="10dp"-->
+        <!--                    android:textSize="18sp"-->
+        <!--                    android:textStyle="bold" />-->
+        <!--            </LinearLayout>-->
 
-<!--            <LinearLayout-->
-<!--                android:layout_width="409dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:orientation="horizontal"-->
-<!--                tools:layout_editor_absoluteX="1dp"-->
-<!--                tools:layout_editor_absoluteY="385dp">-->
+        <!--            <LinearLayout-->
+        <!--                android:layout_width="409dp"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:orientation="horizontal"-->
+        <!--                tools:layout_editor_absoluteX="1dp"-->
+        <!--                tools:layout_editor_absoluteY="385dp">-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/textView7"-->
-<!--                    android:layout_width="20dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:paddingLeft="40dp"-->
-<!--                    android:paddingTop="10dp"-->
-<!--                    android:paddingBottom="10dp"-->
-<!--                    android:text="Volume (0.0-1.0)"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
+        <!--                <TextView-->
+        <!--                    android:id="@+id/textView7"-->
+        <!--                    android:layout_width="20dp"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:paddingLeft="40dp"-->
+        <!--                    android:paddingTop="10dp"-->
+        <!--                    android:paddingBottom="10dp"-->
+        <!--                    android:text="Volume (0.0-1.0)"-->
+        <!--                    android:textSize="18sp"-->
+        <!--                    android:textStyle="bold" />-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/volumeText"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:paddingTop="10dp"-->
-<!--                    android:paddingBottom="10dp"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
-<!--            </LinearLayout>-->
+        <!--                <TextView-->
+        <!--                    android:id="@+id/volumeText"-->
+        <!--                    android:layout_width="wrap_content"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:paddingTop="10dp"-->
+        <!--                    android:paddingBottom="10dp"-->
+        <!--                    android:textSize="18sp"-->
+        <!--                    android:textStyle="bold" />-->
+        <!--            </LinearLayout>-->
 
-<!--            <LinearLayout-->
-<!--                android:layout_width="409dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:orientation="horizontal"-->
-<!--                tools:layout_editor_absoluteX="1dp"-->
-<!--                tools:layout_editor_absoluteY="385dp">-->
+        <!--            <LinearLayout-->
+        <!--                android:layout_width="409dp"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:orientation="horizontal"-->
+        <!--                tools:layout_editor_absoluteX="1dp"-->
+        <!--                tools:layout_editor_absoluteY="385dp">-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/textView8"-->
-<!--                    android:layout_width="20dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:paddingLeft="40dp"-->
-<!--                    android:paddingTop="10dp"-->
-<!--                    android:paddingBottom="10dp"-->
-<!--                    android:text="Duration"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
+        <!--                <TextView-->
+        <!--                    android:id="@+id/textView8"-->
+        <!--                    android:layout_width="20dp"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:paddingLeft="40dp"-->
+        <!--                    android:paddingTop="10dp"-->
+        <!--                    android:paddingBottom="10dp"-->
+        <!--                    android:text="Duration"-->
+        <!--                    android:textSize="18sp"-->
+        <!--                    android:textStyle="bold" />-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/durationText"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:paddingTop="10dp"-->
-<!--                    android:paddingBottom="10dp"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
-<!--            </LinearLayout>-->
-<!--            <LinearLayout-->
-<!--                android:layout_width="409dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:orientation="horizontal"-->
-<!--                tools:layout_editor_absoluteX="1dp"-->
-<!--                tools:layout_editor_absoluteY="385dp">-->
+        <!--                <TextView-->
+        <!--                    android:id="@+id/durationText"-->
+        <!--                    android:layout_width="wrap_content"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:paddingTop="10dp"-->
+        <!--                    android:paddingBottom="10dp"-->
+        <!--                    android:textSize="18sp"-->
+        <!--                    android:textStyle="bold" />-->
+        <!--            </LinearLayout>-->
+        <!--            <LinearLayout-->
+        <!--                android:layout_width="409dp"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:orientation="horizontal"-->
+        <!--                tools:layout_editor_absoluteX="1dp"-->
+        <!--                tools:layout_editor_absoluteY="385dp">-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/textView9"-->
-<!--                    android:layout_width="20dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:paddingLeft="40dp"-->
-<!--                    android:paddingTop="10dp"-->
-<!--                    android:paddingBottom="10dp"-->
-<!--                    android:text="Interval"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
+        <!--                <TextView-->
+        <!--                    android:id="@+id/textView9"-->
+        <!--                    android:layout_width="20dp"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:paddingLeft="40dp"-->
+        <!--                    android:paddingTop="10dp"-->
+        <!--                    android:paddingBottom="10dp"-->
+        <!--                    android:text="Interval"-->
+        <!--                    android:textSize="18sp"-->
+        <!--                    android:textStyle="bold" />-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/intervalText"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:paddingTop="10dp"-->
-<!--                    android:paddingBottom="10dp"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
-<!--            </LinearLayout>-->
-<!--            <LinearLayout-->
-<!--                android:layout_width="409dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:orientation="horizontal"-->
-<!--                tools:layout_editor_absoluteX="1dp"-->
-<!--                tools:layout_editor_absoluteY="385dp">-->
+        <!--                <TextView-->
+        <!--                    android:id="@+id/intervalText"-->
+        <!--                    android:layout_width="wrap_content"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:paddingTop="10dp"-->
+        <!--                    android:paddingBottom="10dp"-->
+        <!--                    android:textSize="18sp"-->
+        <!--                    android:textStyle="bold" />-->
+        <!--            </LinearLayout>-->
+        <!--            <LinearLayout-->
+        <!--                android:layout_width="409dp"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:orientation="horizontal"-->
+        <!--                tools:layout_editor_absoluteX="1dp"-->
+        <!--                tools:layout_editor_absoluteY="385dp">-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/textView10"-->
-<!--                    android:layout_width="20dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:paddingLeft="40dp"-->
-<!--                    android:paddingTop="10dp"-->
-<!--                    android:paddingBottom="10dp"-->
-<!--                    android:text="Test Round"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
+        <!--                <TextView-->
+        <!--                    android:id="@+id/textView10"-->
+        <!--                    android:layout_width="20dp"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:paddingLeft="40dp"-->
+        <!--                    android:paddingTop="10dp"-->
+        <!--                    android:paddingBottom="10dp"-->
+        <!--                    android:text="Test Round"-->
+        <!--                    android:textSize="18sp"-->
+        <!--                    android:textStyle="bold" />-->
 
-<!--                <TextView-->
-<!--                    android:id="@+id/testRoundText"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:paddingTop="10dp"-->
-<!--                    android:paddingBottom="10dp"-->
-<!--                    android:textSize="18sp"-->
-<!--                    android:textStyle="bold" />-->
-<!--            </LinearLayout>-->
-<!--        </LinearLayout>-->
+        <!--                <TextView-->
+        <!--                    android:id="@+id/testRoundText"-->
+        <!--                    android:layout_width="wrap_content"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:paddingTop="10dp"-->
+        <!--                    android:paddingBottom="10dp"-->
+        <!--                    android:textSize="18sp"-->
+        <!--                    android:textStyle="bold" />-->
+        <!--            </LinearLayout>-->
+        <!--        </LinearLayout>-->
 
     </LinearLayout>
-
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

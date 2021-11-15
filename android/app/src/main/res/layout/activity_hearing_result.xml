@@ -4,138 +4,129 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F3F7FB"
+    android:background="@color/background_white"
     tools:context=".HearingActivityResult">
-
     <LinearLayout
-        android:id="@+id/result_intro"
-        android:layout_width="409dp"
-        android:layout_height="wrap_content"
+        android:id="@+id/result_page"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/resultPage"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
-            android:id="@+id/intro"
+            android:id="@+id/result_intro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:id="@+id/intro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/toneResultHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_light"
+                    android:gravity="center_horizontal"
+                    android:text="เสร็จสิ้น การทดสอบการได้ยิน"
+                    android:textColor="@color/text_default"
+                    android:textSize="22sp"
+                    tools:ignore="MissingConstraints" />
+
+                <TextView
+                    android:id="@+id/toneResultSubHeader"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_light"
+                    android:gravity="center_horizontal"
+                    android:text="ผลของคุณคือ"
+                    android:textColor="@color/text_default"
+                    android:textSize="16sp"
+                    tools:ignore="MissingConstraints" />
+
+                <TextView
+                    android:id="@+id/toneResultText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_bold"
+                    android:gravity="center_horizontal"
+                    android:text="การได้ยิน"
+                    android:textColor="@color/text_default"
+                    android:textSize="24sp"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="20dp"
+                    tools:ignore="MissingConstraints" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/animateLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:padding="30dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/result_intro">
+
+
+            <ImageView
+                android:id="@+id/resultImage"
+                android:layout_width="wrap_content"
+                android:layout_height="200dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/result_badcase" />
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/resultSuggestion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:text="@string/testing"
-                android:textSize="18sp"
-                android:fontFamily="@font/sarabun_bold"
-                android:textColor="@color/text_default"
-                tools:ignore="MissingConstraints"
-                tools:layout_editor_absoluteX="115dp"
-                tools:layout_editor_absoluteY="53dp" />
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:text="@string/testing_action_desc_1"
-                android:textSize="14sp"
                 android:fontFamily="@font/sarabun_light"
-                android:textColor="@color/text_default"
-                tools:ignore="MissingConstraints"
-                tools:layout_editor_absoluteX="108dp"
-                tools:layout_editor_absoluteY="73dp" />
-
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="@string/testing_action_desc_2"
-                android:textSize="20sp"
-                android:fontFamily="@font/sarabun_bold"
+                android:paddingTop="20dp"
+                android:paddingBottom="10dp"
+                android:text="คุณสามารถพบจักษุแพทย์ เพื่อปรึกษาและทำการทดสอบการได้ยินโดยละเอียดอีกครั้งหนึ่ง"
+
                 android:textColor="@color/text_default"
-                tools:ignore="MissingConstraints"
-                tools:layout_editor_absoluteX="150dp"
-                tools:layout_editor_absoluteY="92dp" />
+                android:textSize="16sp"
+                tools:ignore="MissingConstraints" />
         </LinearLayout>
-    </LinearLayout>
-    <LinearLayout
-        android:id="@+id/animateLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/result_intro">
 
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="200dp"
-            android:layout_centerInParent="true"
-            android:id="@+id/centerImage"
-            android:src="@drawable/result_normalcase"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/resultPage"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_marginTop="5dp"
-        android:orientation="vertical"
-        android:visibility="visible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/result_intro">
-
-        <ScrollView
-            android:id="@+id/result_view"
+        <LinearLayout
+            android:id="@+id/intro_button"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:id="@+id/resultTable"
-                />
-
-        </ScrollView>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/intro_button"
-        android:layout_width="413dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/resultPage">
-
-        <Button
-            android:id="@+id/doneTesting"
-            android:gravity="center"
-            android:onClick="onClickDone"
-            android:text="@string/done_testing"
-            android:layout_width="158dp"
             android:layout_height="wrap_content"
-            android:background="@color/primary_btn_success"
-            android:fontFamily="@font/sarabun_medium"
-            android:textColor="@color/text_inverse"
-            android:textColorHighlight="@color/text_inverse"
-            android:textColorHint="@color/text_inverse"
-            android:textColorLink="@color/text_inverse"
-            android:textSize="18sp"
-            tools:ignore="OnClick"
-            />
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/animateLayout"
+            app:layout_constraintVertical_bias="0.042"
+            tools:layout_editor_absoluteX="0dp">
+
+            <Button
+                android:id="@+id/doneTesting"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:background="@color/primary_btn_success"
+                android:fontFamily="@font/sarabun_medium"
+                android:gravity="center"
+                android:onClick="onClickDone"
+                android:text="@string/done_testing"
+                android:textColor="@color/text_inverse"
+                android:textSize="18sp"
+                tools:ignore="OnClick" />
+
+        </LinearLayout>
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

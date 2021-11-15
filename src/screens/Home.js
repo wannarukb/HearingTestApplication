@@ -16,7 +16,7 @@ import {LanguageService} from "../services/LanguageService";
 import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
 
-translate = memoize(
+const translate = memoize(
     (key, config) => i18n.t(key, config),
     (key, config) => (config ? key + JSON.stringify(config) : key)
 )
@@ -32,18 +32,14 @@ constructor(props) {
         openModal: false 
     };
 
-
-    this.getToken();
-    this.readResultJSONFile();
-
+    var defaultLang = (this.props.deviceInfo && this.props.deviceInfo.deviceInfo.language)  ? this.props.deviceInfo.deviceInfo.language : 'en';
+    this.setDeviceLanguage(defaultLang);
     console.log("Home information");
-    console.log(this.props.deviceInfo);
+    this.getToken();
+    this.getDeviceInfo();
+    this.readResultJSONFile();
+    
     console.log(this.props.userInfo);
-    let lang = (this.props.deviceInfo.language) ? this.props.deviceInfo.language : 'en';
-    this.setDeviceLanguage(lang);
-    
-    
-    
 }
 
 postTestToneResult = (testToneResult) => {
@@ -110,7 +106,12 @@ setDeviceLanguage(lang){
     deviceJSON.brand = DeviceInfo.getBrand();
     deviceJSON.model = DeviceInfo.getModel();
     deviceJSON.language = (lang) ? lang : 'en';
+    console.log(deviceJSON);
     this.props.setupDeviceInfo(deviceJSON);
+    this.storeDeviceInfo(deviceJSON);
+
+    console.log('HOME Redux deviceInfo : ' + JSON.stringify(this.props.deviceInfo));
+    translate.cache.clear();
     LanguageService.getInstance().changeLanguage(lang);
     
 }
@@ -136,6 +137,31 @@ async readResultJSONFile(){
     } catch (error) {
         console.log("Something went wrong, readResultJSONFile = ", error);
     }
+}
+
+getDeviceInfo = async() =>{
+    var defaultLanguage = 'en';
+    try {
+        let data = await AsyncStorage.getItem("DeviceInfo");
+        
+        if(data){
+            let deviceData = JSON.parse(data);
+            console.log('device data = ', deviceData);
+            this.setState({
+                DeviceInfo : deviceData
+            });
+            
+            console.log(deviceData);
+            defaultLanguage = (deviceData.language != undefined) ? deviceData.language : 'en';
+        }
+        this.setDeviceLanguage(defaultLanguage);
+    } catch (error) {
+        
+        console.log("Something went getDeviceInfo = ", error);
+        this.setDeviceLanguage(defaultLanguage);
+    }
+
+    
 }
 
 async getToken() {
@@ -218,6 +244,15 @@ resetToken = async() =>{
         console.log("reset Token", "Token have been reset to undefined");
     } catch (error) {
         console.log("Something went wrong, store token = ", error);
+    }
+}
+ 
+storeDeviceInfo = async(deviceInfo) =>{
+    try {
+        await AsyncStorage.setItem("DeviceInfo", JSON.stringify(deviceInfo));
+        console.log("reset Token", "Token have been reset to undefined");
+    } catch (error) {
+        console.log("Something went wrong, store DeviceInfo = ", error);
     }
 }
 

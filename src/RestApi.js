@@ -42,6 +42,8 @@ let testtone_header_get = (userToken, userId) => {
      let token = 'Bearer ' + userToken;
      api.setHeader('Authorization', token);
      const response = api.get('/v1.1/UserHearingTests/' + userId);
+     console.log(api);
+     console.log(response);
      return response;
 }
 

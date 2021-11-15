@@ -12,14 +12,14 @@ import { Button, Input } from "../components";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import CheckBox from '@react-native-community/checkbox';
 
-
-import i18n, { translate } from 'i18n-js';
+import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
 
-translate = memoize(
+const translate = memoize(
     (key, config) => i18n.t(key, config),
     (key, config) => (config ? key + JSON.stringify(config) : key)
 )
+
 
 const { height, width } = Dimensions.get("screen");
 class Register extends React.Component {

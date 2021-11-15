@@ -34,8 +34,22 @@ public class TestResultHeader {
         this.endDateTime     = sdf.format(currentEndDate);
     }
 
-    public void setTestResultSummary(String testSummary){
+    /*public void setTestResultSummary(String testSummary){
         this.resultSum = testSummary;
+    }*/
+
+    public void setGoodSummary(){
+        this.resultSum = "Good";
+    }
+
+    public Boolean isGoodResult(){
+        Boolean isGood = false;
+
+        if(resultSum.equals("Good")){
+            isGood = true;
+        }
+
+        return isGood;
     }
 
 }

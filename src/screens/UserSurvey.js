@@ -11,10 +11,10 @@ import Images from "../constants/Images";
 import { Button } from "../components";
 import CheckBox from '@react-native-community/checkbox';
 
-import i18n, { translate } from 'i18n-js';
+import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
 
-translate = memoize(
+const translate = memoize(
     (key, config) => i18n.t(key, config),
     (key, config) => (config ? key + JSON.stringify(config) : key)
 )
@@ -24,296 +24,287 @@ const { height, width } = Dimensions.get("screen");
 class UserSurvey extends Component {
 
   
-  constructor(props) {
-    super(props);
-    this.state = {
-      q1 : false,
-      q2 : false,
-      q3 : false
+    constructor(props) {
+        super(props);
+        this.state = {
+        q1 : false,
+        q2 : false,
+        q3 : false
+        };
+        this.getToken().then( response =>{
+            if(!this.props.network.isConnected){
+                console.log('No Internet');
+                this.getTestToneList();
+            }else{
+                console.log('Internet Connected');
+                let userToken = this.state.userInfo.token;
+                // console.warn(userToken);
+                // console.log(this.props);
+                this.loadTestTone(userToken);
+            }
+        })
     };
-    this.getToken().then( response =>{
-      if(!this.props.network.isConnected){
-        console.log('No Internet');
-        this.getTestToneList();
-      }else{
-        console.log('Internet Connected');
-        let userToken = this.state.userInfo.token;
-        // console.warn(userToken);
-        // console.log(this.props);
-        this.loadTestTone(userToken);
-      }
-    })
-  };
 
-  async getToken() {
-    try {
-      let userData = await AsyncStorage.getItem("UserInfo");
-      let data = JSON.parse(userData);
-      console.log('Login get token = ', data);
-      this.setState({
-        userInfo : data
-      });
-    } catch (error) {
-      console.log("Something went wrong, get token = ", error);
-    }
-  }
-
-  async getTestToneList() {
-    try {
-      let testToneListData = await AsyncStorage.getItem("TestToneList");
-      let data = JSON.parse(testToneListData);
-      console.log('TestToneList = ', data.length);
-      this.props.loadTestToneList(data);
-    } catch (error) {
-      console.log("Something went wrong, get token = ", error);
-    }
-  }
-
-  // async storeTestToneList(testToneList) 
-  storeNewTestToneList = async(testToneList) =>{
-    try {
-      await AsyncStorage.setItem("TestToneList", JSON.stringify(testToneList));
-      console.log("storeTestToneList", "information have been store");
-    } catch (error) {
-      console.log("Something went wrong, store token = ", error);
-    }
-  }
-
-  loadTestTone = (userToken) =>{
-    try {
-      TestToneService.test_tone_api(userToken)
-      .then(responseJson => {
-        console.log('test_tone_api responseJson = ', responseJson.status);
-        if (responseJson.ok) {
-          if (responseJson.data != null) {
-            var data = responseJson.data;
-            this.props.loadTestToneList(data);
-            this.storeNewTestToneList(data);
-          } else {
-            alert('server error no data')
-          }
-        } else {
-          if (responseJson.problem == 'NETWORK_ERROR') {
-            alert('server error = NETWORK_ERROR')
+    async getToken() {
+        try {
+            let userData = await AsyncStorage.getItem("UserInfo");
+            let data = JSON.parse(userData);
+            console.log('Login get token = ', data);
             this.setState({
-              loading: false,
+                userInfo : data
             });
-          } else if (responseJson.problem == 'TIMEOUT_ERROR') {
-            alert('server error = TIMEOUT_ERROR')
-            this.setState({
-              loading: false,
-            });
-          } else {
-            alert('server error responseJson ERROR')
-            this.setState({
-              loading: false,
-            });
-          }
+        } catch (error) {
+            console.log("Something went wrong, get token = ", error);
         }
-      })
-      .catch(error => {
-        console.error(error);
-      });
-      
-    } catch (e) {
-      console.error(error);
-      this.setState({
-        loading: false,
-      });
     }
-  }
 
-  backHome(){
-    this.props.navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [
-          { name: 'Home' },
-        ],
-      })
-    );
-  }
-
-  nextButton(){
-    //let testData = [{"index":0,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":1,"frequency":2000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":2,"frequency":4000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":3,"frequency":500,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5},{"index":4,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":5,"frequency":2000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":6,"frequency":4000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":7,"frequency":500,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"L","maxResult":5},{"index":8,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5},{"index":9,"frequency":2000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5},{"index":10,"frequency":4000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5},{"index":11,"frequency":500,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"Both","maxResult":5}];
-    // let testData = [{"index":0,"frequency":1000,"startDB":40,"durationMin":2,"durationMax":0,"upDB":5,"downDB":10,"intervalMin":1,"intervalMax":0,"testRoundMin":1,"testRoundMax":0,"testSite":"R","maxResult":5}];
-    // console.log(this.props);
-    let testData = this.props.testToneList;
-    let parseTestData = [];
-    
-    if(testData != null && testData != undefined){
-      console.log(testData);
-      // for(let i = 0; i < testData.length; i++){
-      //   var data = testData[i];
-      //   let parseTone = {
-      //     "index": data.testToneId,
-      //     "frequency": data.frequency,
-      //     "runDB": (data.decibel == null || data.decibel == undefined) ? 0 : parseFloat(data.decibel),
-      //     "durationMin": data.durationMin,
-      //     "durationMax":data.durationMax,
-      //     "upDB": (data.updB == null || data.updB == undefined) ? 0 : data.updB,
-      //     "downDB":(data.downdB == null || data.downdB == undefined) ? 0 : data.downdB, 
-      //     "intervalMin":data.intervalMin,
-      //     "intervalMax":data.intervalMax,
-      //     "testRoundMin": (data.testRoundMin == null ? 0 : data.testRoundMin),
-      //     "testRoundMax": (data.testRoundMax == null ? 0 : data.testRoundMax),
-      //     "testSide": data.testSide,
-      //     "maxResult":1
-      //   };
-      //   parseTestData.push(parseTone);
-      // }
-      let userID = this.props.userInfo.user.id;
-      NativeModules.HearingTestModule.GotoActivity(
-        JSON.stringify(userID),
-        JSON.stringify(testData)
-      );
+    async getTestToneList() {
+        try {
+        let testToneListData = await AsyncStorage.getItem("TestToneList");
+        let data = JSON.parse(testToneListData);
+        console.log('TestToneList = ', data.length);
+        this.props.loadTestToneList(data);
+        } catch (error) {
+        console.log("Something went wrong, get token = ", error);
+        }
     }
-   // console.log(parseTestData);
-    
-  }
+
+    // async storeTestToneList(testToneList) 
+    storeNewTestToneList = async(testToneList) =>{
+        try {
+            await AsyncStorage.setItem("TestToneList", JSON.stringify(testToneList));
+            console.log("storeTestToneList", "information have been store");
+        } catch (error) {
+            console.log("Something went wrong, store token = ", error);
+        }
+    }
+
+    loadTestTone = (userToken) =>{
+        try {
+        TestToneService.test_tone_api(userToken)
+        .then(responseJson => {
+            console.log('test_tone_api responseJson = ', responseJson.status);
+            if (responseJson.ok) {
+            if (responseJson.data != null) {
+                var data = responseJson.data;
+                this.props.loadTestToneList(data);
+                this.storeNewTestToneList(data);
+            } else {
+                alert('server error no data')
+            }
+            } else {
+            if (responseJson.problem == 'NETWORK_ERROR') {
+                alert('server error = NETWORK_ERROR')
+                this.setState({
+                loading: false,
+                });
+            } else if (responseJson.problem == 'TIMEOUT_ERROR') {
+                alert('server error = TIMEOUT_ERROR')
+                this.setState({
+                loading: false,
+                });
+            } else {
+                alert('server error responseJson ERROR')
+                this.setState({
+                loading: false,
+                });
+            }
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
+        
+        } catch (e) {
+            console.error(error);
+            this.setState({
+                loading: false,
+            });
+        }
+    }
+
+    backHome(){
+        this.props.navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [
+                    { name: 'Home' },
+                ],
+            })
+        );
+    }
+
+    nextButton(){
+        let testData = this.props.testToneList;
+        let parseTestData = [];
+        
+        if(testData != null && testData != undefined){
+            console.log(testData);
+            let userID = this.props.userInfo.user.id;
+            let translateMenu = {
+                "StartPlayToneButton": translate('StartPlayToneButton'),
+                "TonePlayHeaderLabel": translate('TonePlayHeaderLabel'),
+                "TonePlayDescription": translate('TonePlayDescription'),
+                "HearToneButton": translate('HearToneButton'),
+                "ToneResultIntro": translate('ToneResultIntro'),
+                "ToneResultLabel": translate('ToneResultLabel'),
+                "ToneResultInfo_Good": translate('ToneResultInfo_Good'),
+                "ToneResultInfo_GoodSuggestion": translate('ToneResultInfo_GoodSuggestion'),
+                "ToneResultInfo_Bad": translate('ToneResultInfo_Bad'),
+                "ToneResultInfo_BadSuggestion": translate('ToneResultInfo_BadSuggestion'),
+                "GoBackToHomePageButton": translate('GoBackToHomePageButton')
+            }
+            NativeModules.HearingTestModule.GotoActivity(
+                JSON.stringify(userID),
+                JSON.stringify(testData),
+                JSON.stringify(translateMenu)
+            );
+        }
+        
+    }
   
 
-  render() {
-    const { navigation } = this.props;
-    return (
-      <Block flex style={styles.container}>
-        <Block flex>
-          <ImageBackground
-              source={Images.lightBG}
-              style={{ height, width, zIndex: 1 }}
-          >
-            <Block  style={styles.navbar}>
-              <Block style={styles.row}>
-                <Block style={{width: '25%',marginHorizontal: 2, background: '#ff0000' , paddingLeft: 10, justifyContent: 'center'}}>
-                  {/* <Button style={styles.backBtn}  onPress={() => navigation.navigate("Home")}>
-                    
-                  </Button> */}
-                  <Text style={styles.backText}  onPress={() => this.backHome()}>
-                    {/* <Icon
-                      name="chevron-left"
-                      family="entypo"
-                      size={20}
-                      color={themeColor.COLORS.BTN_SECONDARY}
-                      style={{marginRight: 5}}
-                    />  */}
-                    {translate('BackButton')} {this.props.token}
-                  </Text>
-                </Block>
-                <Block style={{width: '50%',marginHorizontal: 2, justifyContent: 'center'}}>
-                  <Text  style={styles.navbarText} >
-                    {translate('UserSurveyHeaderLabel')}
-                  </Text>
-                </Block>
-                <Block style={{width: '25%',marginHorizontal: 2}}></Block>
-              </Block>
-            </Block>
-            <ScrollView
-                  showsVerticalScrollIndicator={false}
-                  style={{ width, marginTop: '0%' }}
+    render() {
+        const { navigation } = this.props;
+        return (
+        <Block flex style={styles.container}>
+            <Block flex>
+            <ImageBackground
+                source={Images.lightBG}
+                style={{ height, width, zIndex: 1 }}
             >
-              <Block  style={styles.contentContainer}>
-                <Block  style={{ paddingVertical: 15, justifyContent: "space-around", height: 30,alignItems: "center", marginBottom: 30}}>
-                  <Text  style={styles.mainQuestionText} >{translate('MainPageQuestion')}</Text>
-                </Block>
-                <Block style={styles.questionRow}>
-                  <Block style={styles.subQuestion}>
-                      <Text  style={styles.subQuestionText} >{translate('FirstQuestion')}</Text>
-                  </Block>
-                  <Block style={styles.checkboxBlock}>
-                    <CheckBox
-                      disabled={false}
-                      value={this.state.q1}
-                      onValueChange={(newValue) => this.setState({ q1: newValue})}
-                      style={styles.checkbox}
-                    />
-                  </Block>
-                  <Block style={styles.subQuestionLabel}>
-                      <Text  style={styles.subQuestionText} > {translate('YesLabel')}</Text>
-                  </Block>
-                </Block>
-
-                <Block style={styles.questionRow}>
-                  <Block style={styles.subQuestion}>
-                      <Text  style={styles.subQuestionText} >{translate('SecondQuestion')}</Text>
-                  </Block>
-                  <Block style={styles.checkboxBlock}>
-                    <CheckBox
-                      disabled={false}
-                      value={this.state.q2}
-                      onValueChange={(newValue) => this.setState({ q2: newValue})}
-                      style={styles.checkbox}
-                    />
-                  </Block>
-                  <Block style={styles.subQuestionLabel}>
-                      <Text  style={styles.subQuestionText} > {translate('YesLabel')}</Text>
-                  </Block>
-                </Block>
-
-                <Block style={styles.questionRow}>
-                  <Block style={styles.subQuestion}>
-                      <Text  style={styles.subQuestionText} >{translate('ThirdQuestion')}</Text>
-                  </Block>
-                  <Block style={styles.checkboxBlock}>
-                    <CheckBox
-                      disabled={false}
-                      value={this.state.q3}
-                      onValueChange={(newValue) => this.setState({ q3: newValue})}
-                      style={styles.checkbox}
-                    />
-                  </Block>
-                  <Block style={styles.subQuestionLabel}>
-                      <Text  style={styles.subQuestionText} > {translate('YesLabel')}</Text>
-                  </Block>
-                </Block>
-              </Block>
-
-              {(this.state.q1 || this.state.q2 || this.state.q3) ? 
-                (
-                  <Block flex middle>
-                    <Block style={styles.alertBox}>
-                      
-                      <Text style={styles.alertTextHead}>
-                        {translate('SurveyResult')}
-                      </Text>
-                      <Text style={styles.alertText}>
-                        {translate('SurveySuggest')}
-                      </Text>
+                <Block  style={styles.navbar}>
+                <Block style={styles.row}>
+                    <Block style={{width: '25%',marginHorizontal: 2, background: '#ff0000' , paddingLeft: 10, justifyContent: 'center'}}>
+                    {/* <Button style={styles.backBtn}  onPress={() => navigation.navigate("Home")}>
+                        
+                    </Button> */}
+                    <Text style={styles.backText}  onPress={() => this.backHome()}>
+                        {/* <Icon
+                        name="chevron-left"
+                        family="entypo"
+                        size={20}
+                        color={themeColor.COLORS.BTN_SECONDARY}
+                        style={{marginRight: 5}}
+                        />  */}
+                        {translate('BackButton')} {this.props.token}
+                    </Text>
                     </Block>
-                    <Block middle>
-                      <Button style={styles.backButton}
-                        onPress={() => this.backHome()}>
-                        <Text style={styles.createButtonText}>
-                          {translate('BackButton')}
+                    <Block style={{width: '50%',marginHorizontal: 2, justifyContent: 'center'}}>
+                    <Text  style={styles.navbarText} >
+                        {translate('UserSurveyHeaderLabel')}
+                    </Text>
+                    </Block>
+                    <Block style={{width: '25%',marginHorizontal: 2}}></Block>
+                </Block>
+                </Block>
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    style={{ width, marginTop: '0%' }}
+                >
+                <Block  style={styles.contentContainer}>
+                    <Block  style={{ paddingVertical: 15, justifyContent: "space-around", height: 30,alignItems: "center", marginBottom: 30}}>
+                    <Text  style={styles.mainQuestionText} >{translate('MainPageQuestion')}</Text>
+                    </Block>
+                    <Block style={styles.questionRow}>
+                    <Block style={styles.subQuestion}>
+                        <Text  style={styles.subQuestionText} >{translate('FirstQuestion')}</Text>
+                    </Block>
+                    <Block style={styles.checkboxBlock}>
+                        <CheckBox
+                        disabled={false}
+                        value={this.state.q1}
+                        onValueChange={(newValue) => this.setState({ q1: newValue})}
+                        style={styles.checkbox}
+                        />
+                    </Block>
+                    <Block style={styles.subQuestionLabel}>
+                        <Text  style={styles.subQuestionText} > {translate('YesLabel')}</Text>
+                    </Block>
+                    </Block>
+
+                    <Block style={styles.questionRow}>
+                    <Block style={styles.subQuestion}>
+                        <Text  style={styles.subQuestionText} >{translate('SecondQuestion')}</Text>
+                    </Block>
+                    <Block style={styles.checkboxBlock}>
+                        <CheckBox
+                        disabled={false}
+                        value={this.state.q2}
+                        onValueChange={(newValue) => this.setState({ q2: newValue})}
+                        style={styles.checkbox}
+                        />
+                    </Block>
+                    <Block style={styles.subQuestionLabel}>
+                        <Text  style={styles.subQuestionText} > {translate('YesLabel')}</Text>
+                    </Block>
+                    </Block>
+
+                    <Block style={styles.questionRow}>
+                    <Block style={styles.subQuestion}>
+                        <Text  style={styles.subQuestionText} >{translate('ThirdQuestion')}</Text>
+                    </Block>
+                    <Block style={styles.checkboxBlock}>
+                        <CheckBox
+                        disabled={false}
+                        value={this.state.q3}
+                        onValueChange={(newValue) => this.setState({ q3: newValue})}
+                        style={styles.checkbox}
+                        />
+                    </Block>
+                    <Block style={styles.subQuestionLabel}>
+                        <Text  style={styles.subQuestionText} > {translate('YesLabel')}</Text>
+                    </Block>
+                    </Block>
+                </Block>
+
+                {(this.state.q1 || this.state.q2 || this.state.q3) ? 
+                    (
+                    <Block flex middle>
+                        <Block style={styles.alertBox}>
+                        
+                        <Text style={styles.alertTextHead}>
+                            {translate('SurveyResult')}
                         </Text>
-                      </Button>
+                        <Text style={styles.alertText}>
+                            {translate('SurveySuggest')}
+                        </Text>
+                        </Block>
+                        <Block middle>
+                        <Button style={styles.backButton}
+                            onPress={() => this.backHome()}>
+                            <Text style={styles.createButtonText}>
+                            {translate('BackButton')}
+                            </Text>
+                        </Button>
+                        </Block>
                     </Block>
-                  </Block>
-                )
-                :(
-                  <Block middle>
-                    <Button style={styles.createButton}
-                      onPress={() => this.nextButton()}
-                      >
-                      <Text style={styles.createButtonText}>
-                      {translate('NextButton')}
-                      </Text>
-                    </Button>
-                  </Block>
-                )
-              }
+                    )
+                    :(
+                    <Block middle>
+                        <Button style={styles.createButton}
+                        onPress={() => this.nextButton()}
+                        >
+                        <Text style={styles.createButtonText}>
+                        {translate('NextButton')}
+                        </Text>
+                        </Button>
+                    </Block>
+                    )
+                }
 
-              
+                
 
-              
-        
-            </ScrollView>
+                
             
-          </ImageBackground>
+                </ScrollView>
+                
+            </ImageBackground>
+            </Block>
         </Block>
-      </Block>
-        
-    );
-  }
+            
+        );
+    }
 }
 
 const styles = StyleSheet.create({
@@ -397,7 +388,7 @@ const styles = StyleSheet.create({
   subQuestion:{
     paddingVertical: 5,
     paddingLeft: 10,
-    width: '80%',
+    width: '70%',
     height: 50,
     justifyContent: "center",
     borderBottomWidth: 1,
@@ -405,7 +396,7 @@ const styles = StyleSheet.create({
   },
   checkboxBlock:{
     paddingVertical: 5,
-    width: '10%',
+    width: '15%',
     height: 50,
     justifyContent: "center",
     borderBottomWidth: 1,
@@ -414,7 +405,7 @@ const styles = StyleSheet.create({
   subQuestionLabel:{
     paddingVertical: 5,
     paddingLeft: 5,
-    width: '10%',
+    width: '15%',
     height: 50,
     justifyContent: "center",
     borderBottomWidth: 1,

@@ -202,7 +202,7 @@ dependencies {
     implementation "android.arch.work:work-runtime:2.0.1"
     implementation "com.android.support:multidex:2.0.1"
 
-    implementation "com.skyfishjy.ripplebackground:library:1.0.1"
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.0'
     implementation project(':react-native-fs')
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.navigation:navigation-fragment:2.3.2'

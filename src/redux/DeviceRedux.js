@@ -20,6 +20,7 @@ export const reducer = (state = initialState, action) => {
     const {type, deviceInfo} = action;  
     switch (type) {
         case types.SETUP_DEVICEINFO:
+            console.log('Device Redux : ' + JSON.stringify(deviceInfo));
             return Object.assign({}, state, {
                 ...state,
                 deviceInfo

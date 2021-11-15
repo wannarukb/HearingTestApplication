@@ -18,7 +18,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.skyfishjy.library.RippleBackground;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -158,8 +157,8 @@ public class HearingTonePlayActivity extends AppCompatActivity {
         if(noOfClick == 1){
             System.out.println("++++++++++++ Start ++++++++++++ ");
             try {
-                final RippleBackground rippleBackground=(RippleBackground)findViewById(R.id.content);
-                rippleBackground.startRippleAnimation();
+//                final RippleBackground rippleBackground=(RippleBackground)findViewById(R.id.content);
+//                rippleBackground.startRippleAnimation();
 
                 play();
                 m_PlayThread.interrupt();

@@ -50,12 +50,17 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import com.facebook.react.bridge.Callback;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.Gson;
-import com.skyfishjy.library.RippleBackground;
 
 import org.w3c.dom.Text;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class HearingActivity extends ReactActivity {
 
@@ -89,6 +94,10 @@ public class HearingActivity extends ReactActivity {
     public ImageView testToneImage;
 
     public Integer  result_pass_validation_time;
+    public Map<String, Object> transalationMap;
+
+    public TextView playToneHeader, playToneDescription;
+    public String translationMenu;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -105,62 +114,85 @@ public class HearingActivity extends ReactActivity {
         playExecuteCount    = 0;
         noOfLatestResult    = 0;
         testToneImage       = (ImageView) findViewById(R.id.testToneImage);
+        playToneHeader      = (TextView) findViewById(R.id.tonePlayHeaderLabel);
+        playToneDescription = (TextView) findViewById(R.id.tonePlayDescription);
+        startButton         = (Button) findViewById(R.id.start);
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
             Gson gson = new Gson();
             String testToneJSON = extras.getString("TestToneList");
+            String translateMenu = extras.getString("TranslateMenu");
             userId              = Integer.parseInt(extras.getString("UserId"));
             saveHearingPath     = extras.getString("FilePath");
+            translationMenu     = translateMenu;
 
-            TestTone[] parseTone;
-            System.out.println(testToneJSON);
-            parseTone    = gson.fromJson(testToneJSON, TestTone[].class);
+            try
+            {
+                transalationMap = new ObjectMapper().readValue(translateMenu, Map.class);
+
+                TestTone[] parseTone;
+                System.out.println(testToneJSON);
+                parseTone    = gson.fromJson(testToneJSON, TestTone[].class);
+
+                playToneHeader.setText((String) transalationMap.get("TonePlayHeaderLabel"));
+                playToneDescription.setText((String) transalationMap.get("TonePlayDescription"));
+                startButton.setText((String) transalationMap.get("StartPlayToneButton"));
 
 
-            if(parseTone != null && parseTone.length > 0){
-                List<TestTone> parseList = Arrays.asList(parseTone);
-                List<TestTone> parseToneArray = new ArrayList<TestTone>();
-                parseToneArray.addAll(parseList);
-                TestTone tempTone;
-                int i = 0;
-                int tonesize = parseList.size();
-                while(i < tonesize){
-                    TestTone eachTone = parseToneArray.get(i);
-                    System.out.println(i + " : " + eachTone.runIndex + " : LEK3 = " + eachTone.frequency + ", " + eachTone.amplitude + ", " + eachTone.remainingRound + ", " + eachTone.testSide + " , " + eachTone.duration + ", " + eachTone.interval);
-                    if(i < parseList.size()){
-                        tempTone = new TestTone(eachTone, true);
-                        protocolId = eachTone.protocolId;
-                    }else{
-                        tempTone = new TestTone(eachTone, false);
-                    }
-                    tempTone.runIndex = i;
-                    tempTone.counter  = i+1;
-                    int remainingRound = tempTone.remainingRound;
-                    tempTone.remainingRound = tempTone.remainingRound -1;
-                    remainingRound = remainingRound - 1;
-                    i++;
-                    if(remainingRound > 0){
-                        TestTone newTestTone = new TestTone(tempTone, false);
-                        newTestTone.runIndex       = tonesize + 1;
-                        parseToneArray.add(newTestTone);
-                        tonesize++;
-                    }
-                    testToneList.add(tempTone);
+                if(parseTone != null && parseTone.length > 0){
+                    List<TestTone> parseList = Arrays.asList(parseTone);
+                    List<TestTone> parseToneArray = new ArrayList<TestTone>();
+                    parseToneArray.addAll(parseList);
+                    TestTone tempTone;
+                    int i = 0;
+                    int tonesize = parseList.size();
+                    while(i < tonesize){
+                        TestTone eachTone = parseToneArray.get(i);
+                        System.out.println(i + " : " + eachTone.runIndex + " : LEK3 = " + eachTone.frequency + ", " + eachTone.amplitude + ", " + eachTone.remainingRound + ", " + eachTone.testSide + " , " + eachTone.duration + ", " + eachTone.interval);
+                        if(i < parseList.size()){
+                            tempTone = new TestTone(eachTone, true);
+                            protocolId = eachTone.protocolId;
+                        }else{
+                            tempTone = new TestTone(eachTone, false);
+                        }
+                        tempTone.runIndex = i;
+                        tempTone.counter  = i+1;
+                        int remainingRound = tempTone.remainingRound;
+                        tempTone.remainingRound = tempTone.remainingRound -1;
+                        remainingRound = remainingRound - 1;
+                        i++;
+                        if(remainingRound > 0){
+                            TestTone newTestTone = new TestTone(tempTone, false);
+                            newTestTone.runIndex       = tonesize + 1;
+                            parseToneArray.add(newTestTone);
+                            tonesize++;
+                        }
+                        testToneList.add(tempTone);
 
-                };
+                    };
+                }
+
+                System.out.println("Hearing - testToneList = " + testToneList.size());
+                currentRunTone      = testToneList.get(runningIndex);
+                System.out.println("Hearing - Current Run Tone  = " + currentRunTone.testToneId + ", " + currentRunTone.testSide + ", " + currentRunTone.frequency + ", " + currentRunTone.amplitude);
+                currentTestRound    = currentRunTone.testRound;
+                noOfClick = 0;
+
+
+                mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+                devices      = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
+                result_pass_validation_time = 0;
+            }
+            catch (JsonGenerationException e) {
+                e.printStackTrace();
+            } catch (JsonMappingException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
-            System.out.println("Hearing - testToneList = " + testToneList.size());
-            currentRunTone      = testToneList.get(runningIndex);
-            System.out.println("Hearing - Current Run Tone  = " + currentRunTone.testToneId + ", " + currentRunTone.testSide + ", " + currentRunTone.frequency + ", " + currentRunTone.amplitude);
-            currentTestRound    = currentRunTone.testRound;
-            noOfClick = 0;
 
-
-            mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-            devices      = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
-            result_pass_validation_time = 0;
         }
     }
 
@@ -170,8 +202,9 @@ public class HearingActivity extends ReactActivity {
     */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onClickStart(View view) {
-        startButton         = (Button) findViewById(R.id.start);
-        startButton.setText("ได้ยิน");
+
+
+        startButton.setText((String) transalationMap.get("HearToneButton"));
         noOfClick += 1;
         System.out.println(" no of click = " + noOfClick);
 
@@ -336,7 +369,7 @@ public class HearingActivity extends ReactActivity {
 
         System.out.println("FINISH ACTIVITY");
         userHearingTest.endTestResult(testResultList);
-        if(result_pass_validation_time >= PASS_RESULT_CRITERIA) userHearingTest.setTestResultSummary("Good");
+        if(result_pass_validation_time >= PASS_RESULT_CRITERIA) userHearingTest.setGoodSummary();
         Gson gson = new Gson();
         String resultJson = gson.toJson(userHearingTest);
 
@@ -346,8 +379,10 @@ public class HearingActivity extends ReactActivity {
         intent.putExtra("TestResultList", resultJson);
         intent.putExtra("FilePath", saveHearingPath);
         intent.putExtra("UserId", userId);
+        intent.putExtra("TranslateMenu", translationMenu);
         startActivity(intent);
         finish();
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
