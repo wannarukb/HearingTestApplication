@@ -4,6 +4,11 @@ import * as RNLocalize from 'react-native-localize';
 import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
 
+const translate = memoize(
+    (key, config) => i18n.t(key, config),
+    (key, config) => (config ? key + JSON.stringify(config) : key)
+)
+
 
 const translationGetters = {
     // lazy requires (metro bundler does not support symlinks)
@@ -19,6 +24,7 @@ export class LanguageService extends Component {
     static getInstance() {  
         return new LanguageService();
     }
+    
     changeLanguage(lang) {
         // fallback if no available language fits
         const fallback = { languageTag: lang, isRTL: false };
@@ -34,7 +40,7 @@ export class LanguageService extends Component {
         console.log('LEKK = languageTag = ' + languageTag);
 
         // clear translation cache
-        // translate.cache.clear();
+        translate.cache.clear();
         // update layout direction
         I18nManager.forceRTL(isRTL);
         // set i18n-js config

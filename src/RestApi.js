@@ -20,12 +20,22 @@ let register_post = (body) => api.post('/v1/Users/', body).then(response => resp
 * GET :  Test Tone v.1.1
 * URL : https://www3.ict.mahidol.ac.th/test/hearing/api/api/v1.1/TestTones/3
 */
-let testtone_get = (userToken) =>{ 
-    let token = 'Bearer ' + userToken;
-    api.setHeader('Authorization', token);
-    const response = api.get('/v1.1/TestTones/3');
-    return response;
-}
+// let testtone_get = (userToken) =>{ 
+//     let token = 'Bearer ' + userToken;
+//     api.setHeader('Authorization', token);
+//     const response = api.get('/v1.1/TestTones/3');
+//     return response;
+// }
+
+
+//https://www3.ict.mahidol.ac.th/test/hearing/api/api/v1.2/TestTones/3/Redmi%20Note8%20Pro
+let testtone_get = (userToken, deviceModel) =>{ 
+     let token = 'Bearer ' + userToken;
+     api.setHeader('Authorization', token);
+     const response = api.get('/v1.2/TestTones/3/' + deviceModel);
+     return response;
+ }
+
 
 /* 
 * POST : Get test tone protocol by device & model information

@@ -12,6 +12,7 @@ import { Button, Input } from "../components";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import CheckBox from '@react-native-community/checkbox';
 
+import {LanguageService} from "../services/LanguageService";
 import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
 
@@ -19,7 +20,6 @@ const translate = memoize(
     (key, config) => i18n.t(key, config),
     (key, config) => (config ? key + JSON.stringify(config) : key)
 )
-
 
 const { height, width } = Dimensions.get("screen");
 class Register extends React.Component {
@@ -30,12 +30,45 @@ class Register extends React.Component {
             isMale : false,
             isFemale : false
         };
+
+        this.getDeviceInfo();
     }
 
     componentDidMount() {
         // this.props.logout();
         this.getToken();
-      }
+    }
+
+    setDeviceLanguage(lang){
+        console.log("SET DEVICE Language = " + lang);
+        translate.cache.clear();
+        LanguageService.getInstance().changeLanguage(lang);
+        
+    }
+    
+    
+    getDeviceInfo = async() =>{
+        var defaultLanguage = 'en';
+        try {
+            let data = await AsyncStorage.getItem("DeviceInfo");
+            
+            if(data){
+                let deviceData = JSON.parse(data);
+                console.log('device data = ', deviceData);
+                this.setState({
+                    DeviceInfo : deviceData
+                });
+                
+                console.log(deviceData);
+                defaultLanguage = (deviceData.language != undefined) ? deviceData.language : 'en';
+            }
+            this.setDeviceLanguage(defaultLanguage);
+        } catch (error) {
+            
+            console.log("Something went getDeviceInfo = ", error);
+            this.setDeviceLanguage(defaultLanguage);
+        }
+    }
     
     async getToken() {
         try {

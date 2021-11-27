@@ -11,7 +11,7 @@ import TestToneService from '../services/TestToneService';
 
 
 import {connect} from 'react-redux';
-
+import {LanguageService} from "../services/LanguageService";
 import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
 
@@ -19,7 +19,6 @@ const translate = memoize(
     (key, config) => i18n.t(key, config),
     (key, config) => (config ? key + JSON.stringify(config) : key)
 )
-
 
 const { height, width } = Dimensions.get("screen");
 
@@ -34,6 +33,10 @@ class HearingTestResult extends Component {
 
         };
 
+        console.log('----- HearingTestResult -----');
+        console.log(JSON.stringify(this.props));
+
+        this.getDeviceInfo();
 
         this.getToken().then( response =>{
             if(!this.props.network.isConnected){
@@ -48,6 +51,38 @@ class HearingTestResult extends Component {
                 this.loadToneHeaderList(userToken, userId);
             }
         })
+        
+    }
+
+    setDeviceLanguage(lang){
+        console.log("SET DEVICE Language = " + lang);
+        translate.cache.clear();
+        LanguageService.getInstance().changeLanguage(lang);
+        
+    }
+    
+    
+    getDeviceInfo = async() =>{
+        var defaultLanguage = 'en';
+        try {
+            let data = await AsyncStorage.getItem("DeviceInfo");
+            
+            if(data){
+                let deviceData = JSON.parse(data);
+                console.log('device data = ', deviceData);
+                this.setState({
+                    DeviceInfo : deviceData
+                });
+                
+                console.log(deviceData);
+                defaultLanguage = (deviceData.language != undefined) ? deviceData.language : 'en';
+            }
+            this.setDeviceLanguage(defaultLanguage);
+        } catch (error) {
+            
+            console.log("Something went getDeviceInfo = ", error);
+            this.setDeviceLanguage(defaultLanguage);
+        }
     }
 
     async getToken() {
@@ -190,26 +225,11 @@ class HearingTestResult extends Component {
                                 <Block style={{width: '25%',marginHorizontal: 2}}></Block>
                             </Block>
                         </Block>
-                        <View>
-                            <ScrollView style={styles.dataWrapper}>
-                                {/* <Block style={styles.resultBlock}>
-                                    <Block style={styles.row}>
-                                        <Block style={styles.resultImageBox} >
-                                            <Image source={Images.HearingResult_Good} style={styles.resultImage} />
-                                        </Block>
-                                        <Block style={styles.resultDescBox} >
-                                            <Text  style={styles.descText} >
-                                                11.00 น.
-                                            </Text>
-                                            <Text  style={styles.resultText} >
-                                                นพ. ศิริชัย สวัสดี
-                                            </Text>
-                                        </Block>
-                                    </Block>
-                                </Block> */}
+                        <ScrollView 
+                                style={styles.dataWrapper}
+                            >
                                 {this.renderHearingList()}
-                            </ScrollView>
-                        </View>
+                        </ScrollView>
                 
                     </ImageBackground>
                 </Block>
@@ -220,6 +240,13 @@ class HearingTestResult extends Component {
 }
 
 const styles = StyleSheet.create({
+    dataWrapper :{
+        width : width,
+        marginTop: '0%' ,
+        alignSelf:'baseline',
+        paddingBottom: 140,
+        marginBottom: 70
+    },
     resultBlock: {
         backgroundColor: themeColor.COLORS.WHITE,
         height: 80,
@@ -451,7 +478,8 @@ const mapStateToProps = state => {
     return {
       userInfo: state.user,
       network: state.network,
-      ...state.testToneResultTemp
+      ...state.testToneResultTemp,
+      ...state.deviceInfo
     };
   };
   

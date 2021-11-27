@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
-import {connect} from 'react-redux';
+
 import {CommonActions } from '@react-navigation/native';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
-import TestToneService from '../services/TestToneService';
-
 import { StyleSheet, Dimensions, ImageBackground,  ScrollView , NativeModules} from 'react-native';
 import { Block, Text, theme } from "galio-framework";
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 import { Button } from "../components";
 import CheckBox from '@react-native-community/checkbox';
+import DeviceInfo from 'react-native-device-info';
 
+import TestToneService from '../services/TestToneService';
+
+import {connect} from 'react-redux';
+import {LanguageService} from "../services/LanguageService";
 import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
 
@@ -27,10 +30,16 @@ class UserSurvey extends Component {
     constructor(props) {
         super(props);
         this.state = {
-        q1 : false,
-        q2 : false,
-        q3 : false
+            q1 : false,
+            q2 : false,
+            q3 : false
         };
+
+        console.log('----- User Survey -----');
+        console.log(JSON.stringify(this.props));
+
+        this.getDeviceInfo();
+
         this.getToken().then( response =>{
             if(!this.props.network.isConnected){
                 console.log('No Internet');
@@ -38,12 +47,45 @@ class UserSurvey extends Component {
             }else{
                 console.log('Internet Connected');
                 let userToken = this.state.userInfo.token;
-                // console.warn(userToken);
-                // console.log(this.props);
-                this.loadTestTone(userToken);
+                console.log(this.props.deviceInfo );
+                let deviceModel = DeviceInfo.getModel();
+                console.log(" deviceModel = " + deviceModel);
+                this.loadTestTone(userToken, deviceModel);
             }
         })
     };
+
+    setDeviceLanguage(lang){
+        console.log("SET DEVICE Language = " + lang);
+        translate.cache.clear();
+        LanguageService.getInstance().changeLanguage(lang);
+        
+    }
+    
+    
+    getDeviceInfo = async() =>{
+        var defaultLanguage = 'en';
+        try {
+            let data = await AsyncStorage.getItem("DeviceInfo");
+            
+            if(data){
+                let deviceData = JSON.parse(data);
+                console.log('device data = ', deviceData);
+                this.setState({
+                    DeviceInfo : deviceData
+                });
+                
+                console.log(deviceData);
+                defaultLanguage = (deviceData.language != undefined) ? deviceData.language : 'en';
+            }
+            this.setDeviceLanguage(defaultLanguage);
+        } catch (error) {
+            
+            console.log("Something went getDeviceInfo = ", error);
+            this.setDeviceLanguage(defaultLanguage);
+        }
+    }
+
 
     async getToken() {
         try {
@@ -79,9 +121,9 @@ class UserSurvey extends Component {
         }
     }
 
-    loadTestTone = (userToken) =>{
+    loadTestTone = (userToken, deviceModel) =>{
         try {
-        TestToneService.test_tone_api(userToken)
+        TestToneService.test_tone_api(userToken, deviceModel)
         .then(responseJson => {
             console.log('test_tone_api responseJson = ', responseJson.status);
             if (responseJson.ok) {
@@ -154,11 +196,13 @@ class UserSurvey extends Component {
                 "ToneResultInfo_BadSuggestion": translate('ToneResultInfo_BadSuggestion'),
                 "GoBackToHomePageButton": translate('GoBackToHomePageButton')
             }
-            NativeModules.HearingTestModule.GotoActivity(
-                JSON.stringify(userID),
-                JSON.stringify(testData),
-                JSON.stringify(translateMenu)
-            );
+
+            console.log(translateMenu);
+            // NativeModules.HearingTestModule.GotoActivity(
+            //     JSON.stringify(userID),
+            //     JSON.stringify(testData),
+            //     JSON.stringify(translateMenu)
+            // );
         }
         
     }
@@ -200,27 +244,28 @@ class UserSurvey extends Component {
                 </Block>
                 <ScrollView
                     showsVerticalScrollIndicator={false}
-                    style={{ width, marginTop: '0%' }}
+                    style={{ width, marginTop: '0%', paddingHorizontal: 20 }}
                 >
                 <Block  style={styles.contentContainer}>
                     <Block  style={{ paddingVertical: 15, justifyContent: "space-around", height: 30,alignItems: "center", marginBottom: 30}}>
-                    <Text  style={styles.mainQuestionText} >{translate('MainPageQuestion')}</Text>
+                        <Text  style={styles.mainQuestionText} >{translate('MainPageQuestion')}</Text>
                     </Block>
+                    
                     <Block style={styles.questionRow}>
-                    <Block style={styles.subQuestion}>
-                        <Text  style={styles.subQuestionText} >{translate('FirstQuestion')}</Text>
-                    </Block>
-                    <Block style={styles.checkboxBlock}>
-                        <CheckBox
-                        disabled={false}
-                        value={this.state.q1}
-                        onValueChange={(newValue) => this.setState({ q1: newValue})}
-                        style={styles.checkbox}
-                        />
-                    </Block>
-                    <Block style={styles.subQuestionLabel}>
-                        <Text  style={styles.subQuestionText} > {translate('YesLabel')}</Text>
-                    </Block>
+                        <Block style={styles.subQuestion}>
+                            <Text  style={styles.subQuestionText} >{translate('FirstQuestion')}</Text>
+                        </Block>
+                        <Block style={styles.checkboxBlock}>
+                            <CheckBox
+                            disabled={false}
+                            value={this.state.q1}
+                            onValueChange={(newValue) => this.setState({ q1: newValue})}
+                            style={styles.checkbox}
+                            />
+                        </Block>
+                        <Block style={styles.subQuestionLabel}>
+                            <Text  style={styles.subQuestionText} > {translate('YesLabel')}</Text>
+                        </Block>
                     </Block>
 
                     <Block style={styles.questionRow}>
@@ -511,7 +556,8 @@ const mapStateToProps = state => {
   return {
     userInfo: state.user,
     network: state.network,
-    ...state.testToneList
+    ...state.testToneList,
+    ...state.deviceInfo
   };
 };
 

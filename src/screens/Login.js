@@ -12,6 +12,7 @@ import Images from "../constants/Images";
 import { Button, Input } from "../components";
 const { height, width } = Dimensions.get("screen");
 
+import {LanguageService} from "../services/LanguageService";
 import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
 
@@ -20,65 +21,98 @@ const translate = memoize(
     (key, config) => (config ? key + JSON.stringify(config) : key)
 )
 
+
 class Login extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      loading:false,
-      UserEmail:'',
-      UserPassword:''
-    };
-  }
+    constructor(props) {
+        super(props);
+        this.state = {
+            loading:false,
+            UserEmail:'',
+            UserPassword:''
+        };
 
-  componentDidMount() {
-    // this.props.logout();
-    this.getToken();
+        this.getDeviceInfo();
+
+        console.log(JSON.stringify(this.props));
+    }
+
+    setDeviceLanguage(lang){
+        console.log("SET DEVICE Language = " + lang);
+        translate.cache.clear();
+        LanguageService.getInstance().changeLanguage(lang);
+        
+    }
     
-  }
-
-  async getToken() {
-    try {
-      let userData = await AsyncStorage.getItem("UserInfo");
-      let data = JSON.parse(userData);
-      console.log('Login get token = ', data);
-      this.setState({
-        userInfo : data
-      });
-    } catch (error) {
-      console.log("Something went wrong, get token = ", error);
+    
+    getDeviceInfo = async() =>{
+        var defaultLanguage = 'en';
+        try {
+            let data = await AsyncStorage.getItem("DeviceInfo");
+            
+            if(data){
+                let deviceData = JSON.parse(data);
+                console.log('device data = ', deviceData);
+                this.setState({
+                    DeviceInfo : deviceData
+                });
+                
+                console.log(deviceData);
+                defaultLanguage = (deviceData.language != undefined) ? deviceData.language : 'en';
+            }
+            this.setDeviceLanguage(defaultLanguage);
+        } catch (error) {
+            
+            console.log("Something went getDeviceInfo = ", error);
+            this.setDeviceLanguage(defaultLanguage);
+        }
     }
-  }
 
-  login(){
-    const {UserEmail,UserPassword}=this.state
-    if(UserEmail == ""){
-      alert('กรุณากรอกอีเมล')
-    }else if( UserPassword == ""){
-      alert('กรุณากรอกรหัสผ่าน')
-    }else if(!this.props.network.isConnected){
-      alert('No Internet')    
-    }else{
-      this.UserLoginFunction()
+    componentDidMount() {
+        // this.props.logout();
+        this.getToken();
     }
-  }
 
-  tryButton(){
-    //this.goToUserSurveyPage();
-    this.state.UserEmail = 'DefaultUser';
-    this.UserLoginFunction();
+    async getToken() {
+        try {
+            let userData = await AsyncStorage.getItem("UserInfo");
+            let data = JSON.parse(userData);
+            console.log('Login get token = ', data);
+            this.setState({
+                userInfo : data
+            });
+        } catch (error) {
+            console.log("Something went wrong, get token = ", error);
+        }
+    }
 
-  }
+    login(){
+        const {UserEmail,UserPassword}=this.state
+        if(UserEmail == ""){
+            alert('กรุณากรอกอีเมล')
+        }else if( UserPassword == ""){
+            alert('กรุณากรอกรหัสผ่าน')
+        }else if(!this.props.network.isConnected){
+            alert('No Internet')    
+        }else{
+            this.UserLoginFunction()
+        }
+    }
 
-  goToUserSurveyPage = () =>{ 
-    this.props.navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [
-          { name: 'UserSurvey' },
-        ],
-      })
-    );
-  }
+    tryButton(){
+        this.state.UserEmail = 'DefaultUser';
+        this.UserLoginFunction();
+    }
+
+    goToUserSurveyPage = () =>{ 
+        this.props.navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [
+                { name: 'UserSurvey' },
+                ],
+            })
+        );
+    }
 
   // async storeToken(user) 
   storeToken = async(user) =>{
@@ -93,51 +127,51 @@ class Login extends React.Component {
   // async storeTestToneList(testToneList) 
   storeTestToneList = async(testToneList) =>{
     try {
-      await AsyncStorage.setItem("TestToneList", JSON.stringify(testToneList));
-      console.log("storeTestToneList", "information have been store");
-      this.goToUserSurveyPage();
+        await AsyncStorage.setItem("TestToneList", JSON.stringify(testToneList));
+        console.log("storeTestToneList", "information have been store");
+        this.goToUserSurveyPage();
     } catch (error) {
-      console.log("Something went wrong, store token = ", error);
+        console.log("Something went wrong, store token = ", error);
     }
   }
   
 
   loadTestTone = (userToken) =>{
     try {
-      TestToneService.test_tone_api(userToken)
-      .then(responseJson => {
-        console.log('test_tone_api responseJson = ', responseJson.status);
-        if (responseJson.ok) {
-          if (responseJson.data != null) {
-            var data = responseJson.data;
-            // console.log('login load test tone data ' + data);
-            this.props.loadTestToneList(data);
-            this.storeTestToneList(data);
-          } else {
-            alert('server error no data')
-          }
-        } else {
-          if (responseJson.problem == 'NETWORK_ERROR') {
-            alert('server error = NETWORK_ERROR')
-            this.setState({
-              loading: false,
-            });
-          } else if (responseJson.problem == 'TIMEOUT_ERROR') {
-            alert('server error = TIMEOUT_ERROR')
-            this.setState({
-              loading: false,
-            });
-          } else {
-            alert('server error responseJson ERROR')
-            this.setState({
-              loading: false,
-            });
-          }
-        }
-      })
-      .catch(error => {
-        console.error(error);
-      });
+        TestToneService.test_tone_api(userToken)
+        .then(responseJson => {
+            console.log('test_tone_api responseJson = ', responseJson.status);
+            if (responseJson.ok) {
+            if (responseJson.data != null) {
+                var data = responseJson.data;
+                // console.log('login load test tone data ' + data);
+                this.props.loadTestToneList(data);
+                this.storeTestToneList(data);
+            } else {
+                alert('server error no data')
+            }
+            } else {
+            if (responseJson.problem == 'NETWORK_ERROR') {
+                alert('server error = NETWORK_ERROR')
+                this.setState({
+                loading: false,
+                });
+            } else if (responseJson.problem == 'TIMEOUT_ERROR') {
+                alert('server error = TIMEOUT_ERROR')
+                this.setState({
+                loading: false,
+                });
+            } else {
+                alert('server error responseJson ERROR')
+                this.setState({
+                loading: false,
+                });
+            }
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
       
     } catch (e) {
       console.error(error);
@@ -150,50 +184,50 @@ class Login extends React.Component {
   UserLoginFunction = () => {
     const { UserEmail ,UserPassword}  = this.state ;
     try {
-      AuthService.login_api(UserEmail,UserPassword)
-      .then(responseJson => {
-        console.log('login', responseJson);
-        this.setState({loading:false})
-        if (responseJson.ok) {
-          this.setState({
-            loading: false,
-          });
+        AuthService.login_api(UserEmail,UserPassword)
+        .then(responseJson => {
+            console.log('login', responseJson);
+            this.setState({loading:false})
+            if (responseJson.ok) {
+            this.setState({
+                loading: false,
+            });
 
-          if (responseJson.data != null) {
-            var data = responseJson.data;
-            console.log('userInfo', data);
-            this.storeToken(data);
-            this.props.login(data);
-            this.loadTestTone(data.token);
-            
-          } else {
-            alert('server error no data')
-          }
-        } else {
-          if (responseJson.problem == 'NETWORK_ERROR') {
-            alert('server error = NETWORK_ERROR')
+            if (responseJson.data != null) {
+                var data = responseJson.data;
+                console.log('userInfo', data);
+                this.storeToken(data);
+                this.props.login(data);
+                this.loadTestTone(data.token);
+                
+            } else {
+                alert('server error no data')
+            }
+            } else {
+            if (responseJson.problem == 'NETWORK_ERROR') {
+                alert('server error = NETWORK_ERROR')
+                this.setState({
+                loading: false,
+                });
+            } else if (responseJson.problem == 'TIMEOUT_ERROR') {
+                alert('server error = TIMEOUT_ERROR')
+                this.setState({
+                loading: false,
+                });
+            } else {
+                alert('server error responseJson ERROR')
+                this.setState({
+                loading: false,
+                });
+            }
+            }
+        })
+        .catch(error => {
+            console.error(error);
             this.setState({
-              loading: false,
+            loading: false,
             });
-          } else if (responseJson.problem == 'TIMEOUT_ERROR') {
-            alert('server error = TIMEOUT_ERROR')
-            this.setState({
-              loading: false,
-            });
-          } else {
-            alert('server error responseJson ERROR')
-            this.setState({
-              loading: false,
-            });
-          }
-        }
-      })
-      .catch(error => {
-        console.error(error);
-        this.setState({
-          loading: false,
         });
-      });
       
     } catch (e) {
       console.error(error);
@@ -208,115 +242,115 @@ class Login extends React.Component {
     return (
       <Block flex style={styles.container}>
         <Block flex>
-          <ImageBackground
-              source={Images.lightBG}
-              style={{ height, width, zIndex: 1 }}
-          >
-            <ScrollView
-                  showsVerticalScrollIndicator={false}
-                  style={{ width, marginTop: '0%' }}
+            <ImageBackground
+                source={Images.lightBG}
+                style={{ height, width, zIndex: 1 }}
             >
-              <Block flex style={styles.homeContainer}>
-                <Image source={Images.logoFaculty} style={styles.logo} />
-                <Block flex space="around">
-                    <Block style={styles.titleBlock}>
-                      <Block  style={styles.row}>
-                        <Block flex middle style={{ paddingVertical: 30}}>
-                          <Image source={Images.Ear} style={styles.earImg} />
-                          <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-                            {translate('Login')}
-                          </Text>
-                        </Block>
-                      </Block>
-                    </Block>
-                    <Block flex middle>
-                        <Block style={styles.registerContainer}>
-                          <Block flex>
-                    
-                            <Block flex center>
-                              <KeyboardAvoidingView
-                                style={{ flex: 1 }}
-                                behavior="padding"
-                                enabled
-                              >
-                                <Block  style={{ marginBottom: 15 }}>
-                                  <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                    {translate('EmailLabel')}
-                                  </Text>
-                                  <TextInput
-                                    style={styles.inputType}
-                                    placeholder="Email"
-                                    placeholderTextColor="grey"
-                                    returnKeyType="next"
-                                    onSubmitEditing={() => this.pass_tn.focus()}
-                                    onChangeText={text => this.setState({ UserEmail: text })}
-                                    value={UserEmail}
-                                  />
-                                  </Block>
-                                <Block >
-                                  <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                    {translate('PasswordLabel')}
-                                  </Text>
-                                  <TextInput
-                                    style={styles.inputType}
-                                    ref={(id)=>{this.pass_tn=id}}
-                                    placeholder="Password"
-                                    placeholderTextColor="grey"
-                                    secureTextEntry={true}
-                                    autoCapitalize="none"
-                                    returnKeyType="done"
-                                    onChangeText={text => this.setState({ UserPassword: text })}
-                                    value={UserPassword}
-                                  />
-                                </Block>
-                                
-                                <Block middle>
-                                  <Button style={styles.createButton}
-                                   onPress={() => this.login()}>
-                                    <Text style={styles.createButtonText}>
-                                      {translate('Login')}
-                                    </Text>
-                                  </Button>
-                                </Block>
-
-                                <Block  style={styles.row}>
-                                  <Block style={{width: '60%', marginLeft: -5, paddingRight: 5}}>
-                                    <Button style={styles.menuButtonRegister} 
-                                     onPress={() => this.props.navigation.dispatch(
-                                      CommonActions.reset({
-                                        index: 0,
-                                        routes: [
-                                          { name: 'Register' },
-                                        ],
-                                      })
-                                    )}
-                                    >
-                                      <Text style={styles.createButtonText}>
-                                        {translate('RegisterButton')}
-                                      </Text>
-                                    </Button>
-                                  </Block>
-                                  <Block style={{width: '40%', paddingLeft: 5}}>
-                                    <Button style={styles.menuButtonTry}
-                                    onPress={() => this.tryButton()}>
-                                      <Text style={styles.createButtonText}>
-                                        {translate('LoginAsGuest')}
-                                      </Text>
-                                    </Button>
-                                  </Block>
-                                </Block>
-                                
-                              </KeyboardAvoidingView>
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    style={{ width, marginTop: '0%' }}
+                >
+                <Block flex style={styles.homeContainer}>
+                    <Image source={Images.logoFaculty} style={styles.logo} />
+                    <Block flex space="around">
+                        <Block style={styles.titleBlock}>
+                        <Block  style={styles.row}>
+                            <Block flex middle style={{ paddingVertical: 30}}>
+                            <Image source={Images.Ear} style={styles.earImg} />
+                            <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
+                                {translate('Login')}
+                            </Text>
                             </Block>
-                          </Block>
                         </Block>
-                      </Block>
+                        </Block>
+                        <Block flex middle>
+                            <Block style={styles.registerContainer}>
+                            <Block flex>
+                        
+                                <Block flex center>
+                                <KeyboardAvoidingView
+                                    style={{ flex: 1 }}
+                                    behavior="padding"
+                                    enabled
+                                >
+                                    <Block  style={{ marginBottom: 15 }}>
+                                    <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
+                                        {translate('EmailLabel')}
+                                    </Text>
+                                    <TextInput
+                                        style={styles.inputType}
+                                        placeholder="Email"
+                                        placeholderTextColor="grey"
+                                        returnKeyType="next"
+                                        onSubmitEditing={() => this.pass_tn.focus()}
+                                        onChangeText={text => this.setState({ UserEmail: text })}
+                                        value={UserEmail}
+                                    />
+                                    </Block>
+                                    <Block >
+                                    <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
+                                        {translate('PasswordLabel')}
+                                    </Text>
+                                    <TextInput
+                                        style={styles.inputType}
+                                        ref={(id)=>{this.pass_tn=id}}
+                                        placeholder="Password"
+                                        placeholderTextColor="grey"
+                                        secureTextEntry={true}
+                                        autoCapitalize="none"
+                                        returnKeyType="done"
+                                        onChangeText={text => this.setState({ UserPassword: text })}
+                                        value={UserPassword}
+                                    />
+                                    </Block>
+                                    
+                                    <Block middle>
+                                    <Button style={styles.createButton}
+                                    onPress={() => this.login()}>
+                                        <Text style={styles.createButtonText}>
+                                        {translate('Login')}
+                                        </Text>
+                                    </Button>
+                                    </Block>
+
+                                    <Block  style={styles.row}>
+                                    <Block style={{width: '60%', marginLeft: -5, paddingRight: 5}}>
+                                        <Button style={styles.menuButtonRegister} 
+                                        onPress={() => this.props.navigation.dispatch(
+                                        CommonActions.reset({
+                                            index: 0,
+                                            routes: [
+                                            { name: 'Register' },
+                                            ],
+                                        })
+                                        )}
+                                        >
+                                        <Text style={styles.createButtonText}>
+                                            {translate('RegisterButton')}
+                                        </Text>
+                                        </Button>
+                                    </Block>
+                                    <Block style={{width: '40%', paddingLeft: 5}}>
+                                        <Button style={styles.menuButtonTry}
+                                        onPress={() => this.tryButton()}>
+                                        <Text style={styles.createButtonText}>
+                                            {translate('LoginAsGuest')}
+                                        </Text>
+                                        </Button>
+                                    </Block>
+                                    </Block>
+                                    
+                                </KeyboardAvoidingView>
+                                </Block>
+                            </Block>
+                            </Block>
+                        </Block>
+                        
                     
-                
+                    </Block>
                 </Block>
-              </Block>
-            </ScrollView>
-          </ImageBackground>
+                </ScrollView>
+            </ImageBackground>
         </Block>
       </Block>
         
@@ -428,14 +462,14 @@ const styles = StyleSheet.create({
   }
 });
 Login.defaultProps = {
-  id: '',
-  token: ''
+    id: '',
+    token: ''
 };
 
 const mapStateToProps = state => {
-  return {
-    network: state.network,
-  };
+    return {
+        network: state.network,
+    };
 };
 
 const mapDispatchToProps = dispatch => {

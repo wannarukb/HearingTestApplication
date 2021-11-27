@@ -5,8 +5,8 @@ import {
 } from '../RestAPI';
 
 const TestToneService = {
-    test_tone_api: async (userToken) => {
-        let response = await testtone_get(userToken);
+    test_tone_api: async (userToken, deviceModel) => {
+        let response = await testtone_get(userToken, deviceModel);
         return response;
     },
 

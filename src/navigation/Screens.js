@@ -9,10 +9,7 @@ import Home from "../screens/Home";
 import Onboarding from "../screens/Onboarding";
 import Login from "../screens/Login";
 import UserSurvey from "../screens/UserSurvey";
-import Appointment from "../screens/Appointment";
 import HearingTestResult from "../screens/HearingTestResult";
-import HeadsetSelect from "../screens/HeadsetSelect";
-import HearingTestType from "../screens/HearingTestType"
 
 // header for screens
 const { width } = Dimensions.get("screen");
@@ -20,52 +17,11 @@ const { width } = Dimensions.get("screen");
 const Stack = createStackNavigator();
 
 
-// function UserSurveyStack(props) {
-//   return (
-
-//     <Stack.Navigator mode="card" headerMode="screen">
-//       <Stack.Screen
-//         name="UserSurvey"
-//         component={UserSurvey}
-//         options={{
-//           header: ({ navigation, scene }) => (
-//             <Header
-//               title="UserSurvey"
-//               back
-//               white
-//               transparent
-//               navigation={navigation}
-//               scene={scene}
-//             />
-//           ),
-//           headerTransparent: false
-//         }}
-//       />
-//     </Stack.Navigator>
-//   );
-// }
 
 function HeadsetSelectStack(props) {
   return (
     <Stack.Navigator mode="card" headerMode="none">
       
-      
-      <Stack.Screen
-        name="HeadsetSelect"
-        component={HeadsetSelect}
-        option={{
-          title : "Headset",
-          headerTransparent: false
-        }}
-      />
-      <Stack.Screen
-        name="HearingTestType"
-        component={HearingTestType}
-        option={{
-          title : "Headset",
-          headerTransparent: false
-        }}
-      />
       <Stack.Screen
         name="UserSurvey"
         component={UserSurvey}
@@ -95,14 +51,6 @@ function UserSurveyStack(props) {
         component={UserSurvey}
         option={{
           title : "แบบสอบถาม",
-          headerTransparent: false
-        }}
-      />
-      <Stack.Screen
-        name="HeadsetSelect"
-        component={HeadsetSelectStack}
-        option={{
-          title : "Headset",
           headerTransparent: false
         }}
       />
@@ -175,14 +123,6 @@ export default function HomeStack(props) {
         component={HearingTestResult} 
         option={{
           title : "ผลการตรวจ",
-          headerTransparent: false
-        }}
-      />
-      <Stack.Screen 
-        name="Appointment" 
-        component={Appointment} 
-        option={{
-          title : "ตารางนัดหมาย",
           headerTransparent: false
         }}
       />

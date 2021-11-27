@@ -149,7 +149,7 @@ public class HearingActivity extends ReactActivity {
                     int tonesize = parseList.size();
                     while(i < tonesize){
                         TestTone eachTone = parseToneArray.get(i);
-                        System.out.println(i + " : " + eachTone.runIndex + " : LEK3 = " + eachTone.frequency + ", " + eachTone.amplitude + ", " + eachTone.remainingRound + ", " + eachTone.testSide + " , " + eachTone.duration + ", " + eachTone.interval);
+                        System.out.println(i + " : " + eachTone.runIndex + " :  = " + eachTone.frequency + ", " + eachTone.amplitude + ", " + eachTone.remainingRound + ", " + eachTone.testSide + " , " + eachTone.duration + ", " + eachTone.interval);
                         if(i < parseList.size()){
                             tempTone = new TestTone(eachTone, true);
                             protocolId = eachTone.protocolId;
@@ -318,11 +318,11 @@ public class HearingActivity extends ReactActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    System.out.println("LEK m_bStop = " + m_bStop);
+                                    System.out.println(" m_bStop = " + m_bStop);
                                     if(m_bStop) {
                                         m_bStop = false;
                                     }
-                                    System.out.println("LEK RUN = " + currentRunTone.frequency + ", " + currentRunTone.amplitude + " , " + currentRunTone.testSide + " , " + currentRunTone.duration + ", " + currentRunTone.interval);
+                                    System.out.println(" RUN = " + currentRunTone.frequency + ", " + currentRunTone.amplitude + " , " + currentRunTone.testSide + " , " + currentRunTone.duration + ", " + currentRunTone.interval);
 
                                     runningIndex = runningIndex + 1;
                                     if(runningIndex < testToneList.size()){
@@ -389,7 +389,7 @@ public class HearingActivity extends ReactActivity {
     public void generateTone(int frequency, double durationSec, double amplitude, String earSide){
 
 //        System.out.println("GET TONE");
-        System.out.println("LEK --> F = " + frequency + " amplitude : " + amplitude);
+        System.out.println(" --> F = " + frequency + " amplitude : " + amplitude);
 
         // int mBufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
@@ -444,9 +444,9 @@ public class HearingActivity extends ReactActivity {
 //        double rmsdB = 20.0 * Math.log10(amp);
 //        double maxVolDB =  20.0 * Math.log10(max_amp);
 //        float volumePercentage = (float) (rmsdB/maxVolDB);
-//        System.out.println("LEK amp = " + amp);
-//        System.out.println("LEK max_amp = " + max_amp);
-//        System.out.println("LEK volumePercentage = " + volumePercentage);
+//        System.out.println(" amp = " + amp);
+//        System.out.println(" max_amp = " + max_amp);
+//        System.out.println(" volumePercentage = " + volumePercentage);
         float volumePercentage = (float) (amp);
       //  volumeTextView.setText(""+volumePercentage);
 

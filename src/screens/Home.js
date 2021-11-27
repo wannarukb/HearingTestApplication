@@ -32,7 +32,10 @@ constructor(props) {
         openModal: false 
     };
 
-    var defaultLang = (this.props.deviceInfo && this.props.deviceInfo.deviceInfo.language)  ? this.props.deviceInfo.deviceInfo.language : 'en';
+
+    console.log(JSON.stringify(this.props));
+
+    var defaultLang = (this.props.deviceInfo && this.props.deviceInfo.language)  ? this.props.deviceInfo.language : 'en';
     this.setDeviceLanguage(defaultLang);
     console.log("Home information");
     this.getToken();
@@ -160,8 +163,6 @@ getDeviceInfo = async() =>{
         console.log("Something went getDeviceInfo = ", error);
         this.setDeviceLanguage(defaultLanguage);
     }
-
-    
 }
 
 async getToken() {
@@ -615,7 +616,8 @@ const mapStateToProps = state => {
         // image: state.user.image,
         userInfo: state.user,
         network: state.network,
-        deviceInfo : state.deviceInfo
+        //deviceInfo : state.deviceInfo
+        ...state.deviceInfo
     };
 };
 
