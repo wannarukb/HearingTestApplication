@@ -10,6 +10,9 @@ import Register from "../screens/Register";
 import UserSurvey from "../screens/UserSurvey";
 import HearingTestResult from "../screens/HearingTestResult";
 
+import TesterSurvey from "../screens/TesterSurvey";
+import Consent from "../screens/Consent";
+
 
 const Stack = createStackNavigator();
 
@@ -31,15 +34,9 @@ export default () => {
                 headerTransparent: false
               }}
             />
-           
-            <Stack.Screen
-              name="UserSurvey"
-              component={UserSurvey}
-              options={{
-                title : "แบบสอบถาม",
-                headerTransparent: false
-              }}
-            />
+            <Stack.Screen name="UserSurvey" component={UserSurvey}/>
+            <Stack.Screen name="Consent" component={Consent}/>
+            <Stack.Screen name="TesterSurvey" component={TesterSurvey}/>
             <Stack.Screen 
               name="HearingTestResult" 
               component={HearingTestResult} 

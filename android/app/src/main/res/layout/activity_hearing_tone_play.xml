@@ -14,7 +14,7 @@
         android:layout_marginTop="1dp"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
-        >
+        tools:ignore="MissingConstraints">
         <LinearLayout
             android:id="@+id/intro"
             android:layout_width="409dp"

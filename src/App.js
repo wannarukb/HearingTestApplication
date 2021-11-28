@@ -10,39 +10,23 @@ import { NavigationContainer } from "@react-navigation/native";
 import { enableScreens } from "react-native-screens";
 enableScreens();
 
-import Screens from "./navigation/Screens";
+// import Screens from "./navigation/Screens";
 import { themeColor } from "./constants";
 
 
 export default class App extends Component {
 
-  render() {
-      const per = persistStore(store);
-      
-      return (
-        <Provider store={store}>
-          <PersistGate persistor={per}>
-            <ReduxNetworkProvider>
-              <Router/>
-            </ReduxNetworkProvider>
-           </PersistGate>
-        </Provider>
-      );
+    render() {
+        const per = persistStore(store);
+        
+        return (
+            <Provider store={store}>
+                <PersistGate persistor={per}>
+                    <ReduxNetworkProvider>
+                    <Router/>
+                    </ReduxNetworkProvider>
+                </PersistGate>
+            </Provider>
+        );
     }
-  }
-  
-
-/*export default class App extends Component {
-  render() {
-    return (
-      <NavigationContainer>
-        <GalioProvider theme={themeColor}>
-          <Block flex>
-            <Screens />
-          </Block>
-        </GalioProvider>
-      </NavigationContainer>
-    );
-  }
 }
-*/
