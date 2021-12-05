@@ -26,7 +26,7 @@ const AuthService = {
     },
 
     register_guest_post : async (user) => {
-        return await register_post(user);
+        return await register_guest_post(user);
     },
 };
 

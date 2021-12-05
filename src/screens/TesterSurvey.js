@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import {connect} from 'react-redux';
 import {CommonActions } from '@react-navigation/native';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
 import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView , View, ActivityIndicator, Alert, NativeModules} from 'react-native';
@@ -7,15 +7,10 @@ import { Block, Text, theme } from "galio-framework";
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 import { Button } from "../components";
-
-
 import { RadioButton } from 'react-native-paper';
- 
 import DeviceInfo from 'react-native-device-info';
-
 import TestToneService from '../services/TestToneService';
 
-import {connect} from 'react-redux';
 import {LanguageService} from "../services/LanguageService";
 import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
@@ -416,12 +411,7 @@ class TesterSurvey extends Component {
 }
 
 const customStyles = StyleSheet.create({
-    radioButton : {
-        width: 300, 
-        color: themeColor.COLORS.PRIMARY, 
-        fontSize: 16,
-        fontFamily: 'Sarabun-Medium'
-    },
+    
    
     
     mainQuestionText : {
@@ -434,6 +424,12 @@ const customStyles = StyleSheet.create({
     questionRow: {
         flex: 1, 
         flexDirection: 'row',
+    },
+    radioButton : {
+        width: 300, 
+        color: themeColor.COLORS.PRIMARY, 
+        fontSize: 16,
+        fontFamily: 'Sarabun-Medium'
     },
     subQuestionBlock:{
         paddingVertical: 5,

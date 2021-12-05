@@ -25,8 +25,13 @@
     "GenderLabel": "Gender",
     "FemaleLabel": "Female",
     "MaleLabel": "Male",
-    "EmailRequire" : "Require Email",
-    "PasswordRequire" : "Require Password",
+    "YearOfBirthLabel" : "Year of Birth",
+    
+    "RequireField" : "Require Fields Missing:",
+    "EmailFormatError" : "Email format is incorrect (Ex. test@mail.com)",
+    "PasswordLengthError" : "Password length should be 6 - 10 characters",
+
+
     "NoInternet" : "Please connect to Internet",
     "AlertTitleError" : "Error",
     "LoginError" : "Email or Password is incorrect, please recheck your information.",

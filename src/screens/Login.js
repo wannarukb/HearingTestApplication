@@ -48,15 +48,35 @@ class Login extends React.Component {
     }
     
     login(){
+        var alertTitle = translate('AlertTitleError');
+        var alertMessage = '';
+
         const {UserEmail,UserPassword}=this.state
+        var isError = false;
+        var MissingRequireFieldMessage = translate('RequireField');
+        var fieldList = [];
         if(!this.props.network.isConnected){
-            alert(translate('InternetRequire'))    
-        } else if(UserEmail == ""  || UserEmail == undefined){
-            alert(translate('EmailRequire'))
-        }else if( UserPassword == "" || UserPassword == undefined){
-            alert(translate('PasswordRequire'))
+            isError = true;
+            alertMessage = translate('InternetRequire');
         }else{
-            this.UserLoginFunction()
+            if(UserEmail == "" || UserEmail == null || UserEmail == undefined) fieldList.push(translate('EmailLabel'));
+            if(UserPassword == "" || UserPassword == null || UserPassword == undefined) fieldList.push(translate('PasswordLabel'));
+
+            if(fieldList.length > 0){
+                isError = true;
+                alertMessage = MissingRequireFieldMessage + '\n';
+                for(let index = 0; index < fieldList.length; index++){
+                    if(index > 0) alertMessage += '\n';
+                    alertMessage += '  - ' + fieldList[index];
+                }
+            }
+            
+        }
+        
+        if(isError){
+            this.showAlert(alertTitle, alertMessage);
+        }else{
+            this.UserLoginFunction();
         }
     }
 

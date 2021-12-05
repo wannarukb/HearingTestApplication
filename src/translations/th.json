@@ -25,9 +25,12 @@
     "GenderLabel": "เพศ",
     "FemaleLabel": "หญิง",
     "MaleLabel": "ชาย",
+    "YearOfBirthLabel" : "ปีเกิด (พ.ศ.)",
 
-    "EmailRequire" : "กรุณากรอกอีเมล",
-    "PasswordRequire" : "กรุณากรอกรหัสผ่าน",
+    "RequireField" : "กรุณากรอกข้อมูลต่อไปนี้",
+    "EmailFormatError" : "รูปแบบของอีเมลไม่ถูกต้อง (ตัวอย่าง: test@mail.com)",
+    "PasswordLengthError" : "รหัสผ่านต้องมีความยาว 6-10 ตัวอักษร",
+
     "InternetRequire" : "กรุณาเชื่อมต่ออินเตอร์เน็ต",
     "AlertTitleError" : "เกิดข้อผิดพลาด",
     "LoginError" : "อีเมล หรือ รหัสผ่าน ไม่ถูกต้อง กรุณาตรวจสอบข้อมูล",

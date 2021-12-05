@@ -109,13 +109,13 @@ const styles = StyleSheet.create({
         textAlign : 'center'
     },
     formLabel:{
-        fontFamily:'Sarabun-Medium',
+        fontFamily:'Sarabun-SemiBold',
         fontSize: 16,
         color: themeColor.COLORS.PRIMARY,
     },
 
     formRequireLabel:{
-        fontFamily:'Sarabun-Medium',
+        fontFamily:'Sarabun-SemiBold',
         fontSize: 16,
         color: themeColor.COLORS.REQUIRED
     },
@@ -127,7 +127,9 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: themeColor.COLORS.WHITE,
         // marginTop: 5
-        width: '100%'
+        width: '100%',
+        fontFamily:'Sarabun',
+        fontSize: 18,
     },
 
     loadingBox :{
