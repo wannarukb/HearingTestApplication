@@ -5,12 +5,14 @@ import AsyncStorage  from '@react-native-async-storage/async-storage';
 import AuthService from '../services/AuthService';
 import TestToneService from '../services/TestToneService';
 
-import { StyleSheet, Picker, Dimensions, ActivityIndicator,Platform, TouchableWithoutFeedback, Keyboard, ImageBackground, Image, ScrollView, View ,KeyboardAvoidingView ,TextInput, Alert} from 'react-native';
+import { StyleSheet, Dimensions, ActivityIndicator,Platform, TouchableWithoutFeedback, Keyboard, ImageBackground, Image, ScrollView, View ,KeyboardAvoidingView ,TextInput, Alert} from 'react-native';
 import { Block, Text, theme } from "galio-framework";
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 import { Button } from "../components";
 import { RadioButton } from 'react-native-paper';
+import {Picker} from '@react-native-picker/picker';
+
 import DeviceInfo from 'react-native-device-info';
 
 
@@ -33,15 +35,29 @@ class Register extends React.Component {
         console.log("----- Register -----");
         console.log(JSON.stringify(this.props));
 
-        this.state = {
-            loading:false,
-            isMale : false,
-            isFemale : false
-        };
+        var currentDate = new Date();
+        var yearValue   = currentDate.getFullYear();
+        var startYear   = yearValue - 100;
 
         var lang = this.props.deviceInfo.language;
-        this.setDeviceLanguage(lang);
+        var yearPickerList = [];
+        for(let year = startYear; year <= yearValue; year++){
+            var yearLabel = (lang == 'th') ? year + 543 : year ;
+            var yearObj = {
+                value : ""+year,
+                label : ""+yearLabel
+            }
 
+            yearPickerList.push(yearObj);
+        }
+        
+        this.state = {
+            loading:false,
+            yearList : yearPickerList
+        };
+
+       
+        this.setDeviceLanguage(lang)
     }
 
     setDeviceLanguage(lang){
@@ -385,9 +401,12 @@ class Register extends React.Component {
         );
     }
 
+    
+    
     render() {
         const { navigation } = this.props;
-        const {loading,  UserEmail ,UserPassword, UserFirstName, UserLastName, UserBirthYear, UserGender } = this.state;
+        const {loading,  UserEmail ,UserPassword, UserFirstName, UserLastName, UserBirthYear, UserGender, yearList } = this.state;
+
         return (
         <Block flex style={styles.container}>
             <Block flex>
@@ -493,13 +512,28 @@ class Register extends React.Component {
                                                         {translate('YearOfBirthLabel')}
                                                         <Text style={styles.formRequireLabel}  > * </Text>
                                                     </Text>
-                                                    <TextInput
+                                                    {/* <TextInput
                                                         style={styles.inputType}
                                                         placeholderTextColor="grey"
                                                         returnKeyType="next"
                                                         onChangeText={text => this.setState({ UserBirthYear: text })}
                                                         value={UserBirthYear}
-                                                    />
+                                                    /> */}
+                                                    <Picker
+                                                        
+                                                        selectedValue={UserBirthYear}
+                                                        onValueChange={(itemValue, itemIndex) =>this.setState({ UserBirthYear: itemValue }) }
+                                                        style={{
+                                                            color: themeColor.COLORS.PRIMARY,
+                                                            backgroundColor: themeColor.COLORS.BTN_SECONDARY,
+                                                            width: '100%',
+                                                        }}    
+                                                        fontSize={20}
+                                                    >
+                                                        {
+                                                            yearList.map(year => <Picker.Item key={year.value} label={year.label} value={year.value}/>)
+                                                        }
+                                                    </Picker>
                                                 </Block>
                                             </Block>
 

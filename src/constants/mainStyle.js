@@ -130,6 +130,7 @@ const styles = StyleSheet.create({
         width: '100%',
         fontFamily:'Sarabun',
         fontSize: 18,
+        color: themeColor.COLORS.PRIMARY,
     },
 
     loadingBox :{
