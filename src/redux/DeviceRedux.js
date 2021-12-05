@@ -10,9 +10,14 @@ export const deviceInfoActions = {
   
 const initialState = {   
     "deviceInfo" :  {
-        language : "en",
-        deviceBrand : "",
-        deviceModel : ""
+        uniqueId:"",
+        systemName:"",
+        systemVersion:"",
+        isTablet:false,
+        brand:"",
+        model:"",
+        deviceType:"",
+        language:""
     }
 };
   

@@ -6,10 +6,11 @@ export default {
     // PRIMARY_BTN_SUCCESS: '#3FB6AA',
     PRIMARY_BTN_SUCCESS: '#14468A',
     BTN_REGISTER: '#29887E',
-    BTN_SECONDARY: '#6291CA',
+    BTN_SECONDARY: '#F1F2F3',
 
     SECONDARY: '#4E596F',
-    LABEL: '#FE2472',
+    LIGHT_SECONDARY : '#F1F2F3',
+    LABEL: '#172B4D',
     INFO: '#11CDEF',
     ERROR: '#F5365C',
     SUCCESS: '#2DCE89',
@@ -44,7 +45,8 @@ export default {
     MUTED: '#ADB5BD',
     INPUT: '#DCDCDC',
     INPUT_SUCCESS: '#7BDEB2',
-    INPUT_ERROR: '#FCB3A4',
+    INPUT_ERROR: '#E00000',
+    REQUIRED : '#E00000',
     ACTIVE: '#5E72E4', //same as primary
     BUTTON_COLOR: '#9C26B0', //wtf
     PLACEHOLDER: '#9FA5AA',

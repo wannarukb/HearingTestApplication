@@ -77,7 +77,7 @@ public class HearingActivity extends ReactActivity {
 
     public int              runningIndex;
     public int              currentTestRound;
-    public Button           startButton;
+    public Button           startButton, cancelButton;
     Thread m_PlayThread = null;
     boolean m_bStop = false;
     Integer noOfClick;
@@ -117,6 +117,7 @@ public class HearingActivity extends ReactActivity {
         playToneHeader      = (TextView) findViewById(R.id.tonePlayHeaderLabel);
         playToneDescription = (TextView) findViewById(R.id.tonePlayDescription);
         startButton         = (Button) findViewById(R.id.start);
+        cancelButton        = (Button) findViewById(R.id.cancel);
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
@@ -135,9 +136,10 @@ public class HearingActivity extends ReactActivity {
                 System.out.println(testToneJSON);
                 parseTone    = gson.fromJson(testToneJSON, TestTone[].class);
 
-                playToneHeader.setText((String) transalationMap.get("TonePlayHeaderLabel"));
-                playToneDescription.setText((String) transalationMap.get("TonePlayDescription"));
+                playToneHeader.setText((String) transalationMap.get("TonePlaySuggestionHeaderLabel"));
+                playToneDescription.setText((String) transalationMap.get("TonePlaySuggestionDescription"));
                 startButton.setText((String) transalationMap.get("StartPlayToneButton"));
+                cancelButton.setText((String) transalationMap.get("CancelButton"));
 
 
                 if(parseTone != null && parseTone.length > 0){
@@ -205,6 +207,8 @@ public class HearingActivity extends ReactActivity {
 
 
         startButton.setText((String) transalationMap.get("HearToneButton"));
+        playToneHeader.setText((String) transalationMap.get("TonePlayHeaderLabel"));
+        playToneDescription.setText((String) transalationMap.get("TonePlayDescription"));
         noOfClick += 1;
         System.out.println(" no of click = " + noOfClick);
 
@@ -249,6 +253,11 @@ public class HearingActivity extends ReactActivity {
     }
 
 
+    public void onClickCancel(View view) {
+        Intent intent = new Intent(this, ReactResultActivity.class);
+        startActivity(intent);
+        finish();
+    }
     synchronized void stop() {
         m_bStop = true;
 

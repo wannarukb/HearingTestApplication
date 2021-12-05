@@ -4,7 +4,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import { useSelector, useDispatch } from 'react-redux'
 
 import Home from "../screens/Home";
-import Onboarding from "../screens/Onboarding";
+import HomeGuest from "../screens/HomeGuest";
 import Login from "../screens/Login";
 import Register from "../screens/Register";
 import UserSurvey from "../screens/UserSurvey";
@@ -22,9 +22,9 @@ export default () => {
   console.log('Navigation : '  + JSON.stringify(isAuthenticated));
   return (
     <NavigationContainer>
-        <Stack.Navigator headerMode="none" initialRouteName={ isAuthenticated === true ? 'Home' : 'Onboarding'}>
-           
-            <Stack.Screen name="Onboarding" component={Onboarding} /> 
+        {/* <Stack.Navigator headerMode="none" initialRouteName={ isAuthenticated === true ? 'Home' : 'HomeGuest'}> */}
+        <Stack.Navigator headerMode="none" initialRouteName={ isAuthenticated === true ? 'HomeGuest' : 'HomeGuest'}>   
+            <Stack.Screen name="HomeGuest" component={HomeGuest} /> 
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen 
               name="Login" 

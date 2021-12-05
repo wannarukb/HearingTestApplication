@@ -1,7 +1,8 @@
 {
-    "hello": "Hello !",
+    "ChangeLanguageLabel": "เปลี่ยนภาษา",
     "AppConcept": "Hearing test by yourself",
     "AppConceptSubDesc": "ทดสอบประสิทธิภาพทางการได้ยินด้วยตัวคุณเองทุกที่ทุกเวลา",
+    "GuestLabel" : "Guest",
     "StartOnBoardingButton": "เริ่มต้นใช้งาน",
     "Welcome": "ยินดีต้อนรับ",
     "WelcomeSubInfo": "วันนี้คุณได้ทำการทดสอบการได้ยินหรือยัง ?",
@@ -14,8 +15,7 @@
     "Logout": "ออกจากระบบ",
     "EnglishLabel" : "English",
     "ThaiLabel" : "ภาษาไทย",
-    "RegisterButton": "สมัครเลย !",
-    "LoginAsGuest": "ทดลองใช้งาน",
+    "RegisterButton": "สมัครเข้าใช้งาน",
     "Login": "เข้าสู่ระบบ",
     "EmailLabel": "อีเมล",
     "PasswordLabel": "รหัสผ่าน",
@@ -25,6 +25,13 @@
     "GenderLabel": "เพศ",
     "FemaleLabel": "หญิง",
     "MaleLabel": "ชาย",
+
+    "EmailRequire" : "กรุณากรอกอีเมล",
+    "PasswordRequire" : "กรุณากรอกรหัสผ่าน",
+    "InternetRequire" : "กรุณาเชื่อมต่ออินเตอร์เน็ต",
+    "AlertTitleError" : "เกิดข้อผิดพลาด",
+    "LoginError" : "อีเมล หรือ รหัสผ่าน ไม่ถูกต้อง กรุณาตรวจสอบข้อมูล",
+
     "ConfirmRegisterButton": "ยืนยันการสมัคร",
     "BackButton": "ย้อนกลับ",
     "NextButton": "ถัดไป",
@@ -52,6 +59,8 @@
     "TesterTeenLabel" : "15 - 20 ปี",
     "TesterAdultLabel" : "21 - 59 ปี",
     "TesterElderLabel" : "60 ปี ขึ้นไป",
+
+    "ErrorNoTestData" : "ขออภัยค่ะ ไม่พบข้อมูลชุดทดสอบสำหรับคุณในขณะนี้ กรุณาลองใหม่ภายหลัง",
 
     
     "TonePlaySuggestionHeaderLabel": "กรุณาสวมหูฟังเพื่อผลทดสอบที่แม่นยำ",

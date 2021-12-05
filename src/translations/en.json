@@ -1,7 +1,8 @@
 {
-    "hello": "Hello !",
+    "ChangeLanguageLabel": "Change Language",
     "AppConcept": "Hearing test by yourself",
     "AppConceptSubDesc": "Hearing Test anytime",
+    "GuestLabel" : "Guest",
     "StartOnBoardingButton": "Start !",
     "Welcome": "Welcome",
     "WelcomeSubInfo": "Do you complete hearing testing today ?",
@@ -15,7 +16,6 @@
     "EnglishLabel" : "English",
     "ThaiLabel" : "ภาษาไทย",
     "RegisterButton": "Register",
-    "LoginAsGuest": "Login as Guest",
     "Login": "Login",
     "EmailLabel": "Email",
     "PasswordLabel": "Password",
@@ -25,6 +25,12 @@
     "GenderLabel": "Gender",
     "FemaleLabel": "Female",
     "MaleLabel": "Male",
+    "EmailRequire" : "Require Email",
+    "PasswordRequire" : "Require Password",
+    "NoInternet" : "Please connect to Internet",
+    "AlertTitleError" : "Error",
+    "LoginError" : "Email or Password is incorrect, please recheck your information.",
+
     "ConfirmRegisterButton": "Confirm",
     "BackButton": "Back",
     "NextButton": "Next",
@@ -51,7 +57,7 @@
     "TesterTeenLabel" : "15 - 20 Year",
     "TesterAdultLabel" : "21 - 59 Year",
     "TesterElderLabel" : "Above 60 Year",
-
+    "ErrorNoTestData" : "Sorry, we cannot find your hearing test. Please try again later.",
     
     "TonePlaySuggestionHeaderLabel": "Please wear headphones for accurate test results.",
     "TonePlaySuggestionDescription": "Start Testing",

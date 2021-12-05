@@ -1,21 +1,19 @@
 import React, { Component } from 'react';
-
+import {connect} from 'react-redux';
 import {CommonActions } from '@react-navigation/native';
-import AsyncStorage  from '@react-native-async-storage/async-storage';
-import { StyleSheet, Dimensions, ImageBackground, Image,  ScrollView , NativeModules} from 'react-native';
+import { StyleSheet, Dimensions, ImageBackground, Image,  ScrollView , View} from 'react-native';
 import { Block, Text, theme } from "galio-framework";
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 import { Button } from "../components";
 import CheckBox from '@react-native-community/checkbox';
-import DeviceInfo from 'react-native-device-info';
 
-import TestToneService from '../services/TestToneService';
 
-import {connect} from 'react-redux';
 import {LanguageService} from "../services/LanguageService";
 import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
+
+import mainStyle  from "../constants/mainStyle";
 
 const translate = memoize(
     (key, config) => i18n.t(key, config),
@@ -23,6 +21,7 @@ const translate = memoize(
 )
 
 const { height, width } = Dimensions.get("screen");
+const styles = mainStyle.styles;
 
 class UserSurvey extends Component {
 
@@ -38,10 +37,9 @@ class UserSurvey extends Component {
         console.log('----- User Survey -----');
         console.log(JSON.stringify(this.props));
 
-        this.getDeviceInfo();
-    };
-
-
+        var lang = this.props.deviceInfo.language;
+        this.setDeviceLanguage(lang);
+    }
 
     setDeviceLanguage(lang){
         console.log("SET DEVICE Language = " + lang);
@@ -51,38 +49,14 @@ class UserSurvey extends Component {
     }
     
     
-    getDeviceInfo = async() =>{
-        var defaultLanguage = 'en';
-        try {
-            let data = await AsyncStorage.getItem("DeviceInfo");
-            
-            if(data){
-                let deviceData = JSON.parse(data);
-                console.log('device data = ', deviceData);
-                this.setState({
-                    DeviceInfo : deviceData
-                });
-                
-                console.log(deviceData);
-                defaultLanguage = (deviceData.language != undefined) ? deviceData.language : 'en';
-            }
-            this.setDeviceLanguage(defaultLanguage);
-        } catch (error) {
-            
-            console.log("Something went getDeviceInfo = ", error);
-            this.setDeviceLanguage(defaultLanguage);
-        }
-    }
-
-    
-    
 
     backHome(){
+        var homePage = (this.props.userInfo.isGuest) ? 'HomeGuest' : 'Home';
         this.props.navigation.dispatch(
             CommonActions.reset({
                 index: 0,
                 routes: [
-                    { name: 'Home' },
+                    { name: homePage },
                 ],
             })
         );
@@ -108,105 +82,107 @@ class UserSurvey extends Component {
             <ImageBackground
                 // source={Images.lightBG}
                 style={{ height, width, zIndex: 1 , backgroundColor: themeColor.COLORS.WHITE}}
-            >
-                <ScrollView
-                     showsVerticalScrollIndicator={false}
-                     style={{ width, marginTop: '0%' }}
-                >
-                    <Block flex style={styles.homeContainer}>
-                        <Image source={Images.logoFaculty} style={styles.logo} />
-                        <Block flex space="around">
-                            <Block  style={styles.contentContainer}>
-                                <Block  style={styles.row}>
-                                    <Block style={{width: '100%', alignItems: 'center', marginBottom: 10}}>
-                                        <Text  style={styles.pageHeader} >{translate('UserSurveyHeaderLabel')}</Text>
-                                    </Block>
-                                </Block>
-                                
-                                <Block  style={styles.row}>
-                                    <Block style={{width: '100%'}}>
-                                        <Text  style={styles.mainQuestionText} >{translate('MainPageQuestion')}</Text>
-                                    </Block>
-                                </Block>
-
-                                <Block style={styles.questionRow}>
-                                    <Block style={styles.subQuestion}>
-                                        <Text  style={styles.subQuestionText} >{translate('FirstQuestion')}</Text>
-                                    </Block>
-                                    <Block style={styles.checkboxBlock}>
-                                        <CheckBox
-                                        disabled={false}
-                                        value={this.state.q1}
-                                        onValueChange={(newValue) => this.setState({ q1: newValue})}
-                                        style={styles.checkbox}
-                                        />
-                                    </Block>
-                                    <Block style={styles.subQuestionLabel}>
-                                        <Text  style={styles.subQuestionText} > {translate('YesLabel')}</Text>
-                                    </Block>
-                                </Block>
-
-                                <Block style={styles.questionRow}>
-                                    <Block style={styles.subQuestion}>
-                                        <Text  style={styles.subQuestionText} >{translate('SecondQuestion')}</Text>
-                                    </Block>
-                                    <Block style={styles.checkboxBlock}>
-                                        <CheckBox
-                                        disabled={false}
-                                        value={this.state.q2}
-                                        onValueChange={(newValue) => this.setState({ q2: newValue})}
-                                        style={styles.checkbox}
-                                        />
-                                    </Block>
-                                    <Block style={styles.subQuestionLabel}>
-                                        <Text  style={styles.subQuestionText} > {translate('YesLabel')}</Text>
-                                    </Block>
-                                </Block>
-
-                                <Block style={styles.questionRow}>
-                                    <Block style={styles.subQuestion}>
-                                        <Text  style={styles.subQuestionText} >{translate('ThirdQuestion')}</Text>
-                                    </Block>
-                                    <Block style={styles.checkboxBlock}>
-                                        <CheckBox
-                                        disabled={false}
-                                        value={this.state.q3}
-                                        onValueChange={(newValue) => this.setState({ q3: newValue})}
-                                        style={styles.checkbox}
-                                        />
-                                    </Block>
-                                    <Block style={styles.subQuestionLabel}>
-                                        <Text  style={styles.subQuestionText} > {translate('YesLabel')}</Text>
-                                    </Block>
-                                </Block>
-                            </Block>
-
-                            {(this.state.q1 || this.state.q2 || this.state.q3) ? 
-                                (
-                                    <Block style={styles.row}>
-                                        <Block style={styles.alertBox}>
-                                            <Text style={styles.alertTextHead}>
-                                                {translate('SurveyResult')}
-                                            </Text>
-                                            <Text style={styles.alertText}>
-                                                {translate('SurveySuggest')}
-                                            </Text>
+            >  
+                <View style={styles.viewSection}> 
+                    <ScrollView
+                        showsVerticalScrollIndicator={false}
+                        style={{ width, marginTop: '0%' }}
+                    >
+                        <Block flex style={styles.homeContainer}>
+                            <Image source={Images.logoFaculty} style={styles.logo} />
+                            <Block flex space="around">
+                                <Block  style={styles.contentContainer}>
+                                    <Block  style={styles.row}>
+                                        <Block style={{width: '100%', textAlign : 'left', marginBottom: 10}}>
+                                            <Text  style={styles.pageHeader} >{translate('UserSurveyHeaderLabel')}</Text>
                                         </Block>
                                     </Block>
-                                )
-                                :(
-                                    <Block middle>
-                                       
+                                    
+                                    <Block  style={styles.row}>
+                                        <Block style={{width: '100%'}}>
+                                            <Text  style={customStyles.mainQuestionText} >{translate('MainPageQuestion')}</Text>
+                                        </Block>
                                     </Block>
-                                )
-                            }
 
-                            
-        
-                            
+                                    <Block style={customStyles.questionRow}>
+                                        <Block style={customStyles.subQuestion}>
+                                            <Text  style={customStyles.subQuestionText} >{translate('FirstQuestion')}</Text>
+                                        </Block>
+                                        <Block style={customStyles.checkboxBlock}>
+                                            <CheckBox
+                                            disabled={false}
+                                            value={this.state.q1}
+                                            onValueChange={(newValue) => this.setState({ q1: newValue})}
+                                            style={customStyles.checkbox}
+                                            />
+                                        </Block>
+                                        <Block style={customStyles.subQuestionLabel}>
+                                            <Text  style={customStyles.subQuestionText} > {translate('YesLabel')}</Text>
+                                        </Block>
+                                    </Block>
+
+                                    <Block style={customStyles.questionRow}>
+                                        <Block style={customStyles.subQuestion}>
+                                            <Text  style={customStyles.subQuestionText} >{translate('SecondQuestion')}</Text>
+                                        </Block>
+                                        <Block style={customStyles.checkboxBlock}>
+                                            <CheckBox
+                                            disabled={false}
+                                            value={this.state.q2}
+                                            onValueChange={(newValue) => this.setState({ q2: newValue})}
+                                            style={customStyles.checkbox}
+                                            />
+                                        </Block>
+                                        <Block style={customStyles.subQuestionLabel}>
+                                            <Text  style={customStyles.subQuestionText} > {translate('YesLabel')}</Text>
+                                        </Block>
+                                    </Block>
+
+                                    <Block style={customStyles.questionRow}>
+                                        <Block style={customStyles.subQuestion}>
+                                            <Text  style={customStyles.subQuestionText} >{translate('ThirdQuestion')}</Text>
+                                        </Block>
+                                        <Block style={customStyles.checkboxBlock}>
+                                            <CheckBox
+                                            disabled={false}
+                                            value={this.state.q3}
+                                            onValueChange={(newValue) => this.setState({ q3: newValue})}
+                                            style={customStyles.checkbox}
+                                            />
+                                        </Block>
+                                        <Block style={customStyles.subQuestionLabel}>
+                                            <Text  style={customStyles.subQuestionText} > {translate('YesLabel')}</Text>
+                                        </Block>
+                                    </Block>
+                                </Block>
+
+                                {(this.state.q1 || this.state.q2 || this.state.q3) ? 
+                                    (
+                                        <Block style={styles.row}>
+                                            <Block style={customStyles.alertBox}>
+                                                <Text style={customStyles.alertTextHead}>
+                                                    {translate('SurveyResult')}
+                                                </Text>
+                                                <Text style={customStyles.alertText}>
+                                                    {translate('SurveySuggest')}
+                                                </Text>
+                                            </Block>
+                                        </Block>
+                                    )
+                                    :(
+                                        <Block middle>
+                                        
+                                        </Block>
+                                    )
+                                }
+
+                                
+            
+                                
+                            </Block>
                         </Block>
-                    </Block>
-                </ScrollView>
+                    </ScrollView>
+                </View>    
                 <Block style={styles.buttonSection}>
                     {(this.state.q1 || this.state.q2 || this.state.q3) ? 
                         (
@@ -229,18 +205,17 @@ class UserSurvey extends Component {
                     }
                     <Block style={styles.row}>
                         <Block style={{width: '100%', alignItems: 'center'}}>
-                            <Button style={styles.backButton}
+                            <Button style={styles.secondaryButton}
                             onPress={() => this.backHome()}
                             >
-                                <Text style={styles.backButtonText}>
+                                <Text style={styles.secondaryButtonText}>
                                     {translate('BackButton')}
                                 </Text>
                             </Button>
                         </Block>
                     </Block>
                     
-                </Block>
-                
+                </Block>                    
             </ImageBackground>
             </Block>
         </Block>
@@ -249,7 +224,7 @@ class UserSurvey extends Component {
     }
 }
 
-const styles = StyleSheet.create({
+const customStyles = StyleSheet.create({
     alertBox : {
         backgroundColor: themeColor.COLORS.ALERT,
         borderRadius: 4,
@@ -271,25 +246,6 @@ const styles = StyleSheet.create({
         color: themeColor.COLORS.ALERT_TEXT,
         textAlign: "center"
     },
-
-    homeContainer: {
-        position: "relative",
-        padding: 10,
-        marginHorizontal: 5,
-        marginTop: 25,
-        zIndex: 2
-    },
-    contentContainer : {
-        flex: 1,
-        paddingVertical: 20,
-        position: 'relative',
-        marginBottom: 20,
-    },
-    pageHeader : {
-        fontSize: 24,
-        fontFamily: 'Sarabun-Bold',
-        color: themeColor.COLORS.PRIMARY
-    },
     
     mainQuestionText : {
         fontSize: 18,
@@ -297,10 +253,7 @@ const styles = StyleSheet.create({
         color: themeColor.COLORS.PRIMARY,
         marginBottom: 10
     },
-    row: {
-        flex: 1, 
-        flexDirection: 'row'
-    },
+    
     questionRow: {
         flex: 1, 
         flexDirection: 'row',
@@ -339,65 +292,6 @@ const styles = StyleSheet.create({
         fontFamily: 'Sarabun-Medium',
         color: themeColor.COLORS.PRIMARY
     },
-    container: {
-        // marginTop: Platform.OS === "android" ? -HeaderHeight : 0,
-        // marginBottom: -HeaderHeight * 2,
-        flex: 1
-    },
-
-    buttonSection : {
-        flex: 1, 
-        bottom: '10%',
-        position: "absolute",
-        paddingHorizontal: 20
-    },
-    
-    primaryButton:{
-        flex: 1, 
-        width: '100%',
-        marginVertical: 5,
-        borderRadius: 5,
-        backgroundColor: themeColor.COLORS.PRIMARY_BTN_SUCCESS,
-    },
-    backButton:{
-        width: '100%',
-        marginVertical: 5,
-        borderRadius: 5,
-        backgroundColor: themeColor.COLORS.WHITE,
-    },
-    primaryButtonText:{
-        fontSize: 18,
-        fontFamily: 'Sarabun-Medium',
-        color: themeColor.COLORS.WHITE
-    },
-    backButtonText:{
-        fontSize: 18,
-        fontFamily: 'Sarabun-Medium',
-        color: themeColor.COLORS.PRIMARY_BTN_SUCCESS
-    },
-    
-    logo: {
-        width: '100%',
-        height: 60,
-        position: 'relative',
-        marginTop: '0%',
-        marginHorizontal : 'auto'
-    },
-    titleBlock:{
-        marginTop:'5%'
-    },
-    title: {
-        fontFamily:'Sarabun-SemiBold',
-        fontSize: 20
-    },
-    subTitle: {
-        fontFamily:'Sarabun-Medium',
-        fontSize: 14,
-    },
-    formLabel:{
-        fontFamily:'Sarabun-Medium',
-        fontSize: 14,
-    }
 });
 
 // export default UserSurvey;

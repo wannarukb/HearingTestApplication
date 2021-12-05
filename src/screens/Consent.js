@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
-
+import {connect} from 'react-redux';
 import {CommonActions } from '@react-navigation/native';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
-import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView , NativeModules} from 'react-native';
+import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView , View} from 'react-native';
 import { Block, Text, theme } from "galio-framework";
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 import { Button } from "../components";
-import CheckBox from '@react-native-community/checkbox';
-import {connect} from 'react-redux';
+
 import {LanguageService} from "../services/LanguageService";
 import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
+
+import mainStyle  from "../constants/mainStyle";
 
 const translate = memoize(
     (key, config) => i18n.t(key, config),
@@ -19,6 +20,7 @@ const translate = memoize(
 )
 
 const { height, width } = Dimensions.get("screen");
+const styles = mainStyle.styles;
 
 class Consent extends Component {
 
@@ -26,11 +28,12 @@ class Consent extends Component {
     constructor(props) {
         super(props);
 
-        console.log('----- User Survey -----');
+        console.log('----- Consent Page -----');
         console.log(JSON.stringify(this.props));
 
-        this.getDeviceInfo();
-    };
+        var lang = this.props.deviceInfo.language;
+        this.setDeviceLanguage(lang);
+    }
 
     setDeviceLanguage(lang){
         console.log("SET DEVICE Language = " + lang);
@@ -39,39 +42,16 @@ class Consent extends Component {
         
     }
     
-    
-    getDeviceInfo = async() =>{
-        var defaultLanguage = 'en';
-        try {
-            let data = await AsyncStorage.getItem("DeviceInfo");
-            
-            if(data){
-                let deviceData = JSON.parse(data);
-                console.log('device data = ', deviceData);
-                this.setState({
-                    DeviceInfo : deviceData
-                });
-                
-                console.log(deviceData);
-                defaultLanguage = (deviceData.language != undefined) ? deviceData.language : 'en';
-            }
-            this.setDeviceLanguage(defaultLanguage);
-        } catch (error) {
-            
-            console.log("Something went getDeviceInfo = ", error);
-            this.setDeviceLanguage(defaultLanguage);
-        }
-    }
 
-   
 
 
     notAcceptButton(){
+        var homePage = (this.props.userInfo.isGuest) ? 'HomeGuest' : 'Home';
         this.props.navigation.dispatch(
             CommonActions.reset({
                 index: 0,
                 routes: [
-                    { name: 'Home' },
+                    { name: homePage },
                 ],
             })
         );
@@ -98,29 +78,31 @@ class Consent extends Component {
                 // source={Images.lightBG}
                 style={{ height, width, zIndex: 1 , backgroundColor: themeColor.COLORS.WHITE}}
             >
-                <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    style={{ width, marginTop: '0%' }}
-                >
-                    <Block flex style={styles.homeContainer}>
-                        <Image source={Images.logoFaculty} style={styles.logo} />
-                        <Block flex space="around">
-                            <Block  style={styles.contentContainer}>
-                                <Block  style={styles.row}>
-                                    <Block style={{width: '100%', alignItems: 'center', marginBottom: 10}}>
-                                        <Text  style={styles.pageHeader} >{translate('ConsentHeaderLabel')}</Text>
+                <View style={styles.viewSection}>
+                    <ScrollView
+                        showsVerticalScrollIndicator={false}
+                        style={{ width, marginTop: '0%' }}
+                    >
+                        <Block flex style={styles.homeContainer}>
+                            <Image source={Images.logoFaculty} style={styles.logo} />
+                            <Block flex space="around">
+                                <Block  style={styles.contentContainer}>
+                                    <Block  style={styles.row}>
+                                        <Block style={{width: '100%', alignItems: 'center', marginBottom: 10}}>
+                                            <Text  style={styles.pageHeader} >{translate('ConsentHeaderLabel')}</Text>
+                                        </Block>
                                     </Block>
-                                </Block>
-                                
-                                <Block  style={styles.row}>
-                                    <Block style={{width: '100%'}}>
-                                        <Text  style={styles.consentText} >{translate('ConsentInfo')}</Text>
+                                    
+                                    <Block  style={styles.row}>
+                                        <Block style={{width: '100%'}}>
+                                            <Text  style={customStyles.consentText} >{translate('ConsentInfo')}</Text>
+                                        </Block>
                                     </Block>
                                 </Block>
                             </Block>
                         </Block>
-                    </Block>
-                </ScrollView>
+                    </ScrollView>
+                </View>
                 <Block style={styles.buttonSection}>
                     <Block style={styles.row}>
                         <Block style={{width: '100%', alignItems: 'center'}}>
@@ -135,10 +117,10 @@ class Consent extends Component {
                     </Block>
                     <Block style={styles.row}>
                         <Block style={{width: '100%', alignItems: 'center'}}>
-                            <Button style={styles.backButton}
+                            <Button style={styles.secondaryButton}
                                 onPress={() => this.notAcceptButton()}
                                 >
-                                    <Text style={styles.backButtonText}>
+                                    <Text style={styles.secondaryButtonText}>
                                         {translate('ConsentNotAcceptLabel')}
                                     </Text>
                             </Button>
@@ -154,90 +136,13 @@ class Consent extends Component {
     }
 }
 
-const styles = StyleSheet.create({
-    homeContainer: {
-        position: "relative",
-        padding: 10,
-        marginHorizontal: 5,
-        marginTop: 25,
-        zIndex: 2
-    },
-    contentContainer : {
-        flex: 1,
-        paddingVertical: 20,
-        position: 'relative'
-    },
-    pageHeader : {
-        fontSize: 24,
-        fontFamily: 'Sarabun-Bold',
-        color: themeColor.COLORS.PRIMARY
-    },
-    row: {
-        flex: 1, 
-        flexDirection: 'row'
-    },
+const customStyles = StyleSheet.create({
     consentText:{
         justifyContent: "center",
         fontSize: 16,
         fontFamily: 'Sarabun-Light',
         color: themeColor.COLORS.PRIMARY
     },
-    container: {
-        // marginTop: Platform.OS === "android" ? -HeaderHeight : 0,
-        // marginBottom: -HeaderHeight * 2,
-        flex: 1
-    },
-    buttonSection : {
-        flex: 1, 
-        bottom: '10%',
-        position: "absolute",
-        paddingHorizontal: 20
-    },
-    primaryButton:{
-        width: '100%',
-        marginVertical: 5,
-        borderRadius: 5,
-        backgroundColor: themeColor.COLORS.PRIMARY_BTN_SUCCESS
-    },
-    backButton:{
-        width: '100%',
-        marginVertical: 5,
-        borderRadius: 5,
-        backgroundColor: themeColor.COLORS.WHITE
-    },
-    primaryButtonText:{
-        fontSize: 18,
-        fontFamily: 'Sarabun-Medium',
-        color: themeColor.COLORS.WHITE
-    },
-    backButtonText:{
-        fontSize: 18,
-        fontFamily: 'Sarabun-Medium',
-        color: themeColor.COLORS.PRIMARY_BTN_SUCCESS
-    },
-
-    logo: {
-        width: '100%',
-        height: 60,
-        position: 'relative',
-        marginTop: '0%',
-        marginHorizontal : 'auto'
-    },
-    titleBlock:{
-        marginTop:'5%'
-    },
-    title: {
-        fontFamily:'Sarabun-SemiBold',
-        fontSize: 20
-    },
-    subTitle: {
-        fontFamily:'Sarabun-Medium',
-        fontSize: 14,
-    },
-    formLabel:{
-        fontFamily:'Sarabun-Medium',
-        fontSize: 14,
-    }
 });
 
 // export default Consent;

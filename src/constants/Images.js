@@ -10,6 +10,9 @@ const Setting     = require("../assets/imgs/SettingMenu.png")
 const EarTestMain  = require("../assets/imgs/hearing.png");
 const HearingResult_Good = require("../assets/imgs/hearingResult_Good.png");
 const HearingResult_Bad = require("../assets/imgs/hearingResult_Bad.png");
+
+const GuestHeader = require("../assets/imgs/GuestHeader.png");
+const Suggestion  = require("../assets/imgs/Suggestion.png");
 // internet imgs
 
 
@@ -24,5 +27,7 @@ export default {
   EarTestMain,
   Setting,
   HearingResult_Good,
-  HearingResult_Bad
+  HearingResult_Bad,
+  GuestHeader,
+  Suggestion
 };

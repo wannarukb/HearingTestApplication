@@ -24,20 +24,38 @@ export class LanguageService extends Component {
     static getInstance() {  
         return new LanguageService();
     }
+
+    getDeviceLang(){
+        return RNLocalize.findBestAvailableLanguage(Object.keys(translationGetters));
+    }
     
     changeLanguage(lang) {
         // fallback if no available language fits
-        const fallback = { languageTag: lang, isRTL: false };
 
-        var { languageTag, isRTL } =  fallback || RNLocalize.findBestAvailableLanguage(Object.keys(translationGetters));
+        console.log("----- Change Language -----");
+        console.log("RNLocalize");
+        console.log(RNLocalize.findBestAvailableLanguage(Object.keys(translationGetters)));
+        
+        const fallback = { languageTag: (lang) ? lang : 'en', isRTL: false };
+        var languageTag, isRTL;
 
-        console.log('LEKK = ' + lang);
+        console.log('changeLanguage = ' + lang);
         if(lang){
             languageTag = fallback.languageTag;
             isRTL       = fallback.isRTL;
+        }else{
+            var RNLocal = RNLocalize.findBestAvailableLanguage(Object.keys(translationGetters));
+            languageTag = RNLocal.languageTag;
+            isRTL       = RNLocal.isRTL; 
         }
 
-        console.log('LEKK = languageTag = ' + languageTag);
+        console.log('changeLanguage = languageTag before convert = ' + languageTag);
+
+        if(languageTag != 'en' && languageTag != 'th'){
+            languageTag = 'en'
+        }
+
+        console.log('changeLanguage = languageTag = ' + languageTag);
 
         // clear translation cache
         translate.cache.clear();

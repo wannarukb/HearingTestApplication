@@ -5,7 +5,7 @@ import TestToneService from '../services/TestToneService';
 import {CommonActions } from '@react-navigation/native';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
 
-import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView ,KeyboardAvoidingView ,TextInput} from 'react-native';
+import { ActivityIndicator, StyleSheet, Dimensions, ImageBackground, Image, ScrollView , View,KeyboardAvoidingView , TouchableWithoutFeedback, Keyboard,TextInput, Alert} from 'react-native';
 import { Block, Text, theme } from "galio-framework";
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
@@ -15,25 +15,29 @@ const { height, width } = Dimensions.get("screen");
 import {LanguageService} from "../services/LanguageService";
 import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
+import mainStyle  from "../constants/mainStyle";
 
 const translate = memoize(
     (key, config) => i18n.t(key, config),
     (key, config) => (config ? key + JSON.stringify(config) : key)
 )
 
+const styles = mainStyle.styles;
 
 class Login extends React.Component {
     constructor(props) {
         super(props);
+        console.log("----- Login -----");
+        console.log(JSON.stringify(this.props));
         this.state = {
             loading:false,
             UserEmail:'',
             UserPassword:''
         };
 
-        this.getDeviceInfo();
-
-        console.log(JSON.stringify(this.props));
+         
+        var lang = this.props.deviceInfo.language;
+        this.setDeviceLanguage(lang);
     }
 
     setDeviceLanguage(lang){
@@ -43,423 +47,314 @@ class Login extends React.Component {
         
     }
     
-    
-    getDeviceInfo = async() =>{
-        var defaultLanguage = 'en';
-        try {
-            let data = await AsyncStorage.getItem("DeviceInfo");
-            
-            if(data){
-                let deviceData = JSON.parse(data);
-                console.log('device data = ', deviceData);
-                this.setState({
-                    DeviceInfo : deviceData
-                });
-                
-                console.log(deviceData);
-                defaultLanguage = (deviceData.language != undefined) ? deviceData.language : 'en';
-            }
-            this.setDeviceLanguage(defaultLanguage);
-        } catch (error) {
-            
-            console.log("Something went getDeviceInfo = ", error);
-            this.setDeviceLanguage(defaultLanguage);
-        }
-    }
-
-    componentDidMount() {
-        // this.props.logout();
-        this.getToken();
-    }
-
-    async getToken() {
-        try {
-            let userData = await AsyncStorage.getItem("UserInfo");
-            let data = JSON.parse(userData);
-            console.log('Login get token = ', data);
-            this.setState({
-                userInfo : data
-            });
-        } catch (error) {
-            console.log("Something went wrong, get token = ", error);
-        }
-    }
-
     login(){
         const {UserEmail,UserPassword}=this.state
-        if(UserEmail == ""){
-            alert('กรุณากรอกอีเมล')
-        }else if( UserPassword == ""){
-            alert('กรุณากรอกรหัสผ่าน')
-        }else if(!this.props.network.isConnected){
-            alert('No Internet')    
+        if(!this.props.network.isConnected){
+            alert(translate('InternetRequire'))    
+        } else if(UserEmail == ""  || UserEmail == undefined){
+            alert(translate('EmailRequire'))
+        }else if( UserPassword == "" || UserPassword == undefined){
+            alert(translate('PasswordRequire'))
         }else{
             this.UserLoginFunction()
         }
     }
 
-    tryButton(){
-        this.state.UserEmail = 'DefaultUser';
-        this.UserLoginFunction();
+    // async storeUserInformation(user) 
+    storeUserInformation = async(user) =>{
+        try {
+            await AsyncStorage.setItem("UserInfo", JSON.stringify(user));
+            console.log("storeUserInformation", "information have been store");
+        } catch (error) {
+            var alertTitle = translate('AlertTitleError');
+            var alertMessage = 'storeUserInformation = ' + error;
+            this.showAlert(alertTitle, alertMessage);
+        }
     }
 
-    goToUserSurveyPage = () =>{ 
+    // async storeTestToneList(testToneList) 
+    storeTestToneList = async(testToneList) =>{
+        try {
+            await AsyncStorage.setItem("TestToneList", JSON.stringify(testToneList));
+            console.log("storeTestToneList", "information have been store");
+        } catch (error) {
+            var alertTitle = translate('AlertTitleError');
+            var alertMessage = 'storeTestToneList = ' + error;
+            this.showAlert(alertTitle, alertMessage);
+        }
+    }
+    
+
+    loadTestTone = async(userId, brandModel) =>{
+        this.setState({loading:true});
+        var alertTitle = translate('AlertTitleError');
+        var alertMessage = '';
+        try {
+
+            var testToneResult = await TestToneService.test_tone_api(userId, brandModel);
+            // console.log(testToneResult);
+            this.setState({loading:false});
+            if(testToneResult){
+                if (testToneResult.ok) {
+                    if (testToneResult.data != undefined && testToneResult.data != null) {
+                        var data = testToneResult.data;
+                        console.log('login load test tone data ' + JSON.stringify(data));
+                        this.props.loadTestToneList(data);
+                        let storeTestTone =  await this.storeTestToneList(data);
+                        this.gotoHomeUser();
+                    } else {
+                        alertMessage = 'Server error no data return.';
+                        this.showAlert(alertTitle, alertMessage);
+                    }
+                } else {
+                    var problem = testToneResult.problem;
+                    var status  = testToneResult.status;
+                    alertMessage = 'Server status: ' + status + ' error: ' + problem;
+                    this.showAlert(alertTitle, alertMessage);
+                }
+            }else{
+                alertMessage = 'Server error no result return.';
+                this.showAlert(alertTitle, alertMessage);
+            }
+        
+        } catch (error) {
+            console.log(error);
+            this.setState({ loading: false, });
+            alertMessage = JSON.stringify(error);
+            this.showAlert(alertTitle, alertMessage);
+        }
+    }
+
+    UserLoginFunction = async() => {
+        this.setState({loading:true});
+        const { UserEmail ,UserPassword}  = this.state ;
+        var alertTitle = translate('AlertTitleError');
+        var alertMessage = '';
+        try {
+
+            var userResult = await AuthService.login_api(UserEmail,UserPassword);
+            console.log(userResult);
+            this.setState({loading:false});
+
+            if(userResult){
+                if (userResult.ok) {
+                    if (userResult.data != undefined && userResult.data != null) {
+                        var data = userResult.data;
+                        console.log('userInfo', data);
+                        var storeUserInfo = await this.storeUserInformation(data);
+                        this.props.login(data);
+                        var userId      = data.id;
+                        var brandModel  = this.props.deviceInfo.model;
+                        var loadTestTone= await this.loadTestTone(userId, brandModel);
+                    } else {
+                        alertMessage = 'Server error no data return.';
+                        this.showAlert(alertTitle, alertMessage);
+                    }
+                } else {
+                    var problem = userResult.problem;
+                    var status  = userResult.status;
+                    if (problem == 'CLIENT_ERROR') {
+                        alertMessage = translate('LoginError');
+                    } else {
+                        alertMessage = 'Server status: ' + status + ' error: ' + problem;
+                    }
+                    this.showAlert(alertTitle, alertMessage);
+                }  
+            }else{
+                alertMessage = 'Server error no result return.';
+                this.showAlert(alertTitle, alertMessage);
+            }
+        
+        } catch (error) {
+            console.log(error);
+            this.setState({ loading: false, });
+            alertMessage = JSON.stringify(error);
+            this.showAlert(alertTitle, alertMessage);
+        }
+
+        
+    }
+
+    goToRegister(){
         this.props.navigation.dispatch(
             CommonActions.reset({
                 index: 0,
                 routes: [
-                { name: 'UserSurvey' },
+                    { name: 'Register' },
                 ],
             })
         );
     }
 
-  // async storeToken(user) 
-  storeToken = async(user) =>{
-    try {
-      await AsyncStorage.setItem("UserInfo", JSON.stringify(user));
-      console.log("storeToken", "information have been store");
-    } catch (error) {
-      console.log("Something went wrong, store token = ", error);
+    backToHomeGuest(){
+        this.props.navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [
+                    { name: 'HomeGuest' },
+                ],
+            })
+        );
     }
-  }
 
-  // async storeTestToneList(testToneList) 
-  storeTestToneList = async(testToneList) =>{
-    try {
-        await AsyncStorage.setItem("TestToneList", JSON.stringify(testToneList));
-        console.log("storeTestToneList", "information have been store");
-        this.goToUserSurveyPage();
-    } catch (error) {
-        console.log("Something went wrong, store token = ", error);
+    gotoHomeUser(){
+        this.props.navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [
+                    { name: 'Home' },
+                ],
+            })
+        );
     }
-  }
-  
 
-  loadTestTone = (userToken) =>{
-    try {
-        TestToneService.test_tone_api(userToken)
-        .then(responseJson => {
-            console.log('test_tone_api responseJson = ', responseJson.status);
-            if (responseJson.ok) {
-            if (responseJson.data != null) {
-                var data = responseJson.data;
-                // console.log('login load test tone data ' + data);
-                this.props.loadTestToneList(data);
-                this.storeTestToneList(data);
-            } else {
-                alert('server error no data')
-            }
-            } else {
-            if (responseJson.problem == 'NETWORK_ERROR') {
-                alert('server error = NETWORK_ERROR')
-                this.setState({
-                loading: false,
-                });
-            } else if (responseJson.problem == 'TIMEOUT_ERROR') {
-                alert('server error = TIMEOUT_ERROR')
-                this.setState({
-                loading: false,
-                });
-            } else {
-                alert('server error responseJson ERROR')
-                this.setState({
-                loading: false,
-                });
-            }
-            }
-        })
-        .catch(error => {
-            console.error(error);
-        });
-      
-    } catch (e) {
-      console.error(error);
-      this.setState({
-        loading: false,
-      });
+    showAlert(alertTitle, alertMessage){
+        console.log(alertMessage);
+        Alert.alert(
+            alertTitle,
+            alertMessage,
+            [
+              { text: "OK", onPress: () => console.log("OK Pressed") }
+            ]
+        );
     }
-  }
 
-  UserLoginFunction = () => {
-    const { UserEmail ,UserPassword}  = this.state ;
-    try {
-        AuthService.login_api(UserEmail,UserPassword)
-        .then(responseJson => {
-            console.log('login', responseJson);
-            this.setState({loading:false})
-            if (responseJson.ok) {
-            this.setState({
-                loading: false,
-            });
-
-            if (responseJson.data != null) {
-                var data = responseJson.data;
-                console.log('userInfo', data);
-                this.storeToken(data);
-                this.props.login(data);
-                this.loadTestTone(data.token);
-                
-            } else {
-                alert('server error no data')
-            }
-            } else {
-            if (responseJson.problem == 'NETWORK_ERROR') {
-                alert('server error = NETWORK_ERROR')
-                this.setState({
-                loading: false,
-                });
-            } else if (responseJson.problem == 'TIMEOUT_ERROR') {
-                alert('server error = TIMEOUT_ERROR')
-                this.setState({
-                loading: false,
-                });
-            } else {
-                alert('server error responseJson ERROR')
-                this.setState({
-                loading: false,
-                });
-            }
-            }
-        })
-        .catch(error => {
-            console.error(error);
-            this.setState({
-            loading: false,
-            });
-        });
-      
-    } catch (e) {
-      console.error(error);
-      this.setState({
-        loading: false,
-      });
-    }
-  }
-  render() {
-    const { navigation } = this.props;
-    const {loading,UserEmail,UserPassword}=this.state;
-    return (
-      <Block flex style={styles.container}>
-        <Block flex>
-            <ImageBackground
-                source={Images.lightBG}
-                style={{ height, width, zIndex: 1 }}
-            >
-                <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    style={{ width, marginTop: '0%' }}
+    render() {
+        const {loading,UserEmail,UserPassword}=this.state;
+        return (
+        <Block flex style={styles.container}>
+            <Block flex>
+                <ImageBackground
+                    // source={Images.lightBG}
+                    style={{ height, width, zIndex: 1 , backgroundColor: themeColor.COLORS.WHITE}}
                 >
-                <Block flex style={styles.homeContainer}>
-                    <Image source={Images.logoFaculty} style={styles.logo} />
-                    <Block flex space="around">
-                        <Block style={styles.titleBlock}>
-                        <Block  style={styles.row}>
-                            <Block flex middle style={{ paddingVertical: 30}}>
-                            <Image source={Images.Ear} style={styles.earImg} />
-                            <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-                                {translate('Login')}
-                            </Text>
+                    {loading && <Block  style={styles.loadingBox}><ActivityIndicator size="large"  color={themeColor.COLORS.PRIMARY_BTN_SUCCESS} /></Block>}
+                                      
+                    <KeyboardAvoidingView
+                        style={{ flex: 1 }}
+                        behavior={Platform.OS === "ios" ? "padding" : "height"}
+                        enabled
+                    >
+                        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                            <View style={customStyles.viewSection}> 
+                                <ScrollView
+                                showsVerticalScrollIndicator={true}
+                                style={{ width, marginTop: '0%' }}
+                                >
+                                     
+                                    <Block style={styles.homeContainer}>
+                                        <Image source={Images.logoFaculty} style={styles.logo} />
+                                        <Block space="around">
+                                            <Block  style={styles.row}>
+                                                <Block style={{width: '100%', alignItems: 'center', marginBottom: 0, paddingVertical: 30}}>
+                                                    <Image source={Images.Ear} style={customStyles.earImg} />
+                                                    <Text style={styles.title}>
+                                                        {translate('Login')}
+                                                    </Text>
+                                                </Block>
+                                            </Block>
+                                            <Block   style={styles.row} style={{ marginBottom: 15 }}>
+                                                <Block style={{width: '100%', marginBottom: 0}}>
+                                                    <Text style={styles.formLabel}  >
+                                                        {translate('EmailLabel')}
+                                                        <Text style={styles.formRequireLabel}  > * </Text>
+                                                    </Text>
+                                                    
+                                                    <TextInput
+                                                        style={styles.inputType}
+                                                        placeholder="Email"
+                                                        placeholderTextColor="grey"
+                                                        returnKeyType="next"
+                                                        onSubmitEditing={() => this.pass_tn.focus()}
+                                                        onChangeText={text => this.setState({ UserEmail: text })}
+                                                        value={UserEmail}
+                                                    />
+                                                </Block>
+                                            </Block>
+
+                                            <Block   style={styles.row} style={{ marginBottom: 15 }}>
+                                                <Block style={{width: '100%', marginBottom: 0}}>
+                                                    <Text style={styles.formLabel}  >
+                                                        {translate('PasswordLabel')}
+                                                        <Text style={styles.formRequireLabel}  > * </Text>
+                                                    </Text>
+                                                    <TextInput
+                                                        style={styles.inputType}
+                                                        ref={(id)=>{this.pass_tn=id}}
+                                                        placeholder="Password"
+                                                        placeholderTextColor="grey"
+                                                        secureTextEntry={true}
+                                                        autoCapitalize="none"
+                                                        returnKeyType="done"
+                                                        onChangeText={text => this.setState({ UserPassword: text })}
+                                                        value={UserPassword}
+                                                    />
+                                                </Block>
+                                            </Block>
+                                        </Block>
+                                    </Block>
+                                </ScrollView>
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </KeyboardAvoidingView>
+                    <Block style={styles.buttonSection}>
+                        <Block style={styles.row}>
+                            <Block style={{width: '100%', alignItems: 'center'}}>
+                                <Button style={styles.primaryButton}
+                                    onPress={() => this.login()}
+                                    >
+                                        <Text style={styles.primaryButtonText}>
+                                            {translate('Login')}
+                                        </Text>
+                                </Button>
                             </Block>
                         </Block>
-                        </Block>
-                        <Block flex middle>
-                            <Block style={styles.registerContainer}>
-                            <Block flex>
-                        
-                                <Block flex center>
-                                <KeyboardAvoidingView
-                                    style={{ flex: 1 }}
-                                    behavior="padding"
-                                    enabled
-                                >
-                                    <Block  style={{ marginBottom: 15 }}>
-                                    <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                        {translate('EmailLabel')}
-                                    </Text>
-                                    <TextInput
-                                        style={styles.inputType}
-                                        placeholder="Email"
-                                        placeholderTextColor="grey"
-                                        returnKeyType="next"
-                                        onSubmitEditing={() => this.pass_tn.focus()}
-                                        onChangeText={text => this.setState({ UserEmail: text })}
-                                        value={UserEmail}
-                                    />
-                                    </Block>
-                                    <Block >
-                                    <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                        {translate('PasswordLabel')}
-                                    </Text>
-                                    <TextInput
-                                        style={styles.inputType}
-                                        ref={(id)=>{this.pass_tn=id}}
-                                        placeholder="Password"
-                                        placeholderTextColor="grey"
-                                        secureTextEntry={true}
-                                        autoCapitalize="none"
-                                        returnKeyType="done"
-                                        onChangeText={text => this.setState({ UserPassword: text })}
-                                        value={UserPassword}
-                                    />
-                                    </Block>
-                                    
-                                    <Block middle>
-                                    <Button style={styles.createButton}
-                                    onPress={() => this.login()}>
-                                        <Text style={styles.createButtonText}>
-                                        {translate('Login')}
-                                        </Text>
-                                    </Button>
-                                    </Block>
-
-                                    <Block  style={styles.row}>
-                                    <Block style={{width: '60%', marginLeft: -5, paddingRight: 5}}>
-                                        <Button style={styles.menuButtonRegister} 
-                                        onPress={() => this.props.navigation.dispatch(
-                                        CommonActions.reset({
-                                            index: 0,
-                                            routes: [
-                                            { name: 'Register' },
-                                            ],
-                                        })
-                                        )}
-                                        >
-                                        <Text style={styles.createButtonText}>
+                        <Block style={styles.row}>
+                            <Block style={{width: '100%', alignItems: 'center'}}>
+                                <Button style={styles.secondaryButton}
+                                    onPress={() => this.goToRegister()}
+                                    >
+                                        <Text style={styles.secondaryButtonText}>
                                             {translate('RegisterButton')}
                                         </Text>
-                                        </Button>
-                                    </Block>
-                                    <Block style={{width: '40%', paddingLeft: 5}}>
-                                        <Button style={styles.menuButtonTry}
-                                        onPress={() => this.tryButton()}>
-                                        <Text style={styles.createButtonText}>
-                                            {translate('LoginAsGuest')}
-                                        </Text>
-                                        </Button>
-                                    </Block>
-                                    </Block>
-                                    
-                                </KeyboardAvoidingView>
-                                </Block>
+                                </Button>
                             </Block>
+                        </Block>
+                        <Block style={styles.row}>
+                            <Block style={{width: '100%', alignItems: 'center'}}>
+                                <Button style={styles.tridaryButton}
+                                    onPress={() => this.backToHomeGuest()}
+                                    >
+                                        <Text style={styles.tridaryButtonText}>
+                                            {translate('BackButton')}
+                                        </Text>
+                                </Button>
                             </Block>
                         </Block>
                         
-                    
                     </Block>
-                </Block>
-                </ScrollView>
-            </ImageBackground>
+                </ImageBackground>
+            </Block>
         </Block>
-      </Block>
-        
-    );
-  }
+            
+        );
+    }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    // marginTop: Platform.OS === "android" ? -HeaderHeight : 0,
-    // marginBottom: -HeaderHeight * 2,
-    flex: 1
-  },
-  registerContainer: {
-    margin: 10
-  },
-  createButton:{
-    marginVertical: 20,
-    borderRadius: 20,
-    backgroundColor: themeColor.COLORS.PRIMARY_BTN_SUCCESS,
-    width: '100%'
-  },
-  createButtonText:{
-    fontSize: 16,
-    fontFamily: 'Sarabun-Medium',
-    color: themeColor.COLORS.WHITE
-  },
-  avatar: {
-    width: 60,
-    height: 60,
-    alignItems: 'flex-end'
-  },
-  row: {
-    flex: 1, 
-    flexDirection: 'row'
-  },
-  menuSet:{
-    marginTop: 10,
-    paddingVertical: 10,
-    position: "relative",
-    width: "100%",
-  },
-  menuButtonRegister:{
-    width: '100%', 
-    alignItems:'center', 
-    justifyContent: 'center',
-    marginVertical: 20,
-    borderRadius: 20,
-    backgroundColor: themeColor.COLORS.BTN_REGISTER
-  },
-  menuButtonTry:{
-    width: '100%', 
-    alignItems:'center', 
-    justifyContent: 'center',
-    marginVertical: 20,
-    borderRadius: 20,
-    backgroundColor: themeColor.COLORS.BTN_SECONDARY
-  },
-  menuText:{
-    fontSize: 14,
-    fontFamily: 'Sarabun-Medium'
-  },
-  homeContainer: {
-    position: "relative",
-    padding: 10,
-    marginHorizontal: 5,
-    marginTop: 25,
-    zIndex: 2
-  },
-  button: {
-    width: width - theme.SIZES.BASE * 4,
-    height: theme.SIZES.BASE * 3,
-    shadowRadius: 0,
-    shadowOpacity: 0
-  },
-  earImg: {
-    width: 66,
-    height: 76.09
-  },
-  logo: {
-    width: '100%',
-    height: 60,
-    position: 'relative',
-    marginTop: '0%',
-    marginHorizontal : 'auto'
-  },
-  titleBlock:{
-    marginTop:'5%'
-  },
-  title: {
-    fontFamily:'Sarabun-SemiBold',
-    fontSize: 20
-  },
-  subTitle: {
-    fontFamily:'Sarabun-Medium',
-    fontSize: 14,
-  },
-  formLabel:{
-    fontFamily:'Sarabun-Medium',
-    fontSize: 14,
-  },
-  inputType:{
-    borderColor: themeColor.COLORS.INPUT,
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    backgroundColor: themeColor.COLORS.WHITE
-    // marginTop: 5
-  }
+const customStyles = StyleSheet.create({
+    viewSection :{
+        width: '100%',
+        alignItems: 'center',
+        height: '70%',
+       
+    },
+    earImg: {
+        width: 66,
+        height: 76.09
+    },
+    registerContainer: {
+        margin: 10
+    },
 });
 Login.defaultProps = {
     id: '',
@@ -469,19 +364,21 @@ Login.defaultProps = {
 const mapStateToProps = state => {
     return {
         network: state.network,
+        ...state.user,
+        ...state.deviceInfo
     };
 };
 
 const mapDispatchToProps = dispatch => {
-  const {actions} = require('../redux/UserRedux');
-  const {testToneActions} = require('../redux/TestToneRedux');
-  
+    const {actions} = require('../redux/UserRedux');
+    const {testToneActions} = require('../redux/TestToneRedux');
+    
 
-  return {
-    login: customers => dispatch(actions.login(customers)),
-    logout: () => dispatch(actions.logout()),
-    loadTestToneList: testToneList => dispatch(testToneActions.loadTestToneList(testToneList))
-  };
+    return {
+        login: customers => dispatch(actions.login(customers)),
+        logout: () => dispatch(actions.logout()),
+        loadTestToneList: testToneList => dispatch(testToneActions.loadTestToneList(testToneList))
+    };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

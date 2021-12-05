@@ -32,6 +32,7 @@ constructor(props) {
         openModal: false 
     };
 
+    console.log('----- Home -----');
 
     console.log(JSON.stringify(this.props));
 
@@ -272,7 +273,7 @@ renderWelcomeBlock(){
                     {translate('Introduction')}
                 </Text>
                 <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-                    {(this.props.userInfo.user.fn == 'DefaultUser') ? 'Guest' : this.props.userInfo.user.fn}
+                    {(this.props.userInfo.fn == 'DefaultUser') ? 'Guest' : this.props.userInfo.fn}
                 </Text>
                 </Block>
                 <Block style={{width: '22%'}}>
@@ -317,8 +318,8 @@ render() {
     <Block flex style={styles.container}>
         <Block flex>
         <ImageBackground
-            source={Images.lightBG}
-            style={{ height, width, zIndex: 1 }}
+            // source={Images.lightBG}
+            style={{ height, width, zIndex: 1 , backgroundColor: themeColor.COLORS.WHITE}}
         >
         
         <ScrollView
@@ -380,81 +381,6 @@ render() {
                             </Button>
                         </Block>
                         </Block>
-                        {/* <Block style={styles.row}>
-                        <Block style={{width: '50%', paddingRight: 2}}>
-                            <Button style={styles.menuBlock} 
-                            //  onPress={() => navigation.navigate("HearingTestResult")}
-                            onPress={() => 
-                                this.props.navigation.dispatch(
-                                CommonActions.reset({
-                                    index: 0,
-                                    routes: [
-                                    { name: 'HearingTestResult' },
-                                    ],
-                                })
-                                )}
-                            >
-                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
-                                ผลการตรวจ
-                            </Text>
-                            </Button>
-                        </Block>
-                        <Block style={{width: '50%', paddingLeft: 2}}>
-                            <Button style={styles.menuBlock} 
-                            //  onPress={() => navigation.navigate("Appointment")}
-                            >
-                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
-                                ตารางนัดหมาย
-                            </Text>
-                            </Button>
-                        </Block>
-                        </Block> */}
-                        {/* <Block style={styles.row}>
-                        <Block style={{width: '33.33%', paddingRight: 2}}>
-                            <Block style={styles.menuBlock}>
-                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
-                                เรื่องหูที่ควรรู้
-                            </Text>
-                            </Block>
-                        </Block>
-                        <Block style={{width: '33.33%', paddingLeft: 2, paddingRight: 2}}>
-                            <Block style={styles.menuBlock}>
-                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
-                                คู่มือการใช้งาน
-                            </Text>
-                            </Block>
-                        </Block>
-                        <Block style={{width: '33.33%', paddingLeft: 2}}>
-                            <Block style={styles.menuBlock}>
-                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
-                                บริการของเรา
-                            </Text>
-                            </Block>
-                        </Block>
-                        </Block>
-                        <Block style={styles.row}>
-                        <Block style={{width: '33.33%', paddingRight: 2}}>
-                            <Block style={styles.menuBlock}>
-                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
-                                ข้อเสนอแนะ
-                            </Text>
-                            </Block>
-                        </Block>
-                        <Block style={{width: '33.33%', paddingLeft: 2, paddingRight: 2}}>
-                            <Block style={styles.menuBlock}>
-                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
-                                ตั้งค่าอุปกรณ์
-                            </Text>
-                            </Block>
-                        </Block>
-                        <Block style={{width: '33.33%', paddingLeft: 2}}>
-                            <Block style={styles.menuBlock}>
-                            <Text style={styles.menuText} color={themeColor.COLORS.PRIMARY} >
-                                เกี่ยวกับเรา
-                            </Text>
-                            </Block>
-                        </Block>
-                        </Block> */}
                     </Block>
                     </Block>
                 </Block>
@@ -477,7 +403,7 @@ render() {
                 <Text>{translate('ThaiLabel')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={{ margin: 5 }} onPress={this.onClickLogOut}>
-                <Text>{ (this.props.userInfo.user.fn != 'DefaultUser') ? translate('Logout'): translate('Logout')}</Text>
+                <Text>{ (this.props.userInfo.fn != 'DefaultUser') ? translate('Logout'): translate('Logout')}</Text>
             </TouchableOpacity>
             </View>
         </Modal>
@@ -502,12 +428,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: 20,
     borderRadius: 20,
-    backgroundColor: themeColor.COLORS.BTN_SECONDARY
+    backgroundColor: themeColor.COLORS.BTN_SECONDARY,
+    
   },
   createButtonText:{
     fontSize: 16,
     fontFamily: 'Sarabun-Medium',
-    color: themeColor.COLORS.WHITE
+    color: themeColor.COLORS.PRIMARY
   },
   avatar: {
     width: 60,
@@ -612,12 +539,10 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => {
     return {
-        // Name: state.user.Name,
-        // image: state.user.image,
-        userInfo: state.user,
         network: state.network,
-        //deviceInfo : state.deviceInfo
-        ...state.deviceInfo
+        ...state.user,
+        ...state.deviceInfo,
+        ...state.testToneList,
     };
 };
 

@@ -14,7 +14,8 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="84dp">
 
         <LinearLayout
             android:id="@+id/intro"
@@ -88,7 +89,7 @@
 
             <Button
                 android:id="@+id/start"
-                android:layout_width="250dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/primary_btn_success"
                 android:fontFamily="@font/sarabun_medium"
@@ -96,6 +97,20 @@
                 android:onClick="onClickStart"
                 android:text="I CAN HEAR"
                 android:textColor="@color/text_inverse"
+                android:textSize="18sp"
+                tools:ignore="OnClick" />
+
+            <Button
+                android:id="@+id/cancel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/background_white"
+                android:fontFamily="@font/sarabun_medium"
+                android:gravity="center"
+                android:layout_marginTop="10dp"
+                android:onClick="onClickCancel"
+                android:text="Cancel"
+                android:textColor="@color/primary_btn_success"
                 android:textSize="18sp"
                 tools:ignore="OnClick" />
 
