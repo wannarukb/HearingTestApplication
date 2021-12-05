@@ -3,534 +3,628 @@ import {connect} from 'react-redux';
 import {CommonActions } from '@react-navigation/native';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
 import AuthService from '../services/AuthService';
+import TestToneService from '../services/TestToneService';
 
-import { StyleSheet, Dimensions, SafeAreaView,Platform, TouchableWithoutFeedback, Keyboard, ImageBackground, Image, ScrollView, View ,KeyboardAvoidingView ,TextInput} from 'react-native';
+import { StyleSheet, Picker, Dimensions, ActivityIndicator,Platform, TouchableWithoutFeedback, Keyboard, ImageBackground, Image, ScrollView, View ,KeyboardAvoidingView ,TextInput, Alert} from 'react-native';
 import { Block, Text, theme } from "galio-framework";
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
-import { Button, Input } from "../components";
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import CheckBox from '@react-native-community/checkbox';
+import { Button } from "../components";
+import { RadioButton } from 'react-native-paper';
+import DeviceInfo from 'react-native-device-info';
+
 
 import {LanguageService} from "../services/LanguageService";
 import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
+import mainStyle  from "../constants/mainStyle";
 
 const translate = memoize(
     (key, config) => i18n.t(key, config),
     (key, config) => (config ? key + JSON.stringify(config) : key)
 )
 
+const styles = mainStyle.styles;
 const { height, width } = Dimensions.get("screen");
+
 class Register extends React.Component {
     constructor(props) {
         super(props);
+        console.log("----- Register -----");
+        console.log(JSON.stringify(this.props));
+
         this.state = {
             loading:false,
             isMale : false,
             isFemale : false
         };
 
-        this.getDeviceInfo();
-    }
+        var lang = this.props.deviceInfo.language;
+        this.setDeviceLanguage(lang);
 
-    componentDidMount() {
-        // this.props.logout();
-        this.getToken();
     }
 
     setDeviceLanguage(lang){
         console.log("SET DEVICE Language = " + lang);
         translate.cache.clear();
         LanguageService.getInstance().changeLanguage(lang);
-        
-    }
-    
-    
-    getDeviceInfo = async() =>{
-        var defaultLanguage = 'en';
-        try {
-            let data = await AsyncStorage.getItem("DeviceInfo");
-            
-            if(data){
-                let deviceData = JSON.parse(data);
-                console.log('device data = ', deviceData);
-                this.setState({
-                    DeviceInfo : deviceData
-                });
-                
-                console.log(deviceData);
-                defaultLanguage = (deviceData.language != undefined) ? deviceData.language : 'en';
-            }
-            this.setDeviceLanguage(defaultLanguage);
-        } catch (error) {
-            
-            console.log("Something went getDeviceInfo = ", error);
-            this.setDeviceLanguage(defaultLanguage);
-        }
-    }
-    
-    async getToken() {
-        try {
-          let userData = await AsyncStorage.getItem("UserInfo");
-          let data = JSON.parse(userData);
-          console.log('Login get token = ', data);
-          this.setState({
-            userInfo : data
-          });
-        } catch (error) {
-          console.log("Something went wrong, get token = ", error);
-        }
-    }
-
-    // async storeToken(user) 
-    storeToken = async(user) =>{
-        try {
-        await AsyncStorage.setItem("UserInfo", JSON.stringify(user));
-        console.log("storeToken", "information have been store");
-        } catch (error) {
-        console.log("Something went wrong, store token = ", error);
-        }
-    }
-
-
-    UserLoginFunction = (userData) => {
-        try {
-            AuthService.login_api(userData.email, userData.password).then(responseJson => {
-                console.log('Login API', responseJson);
-                this.setState({loading:false})
-                if (responseJson.ok) {
-                    this.setState({
-                        loading: false,
-                    });
-        
-                    if (responseJson.data != null) {
-                        var data = responseJson.data;
-                        console.log('userInfo', data);
-                        this.storeToken(data);
-                        this.props.login(data);
-                        this.props.navigation.dispatch(
-                        CommonActions.reset({
-                            index: 0,
-                            routes: [
-                            { name: 'Home' },
-                            ],
-                        })
-                        );
-                    } else {
-                        alert('server error no data')
-                    }
-                } else {
-                if (responseJson.problem == 'NETWORK_ERROR') {
-                    alert('server error = NETWORK_ERROR')
-                    this.setState({
-                        loading: false,
-                    });
-                } else if (responseJson.problem == 'TIMEOUT_ERROR') {
-                    alert('server error = TIMEOUT_ERROR')
-                    this.setState({
-                        loading: false,
-                    });
-                } else {
-                    alert('server error responseJson ERROR')
-                    this.setState({
-                        loading: false,
-                    });
-                }
-                }
-            }).catch(error => {
-                console.error(error);
-                this.setState({
-                    loading: false,
-                });
-            });
-          
-        } catch (e) {
-          // saving error
-        }
-    }
-
-    UserRegisterFunction = () => {
-        const { UserEmail ,UserPassword, UserFirstName, UserLastName, UserBirthYear, UserGender }  = this.state ;
-        try {
-            let userData = {
-                "email" : UserEmail,
-                "password" : UserPassword,
-                "firstName" : UserFirstName,
-                "lastName" : UserLastName,
-                "gender" : UserGender
-            }
-
-            console.log('Register Data : ' + JSON.stringify(userData));
-            AuthService.register_api(userData).then(responseJson => {
-                console.log('Register API', responseJson);
-                this.setState({loading:false})
-                if (responseJson.ok) {
-                    this.setState({
-                        loading: false,
-                    });
-        
-                    if (responseJson.data != null) {
-                        var data = responseJson.data;
-                        this.UserLoginFunction(data);
-                        console.log("Register Success ! " + data);
-                    } else {
-                        alert('server error no data')
-                    }
-                } else {
-                if (responseJson.problem == 'NETWORK_ERROR') {
-                    alert('server error = NETWORK_ERROR')
-                    this.setState({
-                        loading: false,
-                    });
-                } else if (responseJson.problem == 'TIMEOUT_ERROR') {
-                    alert('server error = TIMEOUT_ERROR')
-                    this.setState({
-                        loading: false,
-                    });
-                } else {
-                    alert('server error responseJson ERROR')
-                    this.setState({
-                        loading: false,
-                    });
-                }
-                }
-            }).catch(error => {
-                console.error(error);
-                this.setState({
-                    loading: false,
-                });
-            });
-          
-        } catch (e) {
-          // saving error
-        }
     }
 
     onSubmitRegister(){
+
+        var alertTitle = translate('AlertTitleError');
+        var alertMessage = '';
+
         const {UserEmail, UserPassword, UserFirstName, UserLastName, UserBirthYear, UserGender}=this.state
-        if(UserEmail == "" || UserEmail == null || UserEmail == undefined){
-          alert('กรุณากรอกอีเมล')
-        }else if( UserPassword == "" || UserPassword == null || UserPassword == undefined){
-          alert('กรุณากรอกรหัสผ่าน')
-        }else if( UserFirstName == "" || UserFirstName == null || UserFirstName == undefined){
-            alert('กรุณากรอกชื่อจริง')
-        }else if( UserLastName == "" || UserLastName == null || UserLastName == undefined){
-            alert('กรุณากรอกนามสกุล')
-        }else if( UserGender == "" || UserGender == null || UserGender == undefined){
-            alert('กรุณากรอกเพศ')
-        }else if(!this.props.network.isConnected){
-          alert('No Internet')    
+        var isError = false;
+        var MissingRequireFieldMessage = translate('RequireField');
+        var fieldList = [];
+        if(!this.props.network.isConnected){
+            isError = true;
+            alertMessage = translate('InternetRequire');
         }else{
-          this.UserRegisterFunction();
+            if(UserEmail == "" || UserEmail == null  || UserEmail == undefined) fieldList.push(translate('EmailLabel'));
+            else{
+                let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+                if (reg.test(UserEmail) === false) {
+                    fieldList.push(translate('EmailFormatError'));
+                }
+            }
+            if(UserPassword == ""  || UserPassword == null || UserPassword == undefined) fieldList.push(translate('PasswordLabel'));
+            else{
+                if (UserPassword.length < 6 || UserPassword.length > 10) {
+                    fieldList.push(translate('PasswordLengthError'));
+                }
+            }
+            if(UserFirstName == ""  || UserFirstName == null || UserFirstName == undefined) fieldList.push(translate('FirstNameLabel'));
+            if(UserLastName == ""  || UserLastName == null || UserLastName == undefined) fieldList.push(translate('LastNameLabel'));
+            if(UserBirthYear == ""  || UserBirthYear == null || UserBirthYear == undefined) fieldList.push(translate('YearOfBirthLabel'));
+            if(UserGender == ""  || UserGender == null || UserGender == undefined) fieldList.push(translate('GenderLabel'));
+
+            if(fieldList.length > 0){
+                isError = true;
+                alertMessage = MissingRequireFieldMessage + '\n';
+                for(let index = 0; index < fieldList.length; index++){
+                    if(index > 0) alertMessage += '\n';
+                    alertMessage += '  - ' + fieldList[index];
+                }
+            }
+            
+        }
+        
+        if(isError){
+            this.showAlert(alertTitle, alertMessage);
+        }else{
+
+            var isGuest = (this.props.userInfo.isGuest) ? this.props.userInfo.isGuest : true;
+            var isAuthenticated = (this.props.userInfo.isAuthenticated) ? this.props.userInfo.isAuthenticated : false;
+
+            if(isAuthenticated && isGuest){
+                console.log("GuestRegisterFunction");
+                this.GuestRegisterFunction();
+            }else{
+                console.log("UserRegisterFunction");
+                this.UserRegisterFunction();
+            }
         }
     }
 
-    toggleGender  = (gender)=>{
+    GuestRegisterFunction = async() =>{
+        var alertTitle = translate('AlertTitleError');
+        var alertMessage = '';
+        const { UserEmail ,UserPassword, UserFirstName, UserLastName, UserBirthYear, UserGender }  = this.state ;
+        this.setState({loading:true});
+        try {
+
+            console.log( this.props.userInfo);
+            let registerInfo = {
+                userId      : this.props.userInfo.user.userId,
+                email       : UserEmail,
+                password    : UserPassword,
+                firstName   : UserFirstName,
+                lastName    : UserLastName,
+                gender      : UserGender,
+                yearOfBirth : UserBirthYear + "-01-01T00:00:00.000Z"
+            }
+            
+            console.log(registerInfo);
+            var registerResult = await AuthService.register_guest_post(registerInfo);
+            console.log(registerResult);
+            this.setState({loading:false});
+
+            if(registerResult){
+                if (registerResult.ok) {
+                    if (registerResult.data != undefined && registerResult.data != null) {
+                        var data = registerResult.data;
+                        console.log('RegisterResult', data);
+                        this.UserLoginFunction(UserEmail, UserPassword);
+                    } else {
+                        alertMessage = 'Register, Server error no data return.';
+                        this.showAlert(alertTitle, alertMessage);
+                    }
+                } else {
+                    var problem = registerResult.problem;
+                    var status  = registerResult.status;
+                    alertMessage = 'Register, Server status: ' + status + ' error: ' + problem;
+                    this.showAlert(alertTitle, alertMessage);
+                }  
+            }else{
+                alertMessage = 'Register, Server error no result return.';
+                this.showAlert(alertTitle, alertMessage);
+            }
+        
+        } catch (error) {
+            console.log(error);
+            this.setState({ loading: false, });
+            alertMessage = JSON.stringify(error);
+            this.showAlert(alertTitle, alertMessage);
+        }
+    }
+
+    UserRegisterFunction = async() => {
+        var alertTitle = translate('AlertTitleError');
+        var alertMessage = '';
+        const { UserEmail ,UserPassword, UserFirstName, UserLastName, UserBirthYear, UserGender }  = this.state ;
+        this.setState({loading:true});
+        try {
+
+            var deviceInfo       = this.props.deviceInfo;
+            let registerInfo = {
+                status          : "A",
+                systemName      : deviceInfo.systemName,
+                systemVersion   : "" + deviceInfo.systemVersion,
+                istablet        : "" + deviceInfo.isTablet,
+                brandmodel      : deviceInfo.model,
+                deviceType      : deviceInfo.deviceType,
+                users : [
+                    {
+                        email       : UserEmail,
+                        password    : UserPassword,
+                        firstName   : UserFirstName,
+                        lastName    : UserLastName,
+                        gender      : UserGender,
+                        yearOfBirth : UserBirthYear + "-01-01T00:00:00.000Z"
+                    }
+                ]
+            }
+            console.log(registerInfo);
+            var registerResult = await AuthService.register_api(registerInfo);
+            console.log(registerResult);
+            this.setState({loading:false});
+
+            if(registerResult){
+                if (registerResult.ok) {
+                    if (registerResult.data != undefined && registerResult.data != null) {
+                        var data = registerResult.data;
+                        console.log('RegisterResult', data);
+                        this.UserLoginFunction(UserEmail, UserPassword);
+                    } else {
+                        alertMessage = 'Register, Server error no data return.';
+                        this.showAlert(alertTitle, alertMessage);
+                    }
+                } else {
+                    var problem = registerResult.problem;
+                    var status  = registerResult.status;
+                    alertMessage = 'Register, Server status: ' + status + ' error: ' + problem;
+                    this.showAlert(alertTitle, alertMessage);
+                }  
+            }else{
+                alertMessage = 'Register, Server error no result return.';
+                this.showAlert(alertTitle, alertMessage);
+            }
+        
+        } catch (error) {
+            console.log(error);
+            this.setState({ loading: false, });
+            alertMessage = JSON.stringify(error);
+            this.showAlert(alertTitle, alertMessage);
+        }
+    }
+
+    UserLoginFunction = async(loginEmail, loginPassword) => {
+        this.setState({loading:true});
+        var alertTitle = translate('AlertTitleError');
+        var alertMessage = '';
+        try {
+
+            var userResult = await AuthService.login_api(loginEmail,loginPassword);
+            console.log(userResult);
+            this.setState({loading:false});
+
+            if(userResult){
+                if (userResult.ok) {
+                    if (userResult.data != undefined && userResult.data != null) {
+                        var data = userResult.data;
+                        console.log('userInfo', data);
+                        var storeUserInfo = await this.storeUserInformation(data);
+                        this.props.login(data);
+                        var userId      = data.id;
+                        var brandModel  = this.props.deviceInfo.model;
+                        var loadTestTone= await this.loadTestTone(userId, brandModel);
+                    } else {
+                        alertMessage = 'Server error no data return.';
+                        this.showAlert(alertTitle, alertMessage);
+                    }
+                } else {
+                    var problem = userResult.problem;
+                    var status  = userResult.status;
+                    if (problem == 'CLIENT_ERROR') {
+                        alertMessage = translate('LoginError');
+                    } else {
+                        alertMessage = 'Server status: ' + status + ' error: ' + problem;
+                    }
+                    this.showAlert(alertTitle, alertMessage);
+                }  
+            }else{
+                alertMessage = 'Server error no result return.';
+                this.showAlert(alertTitle, alertMessage);
+            }
+        
+        } catch (error) {
+            console.log(error);
+            this.setState({ loading: false, });
+            alertMessage = JSON.stringify(error);
+            this.showAlert(alertTitle, alertMessage);
+        }
+
+        
+    }
+
+    async getToken() {
+        try {
+            let userData = await AsyncStorage.getItem("UserInfo");
+            let data = JSON.parse(userData);
+            console.log('Login get token = ', data);
+        } catch (error) {
+            console.log("Something went wrong, get token = ", error);
+        }
+    }
+
+    // async storeUserInformation(user) 
+    storeUserInformation = async(user) =>{
+        try {
+            await AsyncStorage.setItem("UserInfo", JSON.stringify(user));
+            console.log("storeUserInformation", "information have been store");
+        } catch (error) {
+            var alertTitle = translate('AlertTitleError');
+            var alertMessage = 'storeUserInformation = ' + error;
+            this.showAlert(alertTitle, alertMessage);
+        }
+    }
+
+    // async storeTestToneList(testToneList) 
+    storeTestToneList = async(testToneList) =>{
+        try {
+            await AsyncStorage.setItem("TestToneList", JSON.stringify(testToneList));
+            console.log("storeTestToneList", "information have been store");
+        } catch (error) {
+            var alertTitle = translate('AlertTitleError');
+            var alertMessage = 'storeTestToneList = ' + error;
+            this.showAlert(alertTitle, alertMessage);
+        }
+    }
+    
+    loadTestTone = async(userId, brandModel) =>{
+        this.setState({loading:true});
+        var alertTitle = translate('AlertTitleError');
+        var alertMessage = '';
+        try {
+
+            var testToneResult = await TestToneService.test_tone_api(userId, brandModel);
+            // console.log(testToneResult);
+            this.setState({loading:false});
+            if(testToneResult){
+                if (testToneResult.ok) {
+                    if (testToneResult.data != undefined && testToneResult.data != null) {
+                        var data = testToneResult.data;
+                        console.log('login load test tone data ' + JSON.stringify(data));
+                        this.props.loadTestToneList(data);
+                        let storeTestTone =  await this.storeTestToneList(data);
+                        this.gotoHomeUser();
+                    } else {
+                        alertMessage = 'Server error no data return.';
+                        this.showAlert(alertTitle, alertMessage);
+                    }
+                } else {
+                    var problem = testToneResult.problem;
+                    var status  = testToneResult.status;
+                    alertMessage = 'Server status: ' + status + ' error: ' + problem;
+                    this.showAlert(alertTitle, alertMessage);
+                }
+            }else{
+                alertMessage = 'Server error no result return.';
+                this.showAlert(alertTitle, alertMessage);
+            }
+        
+        } catch (error) {
+            console.log(error);
+            this.setState({ loading: false, });
+            alertMessage = JSON.stringify(error);
+            this.showAlert(alertTitle, alertMessage);
+        }
+    }
+  
+
+    goBackToLogin(){
+        this.props.navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [
+                    { name: 'Login' },
+                ],
+            })
+        );
+    }
+
+    gotoHomeUser(){
+        this.props.navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [
+                    { name: 'Home' },
+                ],
+            })
+        );
+    }
+
+    onSelectGender = ( item ) => {
+        console.log(item);
         this.setState({
-            UserGender: gender,
-        })
+            UserGender: item,
+        });
+    };
+
+    showAlert(alertTitle, alertMessage){
+        console.log(alertMessage);
+        Alert.alert(
+            alertTitle,
+            alertMessage,
+            [
+              { text: "OK", onPress: () => console.log("OK Pressed") }
+            ]
+        );
     }
 
     render() {
         const { navigation } = this.props;
         const {loading,  UserEmail ,UserPassword, UserFirstName, UserLastName, UserBirthYear, UserGender } = this.state;
         return (
-            <KeyboardAwareScrollView
-                // behavior={Platform.OS === "ios" ? "padding" : "height"}
-                // style={{ flex: 1 }}
-                resetScrollToCoords={{ x: 0, y: 0 }}
-                contentContainerStyle={styles.container}
-                scrollEnabled={false}
-            >
-                <SafeAreaView style={styles.container}>
-                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                        <Block  style={{flex: 1, justifyContent: "flex-end"}}>
-                        <ImageBackground
-                            source={Images.lightBG}
-                            style={{ height, width, zIndex: 1 }}
-                        >
-                            <ScrollView
-                                showsVerticalScrollIndicator={false}
+        <Block flex style={styles.container}>
+            <Block flex>
+                <ImageBackground
+                    // source={Images.lightBG}
+                    style={{ height, width, zIndex: 1 , backgroundColor: themeColor.COLORS.WHITE}}
+                >
+                    {loading && <Block  style={styles.loadingBox}><ActivityIndicator size="large"  color={themeColor.COLORS.PRIMARY_BTN_SUCCESS} /></Block>}
+                                      
+                    <KeyboardAvoidingView
+                        style={{ flex: 1 }}
+                        behavior={Platform.OS === "ios" ? "padding" : "height"}
+                        enabled
+                    >
+                        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                            <View style={styles.viewSection}> 
+                                <ScrollView
+                                showsVerticalScrollIndicator={true}
                                 style={{ width, marginTop: '0%' }}
-                            >
-                            <Block flex style={styles.homeContainer} >
-                                <Image source={Images.logoFaculty} style={styles.logo}/>
-                                <Block flex space="around">
-                                    <Block style={styles.titleBlock}>
-                                        <Block  style={styles.row}>
-                                            <Block flex middle style={{ paddingVertical: 20}}>
-                                                <Image source={Images.Ear} style={styles.earImg} />
-                                                <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-                                                    {translate('RegisterHeaderLabel')}
-                                                </Text>
-                                            </Block>
-                                        </Block>
-                                    </Block>
-                                    <Block flex middle>
-                                        <Block flex style={styles.registerContainer}>
-                                        <Block flex>
-                                            <Block style={{width: '100%'}} >
-                                                <Block style={styles.row} style={{ marginBottom: 15}} >
-                                                    <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                                        {translate('EmailLabel')}
+                                >
+                                     
+                                    <Block style={styles.homeContainer}>
+                                        <Image source={Images.logoFaculty} style={styles.logo} />
+                                        <Block space="around">
+                                            <Block  style={styles.row}>
+                                                <Block style={{width: '100%', alignItems: 'center', marginBottom: 0, paddingVertical: 30}}>
+                                                    <Image source={Images.Ear} style={customStyles.earImg} />
+                                                    <Text style={styles.title}>
+                                                        {translate('RegisterHeaderLabel')}
                                                     </Text>
+                                                </Block>
+                                            </Block>
+                                            <Block   style={styles.row} style={{ marginBottom: 15 }}>
+                                                <Block style={{width: '100%', marginBottom: 0}}>
+                                                    <Text style={styles.formLabel}  >
+                                                        {translate('EmailLabel')}
+                                                        <Text style={styles.formRequireLabel}  > * </Text>
+                                                    </Text>
+                                                    
                                                     <TextInput
                                                         style={styles.inputType}
-                                                        placeholder="Email"
                                                         placeholderTextColor="grey"
                                                         returnKeyType="next"
                                                         keyboardType="email-address"
-                                                        onSubmitEditing={() => this.pass_tn.focus()}
                                                         onChangeText={text => this.setState({ UserEmail: text })}
                                                         value={UserEmail}
                                                     />
                                                 </Block>
-                                                <Block style={{ marginBottom: 15 }}>
-                                                <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                                    {translate('PasswordLabel')}
-                                                </Text>
-                                                <TextInput
-                                                    style={styles.inputType}
-                                                    ref={(id)=>{this.pass_tn=id}}
-                                                    placeholder="Password"
-                                                    placeholderTextColor="grey"
-                                                    secureTextEntry={true}
-                                                    autoCapitalize="none"
-                                                    returnKeyType="next"
-                                                    maxLength={10}
-                                                    onChangeText={text => this.setState({ UserPassword: text })}
-                                                    value={UserPassword}
-                                                />
+                                            </Block>
+
+                                            <Block   style={styles.row} style={{ marginBottom: 15 }}>
+                                                <Block style={{width: '100%', marginBottom: 0}}>
+                                                    <Text style={styles.formLabel}  >
+                                                        {translate('PasswordLabel')}
+                                                        <Text style={styles.formRequireLabel}  > * </Text>
+                                                    </Text>
+                                                    <TextInput
+                                                        style={styles.inputType}
+                                                        ref={(id)=>{this.pass_tn=id}}
+                                                        placeholderTextColor="grey"
+                                                        secureTextEntry={true}
+                                                        autoCapitalize="none"
+                                                        returnKeyType="next"
+                                                        maxLength={10}
+                                                        onChangeText={text => this.setState({ UserPassword: text })}
+                                                        value={UserPassword}
+                                                    />
                                                 </Block>
-                                                <Block  style={{ marginBottom: 15 }}>
-                                                <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                                    {translate('FirstNameLabel')}
-                                                </Text>
-                                                <TextInput
-                                                    style={styles.inputType}
-                                                    placeholderTextColor="grey"
-                                                    returnKeyType="next"
-                                                    onSubmitEditing={() => this.pass_tn.focus()}
-                                                    onChangeText={text => this.setState({ UserFirstName: text })}
-                                                    value={UserFirstName}
-                                                />
-                                                </Block>
-                                                <Block  style={{ marginBottom: 15 }}>
-                                                <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                                    {translate('LastNameLabel')}
-                                                </Text>
-                                                <TextInput
-                                                    style={styles.inputType}
-                                                    placeholderTextColor="grey"
-                                                    returnKeyType="next"
-                                                    onSubmitEditing={() => this.pass_tn.focus()}
-                                                    onChangeText={text => this.setState({ UserLastName: text })}
-                                                    value={UserLastName}
-                                                />
-                                                </Block>
-                                                {/* <Block  style={{ marginBottom: 15 }}>
-                                                    <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                                        ปีเกิด (Year of Birth)
+                                            </Block>
+                                            <Block   style={styles.row} style={{ marginBottom: 15 }}>
+                                                <Block style={{width: '100%', marginBottom: 0}}>
+                                                    <Text style={styles.formLabel}  >
+                                                        {translate('FirstNameLabel')}
+                                                        <Text style={styles.formRequireLabel}  > * </Text>
                                                     </Text>
                                                     <TextInput
                                                         style={styles.inputType}
                                                         placeholderTextColor="grey"
-                                                        returnKeyType="done"
-                                                        keyboardType="number-pad"
-                                                        maxLength={4}
-                                                        onSubmitEditing={() => this.pass_tn.focus()}
+                                                        returnKeyType="next"
+                                                        onChangeText={text => this.setState({ UserFirstName: text })}
+                                                        value={UserFirstName}
+                                                    />
+                                                </Block>
+                                            </Block>
+                                            <Block   style={styles.row} style={{ marginBottom: 15 }}>
+                                                <Block style={{width: '100%', marginBottom: 0}}>
+                                                    <Text style={styles.formLabel}  >
+                                                        {translate('LastNameLabel')}
+                                                        <Text style={styles.formRequireLabel}  > * </Text>
+                                                    </Text>
+                                                    <TextInput
+                                                        style={styles.inputType}
+                                                        placeholderTextColor="grey"
+                                                        returnKeyType="next"
+                                                        onChangeText={text => this.setState({ UserLastName: text })}
+                                                        value={UserLastName}
+                                                    />
+                                                </Block>
+                                            </Block>
+                                            <Block   style={styles.row} style={{ marginBottom: 15 }}>
+                                                <Block style={{width: '100%', marginBottom: 0}}>
+                                                    <Text style={styles.formLabel}  >
+                                                        {translate('YearOfBirthLabel')}
+                                                        <Text style={styles.formRequireLabel}  > * </Text>
+                                                    </Text>
+                                                    <TextInput
+                                                        style={styles.inputType}
+                                                        placeholderTextColor="grey"
+                                                        returnKeyType="next"
                                                         onChangeText={text => this.setState({ UserBirthYear: text })}
                                                         value={UserBirthYear}
                                                     />
-                                                </Block> */}
-                                                <Block  style={{ marginBottom: 15 }}>
-                                                    <Text style={styles.formLabel} color={themeColor.COLORS.PRIMARY} >
-                                                        {translate('GenderLabel')}
-                                                    </Text>
-                                                    <Block style={styles.row}>
-                                                        <Block style={styles.checkboxBlock}>
-                                                            <CheckBox
-                                                                value = {UserGender ==  'female'} 
-                                                                onValueChange = {()=> this.toggleGender('female')}
-                                                                style={styles.checkbox}
-                                                            />
-                                                        </Block>
-                                                        <Block style={styles.subQuestionLabel}>
-                                                            <Text  style={styles.subQuestionText} > {translate('FemaleLabel')}</Text>
-                                                        </Block>
-                                                        <Block style={styles.checkboxBlock}>
-                                                            <CheckBox
-                                                                value = {UserGender ==  'male'} 
-                                                                onValueChange = {()=> this.toggleGender('male')}
-                                                                style={styles.checkbox}
-                                                            />
-                                                        </Block>
-                                                        <Block style={styles.subQuestionLabel}>
-                                                            <Text  style={styles.subQuestionText} > {translate('MaleLabel')}</Text>
-                                                        </Block>
-
-                                                        
-                                                    </Block>
                                                 </Block>
-                                                <Block style={styles.row} >
-                                                    <Block style={{width: '100%'}}>
-                                                        <Button style={styles.createButton} onPress={() => this.onSubmitRegister()}>
-                                                            <Text style={styles.createButtonText}>
-                                                                {translate('ConfirmRegisterButton')}
-                                                            </Text>
-                                                        </Button>
-                                                    </Block>
+                                            </Block>
+
+
+                                            <Block style={styles.row}>
+                                                <Block style={customStyles.subQuestionBlock}>
+                                                    <Text  style={customStyles.subQuestionText} >
+                                                        {translate('GenderLabel')}
+                                                        <Text style={styles.formRequireLabel}  > * </Text>    
+                                                    </Text>
+                                                </Block>
+                                            </Block>
+                                            <Block style={styles.row}>
+                                                
+                                                <Block style={customStyles.checkboxBlock}>
+                                                    <RadioButton
+                                                        value="M"
+                                                        status={ UserGender === 'M' ? 'checked' : 'unchecked' }
+                                                        onPress={() => this.onSelectGender('M')}
+                                                        color={themeColor.COLORS.PRIMARY_BTN_SUCCESS}
+                                                    />
+                                                </Block>
+                                                <Block style={customStyles.subQuestionLabel}>
+                                                    <Text  style={customStyles.subQuestionText} > {translate('MaleLabel')}</Text>
+                                                </Block>
+                                                <Block style={customStyles.checkboxBlock}>
+                                                    <RadioButton
+                                                        value="F"
+                                                        status={ UserGender  === 'F' ? 'checked' : 'unchecked' }
+                                                        onPress={() => this.onSelectGender('F')}
+                                                        color={themeColor.COLORS.PRIMARY_BTN_SUCCESS}
+                                                    />
+                                                </Block>
+                                                <Block style={customStyles.subQuestionLabel}>
+                                                    <Text  style={customStyles.subQuestionText} > {translate('FemaleLabel')}</Text>
                                                 </Block>
                                             </Block>
                                         </Block>
-                                        </Block>
                                     </Block>
-                                    
-                                
-                                </Block>
+                                </ScrollView>
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </KeyboardAvoidingView>
+                    <Block style={styles.buttonSection}>
+                        <Block style={styles.row}>
+                            <Block style={{width: '100%', alignItems: 'center'}}>
+                                <Button style={styles.primaryButton}
+                                    onPress={() => this.onSubmitRegister()}
+                                    >
+                                        <Text style={styles.primaryButtonText}>
+                                            {translate('ConfirmRegisterButton')}
+                                        </Text>
+                                </Button>
                             </Block>
-                            </ScrollView>
-                        </ImageBackground>
-                        <View/>
                         </Block>
-                    </TouchableWithoutFeedback>
-                </SafeAreaView>
-            </KeyboardAwareScrollView>
+                        <Block style={styles.row}>
+                            <Block style={{width: '100%', alignItems: 'center'}}>
+                                <Button style={styles.secondaryButton}
+                                    onPress={() => this.goBackToLogin()}
+                                    >
+                                        <Text style={styles.secondaryButtonText}>
+                                            {translate('BackButton')}
+                                        </Text>
+                                </Button>
+                            </Block>
+                        </Block>
+                    </Block>
+                </ImageBackground>
+            </Block>
+        </Block>
+            
         );
     }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    // marginTop: Platform.OS === "android" ? -HeaderHeight : 0,
-    // marginBottom: -HeaderHeight * 2,
-    flex: 1
-  },
-  registerContainer: {
-    margin: 10
-  },
-  createButton:{
-    margin: 0,
-    borderRadius: 20,
-    backgroundColor: themeColor.COLORS.PRIMARY_BTN_SUCCESS,
-    width: '100%'
-  },
-  createButtonText:{
-    fontSize: 16,
-    fontFamily: 'Sarabun-Medium',
-    color: themeColor.COLORS.WHITE
-  },
-  avatar: {
-    width: 60,
-    height: 60,
-    alignItems: 'flex-end'
-  },
-  row: {
-    flex: 1, 
-    flexDirection: 'row'
-  },
-  menuSet:{
-    marginTop: 10,
-    paddingVertical: 10,
-    position: "relative",
-    width: "100%",
-  },
-  menuButtonRegister:{
-    width: '100%', 
-    alignItems:'center', 
-    justifyContent: 'center',
-    marginVertical: 20,
-    borderRadius: 20,
-    backgroundColor: themeColor.COLORS.BTN_REGISTER
-  },
-  menuButtonTry:{
-    width: '100%', 
-    alignItems:'center', 
-    justifyContent: 'center',
-    marginVertical: 20,
-    borderRadius: 20,
-    backgroundColor: themeColor.COLORS.BTN_SECONDARY
-  },
-  menuText:{
-    fontSize: 14,
-    fontFamily: 'Sarabun-Medium'
-  },
-  homeContainer: {
-    position: "relative",
-    padding: 10,
-    marginHorizontal: 5,
-    marginTop: 100,
-    zIndex: 2
-  },
-  button: {
-    width: width - theme.SIZES.BASE * 4,
-    height: theme.SIZES.BASE * 3,
-    shadowRadius: 0,
-    shadowOpacity: 0
-  },
-  earImg: {
-    width: 66,
-    height: 76.09
-  },
-  logo: {
-    width: '100%',
-    height: 60,
-    position: 'relative',
-    marginTop: '0%',
-    marginHorizontal : 'auto'
-  },
-  titleBlock:{
-    marginTop:'5%',
-    height: 120
-  },
-  title: {
-    fontFamily:'Sarabun-SemiBold',
-    fontSize: 20
-  },
-  subTitle: {
-    fontFamily:'Sarabun-Medium',
-    fontSize: 14,
-  },
-  formLabel:{
-    fontFamily:'Sarabun-Medium',
-    fontSize: 14,
-  },
-  inputType:{
-    borderColor: themeColor.COLORS.INPUT,
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    backgroundColor: themeColor.COLORS.WHITE,
-    // marginTop: 5
-    fontSize: 16,
-  },
-  checkboxBlock:{
-    padding: 5,
-    width: '10%',
-    height: 50,
-    justifyContent: "center",
-    // borderBottomWidth: 1,
-    // borderBottomColor: themeColor.COLORS.BORDER_COLOR,
-  },
-  subQuestionLabel:{
-    paddingVertical: 5,
-    paddingLeft: 5,
-    width: '40%',
-    height: 50,
-    justifyContent: "center",
-    // borderBottomWidth: 1,
-    // borderBottomColor: themeColor.COLORS.BORDER_COLOR,
-  },
-  subQuestionText:{
-    color: themeColor.COLORS.PRIMARY,
-    fontFamily:'Sarabun-Medium',
-    fontSize: 16,
-    width: '40%',
-  },
-  checkbox: {
-    alignSelf: "center",
-  },
+const customStyles = StyleSheet.create({
+
+    earImg: {
+        width: 66,
+        height: 76.09
+    },
+    
+    radioButton : {
+        width: 300, 
+        color: themeColor.COLORS.PRIMARY, 
+        fontSize: 16,
+        fontFamily: 'Sarabun-Medium'
+    },
+    subQuestionBlock:{
+        paddingVertical: 5,
+        paddingLeft: 10,
+        width: '100%',
+        height: 50,
+        justifyContent: "center",
+    },
+    subQuestion:{
+        paddingVertical: 5,
+        paddingLeft: 10,
+        width: '100%',
+        justifyContent: "center",
+        borderBottomWidth: 1,
+        borderBottomColor: themeColor.COLORS.BORDER_COLOR,
+    },
+    checkboxBlock:{
+        paddingVertical: 5,
+        width: '15%',
+        height: 50,
+        justifyContent: "center",
+    },
+    subQuestionLabel:{
+        paddingVertical: 5,
+        paddingLeft: 5,
+        width: '35%',
+        height: 50,
+        justifyContent: "center",
+    },
+    checkbox: {
+        alignSelf: "center",
+        borderRadius: 50
+    },
+    subQuestionText:{
+        fontSize: 18,
+        fontFamily: 'Sarabun-Medium',
+        color: themeColor.COLORS.PRIMARY
+    },
 });
 
 Register.defaultProps = {
@@ -539,21 +633,25 @@ Register.defaultProps = {
 };
 
 const mapStateToProps = state => {
-  return {
-    network: state.network,
-  };
+    return {
+        network: state.network,
+        userInfo : state.user,
+        ...state.deviceInfo,
+        ...state.testToneList,
+    };
 };
 
 const mapDispatchToProps = dispatch => {
-  const {actions} = require('../redux/UserRedux');
-  const {testToneActions} = require('../redux/TestToneRedux');
+    const {actions} = require('../redux/UserRedux');
+    const {testToneActions} = require('../redux/TestToneRedux');
 
-  return {
-    login: customers => dispatch(actions.login(customers)),
-    logout: () => dispatch(actions.logout()),
-    register: users => dispatch(actions.register(users)),
-    loadTestToneList: userToken => dispatch(testToneActions.loadTestToneList(userToken))
-  };
+    return {
+        login: customers => dispatch(actions.login(customers)),
+        logout: () => dispatch(actions.logout()),
+        register: users => dispatch(actions.register(users)),
+        registerGuest: users => dispatch(actions.registerGuest(users)),
+        loadTestToneList: userToken => dispatch(testToneActions.loadTestToneList(userToken))
+    };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Register);
