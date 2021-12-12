@@ -1,7 +1,8 @@
 import React from 'react'
 import {connect} from 'react-redux';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
-import {ImageBackground,Image,StyleSheet,View,Dimensions,ScrollView, LogBox, TouchableOpacity, Alert} from "react-native";
+import RNFS from 'react-native-fs';
+import {ImageBackground,Image,StyleSheet,View,Dimensions,ScrollView, LogBox, TouchableOpacity, Alert, ActivityIndicator} from "react-native";
 import { Block, Button, Text, theme } from "galio-framework";
 import Modal from "react-native-simple-modal";
 
@@ -41,6 +42,88 @@ class HomeGuest extends React.Component {
 
         var defaultLang = (this.props.deviceInfo && this.props.deviceInfo.language)  ? this.props.deviceInfo.language : '';
         this.setDeviceLanguage(defaultLang);
+
+
+        this.readResultJSONFile();
+    }
+
+    postTestToneResult = async (testToneResult) => {
+
+        this.setState({loading:true});
+        var alertTitle = translate('AlertTitleError');
+        var alertMessage = '';
+    
+        try {
+    
+            var postToneResult = await TestToneService.post_testTone_result_api(testToneResult);
+            console.log(postToneResult);
+            this.setState({loading:false});
+            if(postToneResult){
+                if (postToneResult.ok) {
+                    if (postToneResult.data != null) {
+                        var data = postToneResult.data;
+                        console.log("post_testTone_result_api Success ! " + JSON.stringify(data));
+                        var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
+                        RNFS.unlink(path).then(() => {
+                            console.log('FILE DELETED');
+                        }).catch((err) => {
+                            // `unlink` will throw an error, if the item to unlink does not exist
+                            console.log(err.message);
+                        });
+                    } else {
+                        alertMessage = 'Server error no data return.';
+                        this.showAlert(alertTitle, alertMessage);
+                    }
+                } else {
+                    var problem = testToneResult.problem;
+                    var status  = testToneResult.status;
+                    alertMessage = 'Post Test Tone Result, status: ' + status + ' error: ' + problem;
+                    this.showAlert(alertTitle, alertMessage);
+                }
+            }else{
+                alertMessage = 'Server error no result return.';
+                this.showAlert(alertTitle, alertMessage);
+            }
+    
+        } catch (error) {
+            console.log(error);
+            this.setState({ loading: false, });
+            alertMessage = 'Post Test Tone Result : ' + JSON.stringify(error);
+            this.showAlert(alertTitle, alertMessage);
+        }
+    }
+    
+    readResultJSONFile = async() =>{
+    
+        this.setState({ loading: true});
+        var alertTitle = translate('AlertTitleError');
+        var alertMessage = '';
+        try {
+            var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
+            
+            if(path != null && path != undefined){
+                console.log(path)
+                const fileContent = await RNFS.readFile(path, 'utf8');
+                console.log('my save data');
+                console.log(fileContent);
+                if(fileContent != null && fileContent != undefined){
+                    let data = JSON.parse(fileContent);
+                    let isSyncData = JSON.stringify(data) === JSON.stringify({});
+                    if(isSyncData === false){
+                        await AsyncStorage.setItem("TestResults", JSON.stringify(data));
+                        this.postTestToneResult(data);
+                    }
+                }
+            }
+        } catch (error) {
+            console.log(error);
+            this.setState({ loading: false});
+            var errorMessage = JSON.stringify(error);
+            if(!errorMessage.includes('No such file or directory')){
+                alertMessage = 'Something went wrong, readResultJSONFile ='  + JSON.stringify(error);
+                this.showAlert(alertTitle, alertMessage);
+            }
+        }
     }
 
     getDeviceInfo = async() =>{
@@ -426,7 +509,6 @@ HomeGuest.defaultProps = {
 
 const mapStateToProps = state => {
     return {
-        // userInfo: state.user,
         network: state.network,
         userInfo : state.user,
         ...state.deviceInfo,

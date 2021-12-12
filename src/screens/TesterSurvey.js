@@ -142,11 +142,11 @@ class TesterSurvey extends Component {
 
     startHearingTest(testToneData){
 
-        let userID = (this.props.userInfo.isGuest) ? this.props.userInfo.user.userId : this.props.userInfo.user.id;
-        var brandModel      = (this.props.deviceInfo.model) ? this.props.deviceInfo.model : DeviceInfo.getModel();
+        let userID      = (this.props.userInfo.isGuest) ? this.props.userInfo.user.userId : this.props.userInfo.user.id;
+        var brandModel  = (this.props.deviceInfo.model) ? this.props.deviceInfo.model : DeviceInfo.getModel();
 
-        let gender = this.state.AnswerGender;
-        let age    = this.state.AnswerAge;
+        let gender      = this.state.AnswerGender;
+        let ageRange    = this.state.AnswerAge;
         
         var alertTitle = translate('AlertTitleError');
         if(testToneData.length == 0){
@@ -163,11 +163,20 @@ class TesterSurvey extends Component {
                     console.log(testData);
                     console.log("User ID : " + userID);
                     console.log("Gender : " + gender);
-                    console.log("Age : " + age);
-    
+                    console.log("Age : " + ageRange);
+
+                    let userInformation   = {
+                        userID  : userID,
+                        gender  : gender,
+                        ageRange : ageRange
+                    }
+
                     let translateMenu = {
-                        "TonePlaySuggestionHeaderLabel": translate('TonePlaySuggestionHeaderLabel'),
-                        "TonePlaySuggestionDescription": translate('TonePlaySuggestionDescription'),
+                        "StartHeaderLabel": translate('StartHeaderLabel'),
+                        "SuggestionLine1": translate('SuggestionLine1'),
+                        "SuggestionLine2": translate('SuggestionLine2'),
+                        "WarningLabel": translate('WarningLabel'),
+                        "WarningDescription": translate('WarningDescription'),
                         "StartPlayToneButton": translate('StartPlayToneButton'),
                         "TonePlayHeaderLabel": translate('TonePlayHeaderLabel'),
                         "TonePlayDescription": translate('TonePlayDescription'),
@@ -184,10 +193,16 @@ class TesterSurvey extends Component {
     
                     console.log(translateMenu);
                     // NativeModules.HearingTestModule.GotoActivity(
-                    //     JSON.stringify(userID),
+                    //     JSON.stringify(userInformation),
                     //     JSON.stringify(testData),
                     //     JSON.stringify(translateMenu)
                     // );
+
+                    NativeModules.HearingTestModule.GotoActivity(
+                        JSON.stringify(userID),
+                        JSON.stringify(testData),
+                        JSON.stringify(translateMenu)
+                    );
                 }
             }catch(error){
                 console.log(error);

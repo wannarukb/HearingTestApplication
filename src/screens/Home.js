@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
 import { Block, Button, Text, theme } from "galio-framework";
-import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView, TouchableOpacity, View, LogBox , I18nManager } from 'react-native';
+import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView, TouchableOpacity, View, LogBox , Alert,ActivityIndicator } from 'react-native';
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
 const { height, width } = Dimensions.get("screen");
@@ -15,11 +15,15 @@ import DeviceInfo from 'react-native-device-info';
 import {LanguageService} from "../services/LanguageService";
 import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
+import mainStyle  from "../constants/mainStyle";
+
 
 const translate = memoize(
     (key, config) => i18n.t(key, config),
     (key, config) => (config ? key + JSON.stringify(config) : key)
 )
+
+const styles = mainStyle.styles;
 
 
 LogBox.ignoreAllLogs(true);
@@ -36,91 +40,68 @@ constructor(props) {
 
     console.log(JSON.stringify(this.props));
 
-    var defaultLang = (this.props.deviceInfo && this.props.deviceInfo.language)  ? this.props.deviceInfo.language : 'en';
+    var defaultLang = (this.props.deviceInfo && this.props.deviceInfo.language)  ? this.props.deviceInfo.language : '';
     this.setDeviceLanguage(defaultLang);
-    console.log("Home information");
-    this.getToken();
-    this.getDeviceInfo();
+    
+
+    //this.getToken();
+    //this.getDeviceInfo();
     this.readResultJSONFile();
     
     console.log(this.props.userInfo);
 }
 
-postTestToneResult = (testToneResult) => {
+postTestToneResult = async (testToneResult) => {
+
+    this.setState({loading:true});
+    var alertTitle = translate('AlertTitleError');
+    var alertMessage = '';
+
     try {
-        TestToneService.post_testTone_result_api(testToneResult).then(responseJson => {
-        console.log('Post Test Tone API', responseJson);
-        this.setState({loading:false})
-        if (responseJson.ok) {
-            this.setState({
-                loading: false,
-            });
 
-            if (responseJson.data != null) {
-                var data = responseJson.data;
-                console.log("post_testTone_result_api Success ! " + data);
-
-                var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
-                // write the file
-                RNFS.writeFile(path, '{}', 'utf8')
-                .then((Writesuccess) => {
-                    console.log('FILE WRITTEN!');
-                })
-                .catch((err) => {
-                    console.log(err.message);
-                });
-
+        var postToneResult = await TestToneService.post_testTone_result_api(testToneResult);
+        console.log(postToneResult);
+        this.setState({loading:false});
+        if(postToneResult){
+            if (postToneResult.ok) {
+                if (postToneResult.data != null) {
+                    var data = postToneResult.data;
+                    console.log("post_testTone_result_api Success ! " + JSON.stringify(data));
+                    var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
+                    RNFS.unlink(path).then(() => {
+                      console.log('FILE DELETED');
+                    }).catch((err) => {
+                        // `unlink` will throw an error, if the item to unlink does not exist
+                        console.log(err.message);
+                    });
+                } else {
+                    alertMessage = 'Server error no data return.';
+                    this.showAlert(alertTitle, alertMessage);
+                }
             } else {
-                alert('server error no data')
+                var problem = testToneResult.problem;
+                var status  = testToneResult.status;
+                alertMessage = 'Post Test Tone Result, status: ' + status + ' error: ' + problem;
+                this.showAlert(alertTitle, alertMessage);
             }
-        } else {
-            if (responseJson.problem == 'NETWORK_ERROR') {
-                alert('server error = NETWORK_ERROR')
-                this.setState({
-                    loading: false,
-                });
-            } else if (responseJson.problem == 'TIMEOUT_ERROR') {
-                alert('server error = TIMEOUT_ERROR')
-                this.setState({
-                    loading: false,
-                });
-            } else {
-            alert('server error responseJson ERROR')
-            this.setState({
-                loading: false,
-            });
-            }
+        }else{
+            alertMessage = 'Server error no result return.';
+            this.showAlert(alertTitle, alertMessage);
         }
-        }).catch(error => {
-            console.error(error);
-            this.setState({
-                loading: false,
-            });
-        });
-    
-    } catch (e) {
-    console.error(e);
+
+    } catch (error) {
+        console.log(error);
+        this.setState({ loading: false, });
+        alertMessage = 'Post Test Tone Result : ' + JSON.stringify(error);
+        this.showAlert(alertTitle, alertMessage);
     }
 }
 
-setDeviceLanguage(lang){
-    console.log("SET DEVICE Language = " + lang);
-    let deviceJSON = {};
-    deviceJSON.uniqueId = DeviceInfo.getUniqueId();
-    deviceJSON.brand = DeviceInfo.getBrand();
-    deviceJSON.model = DeviceInfo.getModel();
-    deviceJSON.language = (lang) ? lang : 'en';
-    console.log(deviceJSON);
-    this.props.setupDeviceInfo(deviceJSON);
-    this.storeDeviceInfo(deviceJSON);
-
-    console.log('HOME Redux deviceInfo : ' + JSON.stringify(this.props.deviceInfo));
-    translate.cache.clear();
-    LanguageService.getInstance().changeLanguage(lang);
-    
-}
-
-async readResultJSONFile(){
+readResultJSONFile = async() =>{
+    console.log("---- readResultJSONFile ----");
+    this.setState({ loading: true});
+    var alertTitle = translate('AlertTitleError');
+    var alertMessage = '';
     try {
         var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
         
@@ -139,8 +120,36 @@ async readResultJSONFile(){
             }
         }
     } catch (error) {
-        console.log("Something went wrong, readResultJSONFile = ", error);
+        console.log(error);
+        this.setState({ loading: false});
+        var errorMessage = JSON.stringify(error);
+        if(!errorMessage.includes('No such file or directory')){
+            alertMessage = 'Something went wrong, readResultJSONFile ='  + JSON.stringify(error);
+            this.showAlert(alertTitle, alertMessage);
+        }
     }
+}
+
+setDeviceLanguage(lang){
+    console.log("setDeviceLanguage = " + lang);
+    let deviceJSON = {};
+    deviceJSON.uniqueId = DeviceInfo.getUniqueId();
+    deviceJSON.systemName = DeviceInfo.getSystemName();
+    deviceJSON.systemVersion = DeviceInfo.getSystemVersion();
+    deviceJSON.isTablet = DeviceInfo.isTablet();
+    deviceJSON.brand = DeviceInfo.getBrand();
+    deviceJSON.model = DeviceInfo.getModel();
+    deviceJSON.deviceType = DeviceInfo.getDeviceType();
+    var RNLocal = LanguageService.getInstance().getDeviceLang();
+    var languageTag = RNLocal.languageTag;
+    deviceJSON.language = (lang) ? lang : languageTag;
+    console.log("deviceJSON = " + deviceJSON);
+    this.props.setupDeviceInfo(deviceJSON);
+    this.storeDeviceInfo(deviceJSON);
+
+    console.log('HOME Guest Redux deviceInfo : ' + JSON.stringify(this.props.deviceInfo));
+    translate.cache.clear();
+    LanguageService.getInstance().changeLanguage(lang);
 }
 
 getDeviceInfo = async() =>{
@@ -211,32 +220,42 @@ openModal = () => this.setState({ openModal: true });
 closeModal = () => this.setState({ openModal: false });
 
 onClickLogOut = ()=> { 
-    // if(this.props.userInfo.user.fn == 'DefaultUser'){
-    //   this.props.navigation.dispatch(
-    //     CommonActions.reset({
-    //       index: 0,
-    //       routes: [
-    //         { name: 'Login' },
-    //       ],
-    //     })
-    //   );
-    // }else{
+    var alertTitle = translate('AlertTitleError');
+    var alertMessage = '';
+    
     console.log("LOGOUT");
-    this.props.logout();
-    this.resetToken();
-    var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
-    var data = {};
-    AsyncStorage.setItem("TestResults", JSON.stringify(data));
-    // write the file
-    RNFS.writeFile(path, '{}', 'utf8')
-    .then((Writesuccess) => {
-        console.log('FILE WRITTEN!');
-    })
-    .catch((err) => {
-        console.log(err.message);
-    });
-    this.closeModal();
-    // }
+    try{
+        this.props.logout();
+        this.resetToken();
+        var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
+        var data = {};
+        AsyncStorage.setItem("TestResults", JSON.stringify(data));
+        // write the file
+        RNFS.writeFile(path, '{}', 'utf8')
+        .then((Writesuccess) => {
+            console.log('FILE WRITTEN!');
+            this.closeModal();
+            this.props.navigation.dispatch(
+                CommonActions.reset({
+                index: 0,
+                routes: [
+                    { name: 'HomeGuest' },
+                ],
+                })
+            );
+        })
+        .catch((error) => {
+            console.error(error);
+            alertMessage = JSON.stringify(error);
+            this.showAlert(alertTitle, alertMessage);
+        });
+    }catch (error) {
+        console.error(error);
+        alertMessage = JSON.stringify(error);
+        this.showAlert(alertTitle, alertMessage);
+    }
+    
+    
 }
 
 // async storeToken(user) 
@@ -264,128 +283,107 @@ onClickChangeLanguage = (lang) => {
     this.closeModal();
 };
 
-renderWelcomeBlock(){
-    if(this.props.userInfo != null && this.props.userInfo.isAuthenticated == true){
-        return (
-            <Block  style={styles.row}>
-                <Block style={styles.welcomeInfoBlock}>
-                <Text style={styles.subTitle} color={themeColor.COLORS.PRIMARY} >
-                    {translate('Introduction')}
-                </Text>
-                <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-                    {(this.props.userInfo.fn == 'DefaultUser') ? 'Guest' : this.props.userInfo.fn}
-                </Text>
-                </Block>
-                <Block style={{width: '22%'}}>
-                    <Button style={styles.menuButtonTry} onPress={this.openModal} >
-                        <Text style={styles.createButtonText}>
-                        {translate('SetupButton')}
-                        </Text>
-                    </Button>
-                </Block>
-            </Block>
-        )
-    }else{
-        return (
-            <Block  style={styles.row}>
-                <Block style={styles.welcomeInfoBlock}>
-                    <Text style={styles.title} color={themeColor.COLORS.PRIMARY} >
-                    {translate('Welcome')}
-                    </Text>
-                    <Text style={styles.subTitle} color={themeColor.COLORS.TEXT_SECONDARY} >
-                    {translate('WelcomeSubInfo')}
-                    </Text>
-                </Block>
-                <Block style={{width: '22%'}}>
-                    <Button style={styles.menuButtonTry} onPress={this.openModal} >
-                        <Text style={styles.createButtonText}>
-                        {translate('SetupButton')}
-                        </Text>
-                    </Button>
-                </Block>
-            </Block>
-        )
-    }
-    
+showAlert(alertTitle, alertMessage){
+    console.log(alertMessage);
+    Alert.alert(
+        alertTitle,
+        alertMessage,
+        [
+          { text: "OK", onPress: () => console.log("OK Pressed") }
+        ]
+    );
 }
 
-
 render() {
-    // const { navigation } = this.props;
-    // const pureToneModule = NativeModules.HearingTestModule;
+    const {loading}=this.state;
     return (
     
-    <Block flex style={styles.container}>
+    <Block flex style={customStyles.container}>
         <Block flex>
         <ImageBackground
             // source={Images.lightBG}
             style={{ height, width, zIndex: 1 , backgroundColor: themeColor.COLORS.WHITE}}
         >
-        
-        <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={{ width, marginTop: '0%' }}
-        >
-            <Block flex style={styles.homeContainer}>
-                <Image source={Images.logoFaculty} style={styles.logo} />
-                <Block flex space="around">
-                    <Block style={styles.titleBlock}>
-                    <Block style={styles.welcomeBlock}>
-                    {this.renderWelcomeBlock()}  
-                    </Block>
-                    <Block style={styles.menuSet}>
-                        <Block style={styles.row}>
-                        <Block style={{width: '100%'}}>
-                            <Button style={styles.menuBlockMain} 
-                            onPress={() => this.onClickStartTesting()}
-                            >
-                            <ImageBackground
-                                source={Images.EarTestMain}
-                                style={{ height : 100, width: '100%', zIndex: 1 }}
-                            >
-                                <Text style={styles.menuTextMain} color={themeColor.COLORS.PRIMARY} >
-                                {translate('TestingButton')}
-                                </Text>
-                                <Text style={styles.menuSubTextMain} color={themeColor.COLORS.PRIMARY} >
-                                {translate('TestingButtonDesc')}
-                                </Text>
-                            </ImageBackground>
-                            
-                            </Button>
+        {loading && <Block  style={styles.loadingBox}><ActivityIndicator size="large"  color={themeColor.COLORS.PRIMARY_BTN_SUCCESS} /></Block>}
+        <View style={styles.viewSection}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                style={{ width, marginTop: '0%' }}
+            >
+                <Block flex style={styles.homeContainer}>
+                    <Image source={Images.logoFaculty} style={styles.logo} />
+                    <Block flex space="around">
+                        <Block style={styles.welcomeBlock}>
+                            <Block  style={styles.row}>
+                                <Block style={customStyles.welcomeInfoBlock}>
+                                    <Text style={customStyles.subTitleDesc}  >
+                                        {translate('Introduction')}
+                                    </Text>
+                                    <Text style={customStyles.subTitle}>
+                                        {this.props.userInfo.user.fn}
+                                    </Text>
+                                </Block>
+                                <Block style={{width: '22%'}}>
+                                    <Button style={customStyles.menuButtonTry} onPress={this.openModal} >
+                                        <Text style={styles.tridaryButtonText}>
+                                        {translate('SetupButton')}
+                                        </Text>
+                                    </Button>
+                                </Block>
+                            </Block>
                         </Block>
+                        <Block style={customStyles.menuSet}>
+                            <Block style={styles.row}>
+                                <Block style={{width: '100%'}}>
+                                    <Button style={customStyles.menuBlockMain} onPress={() => this.onClickStartTesting()}>
+                                    <ImageBackground
+                                        source={Images.EarTestMain}
+                                        style={{ height : 100, width: '100%', zIndex: 1 }}
+                                    >
+                                        <Text style={customStyles.menuTextMain}  >
+                                        {translate('TestingButton')}
+                                        </Text>
+                                        <Text style={customStyles.menuSubTextMain}>
+                                        {translate('TestingButtonDesc')}
+                                        </Text>
+                                    </ImageBackground>
+                                    
+                                    </Button>
+                                </Block>
+                            </Block>
+                            <Block style={styles.row}>
+                                <Block style={{width: '100%'}}>
+                                    <Button style={customStyles.menuBlockMain} 
+                                    onPress={() => this.props.navigation.dispatch(
+                                        CommonActions.reset({
+                                        index: 0,
+                                        routes: [
+                                            { name: 'HearingTestResult' },
+                                        ],
+                                        })
+                                    )}
+                                    >
+                                    <ImageBackground
+                                        source={Images.HearingResult}
+                                        style={{ height : 100, width: '100%', zIndex: 1 }}
+                                    >
+                                        <Text style={customStyles.menuTextMain}  >
+                                        {translate('ResultButton')}
+                                        </Text>
+                                        <Text style={customStyles.menuSubTextMain}>
+                                        {translate('ResultButtonDesc')}
+                                        </Text>
+                                    </ImageBackground>
+                                    
+                                    </Button>
+                                </Block>
+                            </Block>
                         </Block>
-                        <Block style={styles.row}>
-                        <Block style={{width: '100%'}}>
-                            <Button style={styles.menuBlockMain} 
-                            onPress={() => this.props.navigation.dispatch(
-                                CommonActions.reset({
-                                index: 0,
-                                routes: [
-                                    { name: 'HearingTestResult' },
-                                ],
-                                })
-                            )}
-                            >
-                            <ImageBackground
-                                source={Images.HearingResult}
-                                style={{ height : 100, width: '100%', zIndex: 1 }}
-                            >
-                                <Text style={styles.menuTextMain} color={themeColor.COLORS.PRIMARY} >
-                                {translate('ResultButton')}
-                                </Text>
-                                <Text style={styles.menuSubTextMain} color={themeColor.COLORS.PRIMARY} >
-                                {translate('ResultButtonDesc')}
-                                </Text>
-                            </ImageBackground>
-                            
-                            </Button>
-                        </Block>
-                        </Block>
-                    </Block>
                     </Block>
                 </Block>
-            </Block>
             </ScrollView>
+        </View>
+    
         <Modal
             offset={this.state.offset}
             open={this.state.openModal}
@@ -403,7 +401,7 @@ render() {
                 <Text>{translate('ThaiLabel')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={{ margin: 5 }} onPress={this.onClickLogOut}>
-                <Text>{ (this.props.userInfo.fn != 'DefaultUser') ? translate('Logout'): translate('Logout')}</Text>
+                <Text>{translate('Logout')}</Text>
             </TouchableOpacity>
             </View>
         </Modal>
@@ -415,132 +413,95 @@ render() {
 }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    // marginTop: Platform.OS === "android" ? -HeaderHeight : 0,
-    // marginBottom: -HeaderHeight * 2,
-    flex: 1,
-    marginBottom : 10
-  },
-  menuButtonTry:{
-    width: '100%', 
-    alignItems:'center', 
-    justifyContent: 'center',
-    marginVertical: 20,
-    borderRadius: 20,
-    backgroundColor: themeColor.COLORS.BTN_SECONDARY,
+const customStyles = StyleSheet.create({
+    subTitle: {
+        fontFamily:'Sarabun-SemiBold',
+        fontSize: 20,
+        color: themeColor.COLORS.PRIMARY,
+        textAlign : 'left'
+    },
+    subTitleDesc: {
+        fontFamily:'Sarabun',
+        fontSize: 16,
+        color: themeColor.COLORS.PRIMARY,
+        textAlign : 'left'
+    },
+    container: {
+        // marginTop: Platform.OS === "android" ? -HeaderHeight : 0,
+        // marginBottom: -HeaderHeight * 2,
+        flex: 1,
+        marginBottom : 10
+    },
+    menuButtonTry:{
+        width: '100%', 
+        alignItems:'center', 
+        justifyContent: 'center',
+        marginVertical: 20,
+        borderRadius: 20,
+        backgroundColor: themeColor.COLORS.BTN_SECONDARY,
+    },
+    welcomeInfoBlock: {
+        width: '75%', 
+        paddingTop: 20,
+        marginLeft: 0,
+        textAlign: "left",
+    },
+    menuSet:{
+        marginTop: 0,
+        paddingVertical: 10,
+        position: "relative",
+        width: "100%",
+    },
+    menuBlockMain:{
+        width: '100%', 
+        alignItems:'center', 
+        justifyContent: 'center',
+        height: 100, 
+        backgroundColor: '#E5E5E5',
+        marginTop: 6,
+        borderRadius: 4,
+        marginLeft: 0
+    },
     
-  },
-  createButtonText:{
-    fontSize: 16,
-    fontFamily: 'Sarabun-Medium',
-    color: themeColor.COLORS.PRIMARY
-  },
-  avatar: {
-    width: 60,
-    height: 60,
-    alignItems: 'flex-end'
-  },
-  row: {
-    flex: 1, 
-    flexDirection: 'row'
-  },
-  welcomeBlock: {
-    // marginHorizontal : 0,
-    // backgroundColor: '#14468A'
-  },
-  welcomeInfoBlock: {
-    width: '75%', 
-    marginLeft: 0,
-  },
-  menuSet:{
-    marginTop: 0,
-    paddingVertical: 10,
-    position: "relative",
-    width: "100%",
-  },
-  menuBlockMain:{
-    width: '100%', 
-    alignItems:'center', 
-    justifyContent: 'center',
-    height: 100, 
-    backgroundColor: '#E5E5E5',
-    marginTop: 6,
-    borderRadius: 4,
-    marginLeft: 0
-  },
-  
-  menuBlock:{
-    width: '100%', 
-    alignItems:'center', 
-    justifyContent: 'center',
-    height: 100, 
-    backgroundColor: '#E5E5E5',
-    marginTop: 6,
-    borderRadius: 4,
-    marginLeft: 0
-  },
+    menuBlock:{
+        width: '100%', 
+        alignItems:'center', 
+        justifyContent: 'center',
+        height: 100, 
+        backgroundColor: '#E5E5E5',
+        marginTop: 6,
+        borderRadius: 4,
+        marginLeft: 0
+    },
 
-  menuTextMain:{
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    fontSize: 22,
-    fontFamily: 'Sarabun-SemiBold',
-    textAlign: 'left',
-    color: themeColor.COLORS.PRIMARY
-  },
-  menuSubTextMain:{
-    paddingHorizontal: 20,
-    paddingTop: 5,
-    marginTop: -10,
-    fontSize: 12,
-    fontFamily: 'Sarabun-Light',
-    textAlign: 'left',
-    color: themeColor.COLORS.PRIMARY
-  },
-  menuText:{
-    fontSize: 14,
-    fontFamily: 'Sarabun-Medium',
-    color: themeColor.COLORS.PRIMARY
-  },
-  homeContainer: {
-    position: "relative",
-    padding: 10,
-    marginHorizontal: 5,
-    marginTop: 25,
-    zIndex: 2
-  },
-  button: {
-    width: width - theme.SIZES.BASE * 4,
-    height: theme.SIZES.BASE * 3,
-    shadowRadius: 0,
-    shadowOpacity: 0
-  },
-  logo: {
-    width: '100%',
-    height: 60,
-    // backgroundColor: '#000000',
-    position: 'relative',
-    marginTop: '0%',
-    marginHorizontal : 'auto'
-  },
-  titleBlock:{
-    marginTop:'5%',
-  },
-  title: {
-    fontFamily:'Sarabun-SemiBold',
-    fontSize: 20
-  },
-  subTitle: {
-    fontFamily:'Sarabun-Medium',
-    fontSize: 14,
-  }
+    menuTextMain:{
+        paddingHorizontal: 20,
+        paddingTop: 20,
+        fontSize: 22,
+        fontFamily: 'Sarabun-SemiBold',
+        textAlign: 'left',
+        color: themeColor.COLORS.PRIMARY
+    },
+    menuSubTextMain:{
+        paddingHorizontal: 20,
+        paddingTop: 5,
+        marginTop: -10,
+        fontSize: 12,
+        fontFamily: 'Sarabun-Light',
+        textAlign: 'left',
+        color: themeColor.COLORS.PRIMARY
+    },
+    menuText:{
+        fontSize: 14,
+        fontFamily: 'Sarabun-Medium',
+        color: themeColor.COLORS.PRIMARY
+    }
 });
 
 const mapStateToProps = state => {
     return {
         network: state.network,
-        ...state.user,
+        userInfo : state.user,
         ...state.deviceInfo,
         ...state.testToneList,
     };

@@ -25,7 +25,7 @@
             android:orientation="vertical"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
-            android:paddingBottom="40dp"
+            android:paddingBottom="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -52,6 +52,7 @@
                 android:text="text"
                 android:textColor="@color/text_default"
                 android:textSize="16sp"
+                android:visibility="visible"
                 tools:ignore="MissingConstraints" />
 
         </LinearLayout>
@@ -73,19 +74,113 @@
                 android:layout_width="wrap_content"
                 android:layout_height="200dp"
                 android:layout_centerInParent="true"
-                android:src="@drawable/tone_none" />
+                android:src="@drawable/suggestion" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/suggestionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="20dp"
+            android:paddingTop="20dp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/suggestionLine1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sarabun_regular"
+                android:gravity="center_horizontal"
+                android:text="กรุณาสวมหูฟังระหว่างการทดสอบ"
+                android:textColor="@color/text_default"
+                android:textSize="16sp"
+                android:visibility="visible"
+                tools:ignore="MissingConstraints" />
+
+            <TextView
+                android:id="@+id/suggestionLine2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sarabun_regular"
+                android:gravity="center_horizontal"
+                android:text="อยู่ในห้องที่ปราศจากเสียงรบกวน"
+                android:textColor="@color/text_default"
+                android:textSize="16sp"
+                android:visibility="visible"
+                tools:ignore="MissingConstraints" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/warninglayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:id="@+id/subBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:orientation="horizontal"
+                android:padding="10dp"
+                android:visibility="visible"
+                android:background="@color/suggestion"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+                <TextView
+                    android:id="@+id/warningLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_bold"
+                    android:gravity="left"
+                    android:text="คำเตือน :"
+                    android:textColor="@color/suggestion_text"
+                    android:textSize="12sp"
+                    android:layout_marginRight="5dp"
+                    android:visibility="visible"
+                    tools:ignore="MissingConstraints" />
+
+                <TextView
+                    android:id="@+id/warningText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_regular"
+                    android:gravity="left"
+                    android:text="การทดสอบมีการเล่นเสียงเพื่อทดสอบการได้ยินของหูแต่ละข้าง กรุณาตรวจสอบและใส่หูฟังให้ถูกข้าง"
+                    android:textColor="@color/suggestion_text"
+                    android:textSize="12sp"
+                    android:visibility="visible"
+                    tools:ignore="MissingConstraints" />
+            </LinearLayout>
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/intro_button"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="168dp"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="30dp"
+            android:padding="20dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/animateLayout">
+            app:layout_constraintTop_toBottomOf="@+id/warninglayout">
 
             <Button
                 android:id="@+id/start"
@@ -104,10 +199,10 @@
                 android:id="@+id/cancel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/background_white"
+                android:layout_marginTop="10dp"
+                android:background="@color/light_secondary"
                 android:fontFamily="@font/sarabun_medium"
                 android:gravity="center"
-                android:layout_marginTop="10dp"
                 android:onClick="onClickCancel"
                 android:text="Cancel"
                 android:textColor="@color/primary_btn_success"

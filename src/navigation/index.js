@@ -17,13 +17,14 @@ import Consent from "../screens/Consent";
 const Stack = createStackNavigator();
 
 export default () => {
-  // const isAuthenticated = useSelector(state => state.userInfo.isAuthenticated);
-  const isAuthenticated = useSelector(state => state.user.isAuthenticated)
-  console.log('Navigation : '  + JSON.stringify(isAuthenticated));
+  console.log("LEK => " + JSON.stringify(useSelector(state => state)));
+  const isGuest = useSelector(state => state.user.isGuest)
+  const isAuthenticated = useSelector(state => state.user.isAuthenticated);
+  console.log('Navigation, Is Guest : '  + JSON.stringify(isGuest));
   return (
     <NavigationContainer>
-        {/* <Stack.Navigator headerMode="none" initialRouteName={ isAuthenticated === true ? 'Home' : 'HomeGuest'}> */}
-        <Stack.Navigator headerMode="none" initialRouteName={ isAuthenticated === true ? 'HomeGuest' : 'HomeGuest'}>   
+        {/* <Stack.Navigator headerMode="none" initialRouteName={ isGuest === true ? 'Home' : 'HomeGuest'}> */}
+        <Stack.Navigator headerMode="none" initialRouteName={ isAuthenticated === true && isGuest === false ? 'Home' : 'HomeGuest'}>   
             <Stack.Screen name="HomeGuest" component={HomeGuest} /> 
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen 

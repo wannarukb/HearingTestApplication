@@ -225,7 +225,7 @@ public class HearingActivityResult extends ReactActivity {
                         new FileOutputStream(filePath),"UTF-8"));
                 writer.write(data);
 
-                if (writer != null) writer.close( );
+                if (writer != null) writer.close();
 
                 System.out.println(data);
 

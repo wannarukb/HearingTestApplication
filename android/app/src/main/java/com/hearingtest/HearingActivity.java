@@ -96,7 +96,8 @@ public class HearingActivity extends ReactActivity {
     public Integer  result_pass_validation_time;
     public Map<String, Object> transalationMap;
 
-    public TextView playToneHeader, playToneDescription;
+    public TextView playToneHeader, playToneDescription, suggestionLine1, suggestionLine2, warningLabel, warningText;
+    public LinearLayout suggestionLayout, warningLayout;
     public String translationMenu;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -119,6 +120,13 @@ public class HearingActivity extends ReactActivity {
         startButton         = (Button) findViewById(R.id.start);
         cancelButton        = (Button) findViewById(R.id.cancel);
 
+        suggestionLayout    = (LinearLayout) findViewById(R.id.suggestionLayout);
+        warningLayout       = (LinearLayout) findViewById(R.id.warninglayout);
+        suggestionLine1     = (TextView) findViewById(R.id.suggestionLine1);
+        suggestionLine2     = (TextView) findViewById(R.id.suggestionLine2);
+        warningLabel        = (TextView) findViewById(R.id.warningLabel);
+        warningText         = (TextView) findViewById(R.id.warningText);
+
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
             Gson gson = new Gson();
@@ -136,10 +144,16 @@ public class HearingActivity extends ReactActivity {
                 System.out.println(testToneJSON);
                 parseTone    = gson.fromJson(testToneJSON, TestTone[].class);
 
-                playToneHeader.setText((String) transalationMap.get("TonePlaySuggestionHeaderLabel"));
-                playToneDescription.setText((String) transalationMap.get("TonePlaySuggestionDescription"));
+                playToneHeader.setText((String) transalationMap.get("StartHeaderLabel"));
+                playToneDescription.setVisibility(View.INVISIBLE);
+                playToneDescription.setText((String) transalationMap.get("TonePlayDescription"));
                 startButton.setText((String) transalationMap.get("StartPlayToneButton"));
                 cancelButton.setText((String) transalationMap.get("CancelButton"));
+
+                suggestionLine1.setText((String) transalationMap.get("SuggestionLine1"));
+                suggestionLine2.setText((String) transalationMap.get("SuggestionLine2"));
+                warningLabel.setText((String) transalationMap.get("WarningLabel"));
+                warningText.setText((String) transalationMap.get("WarningDescription"));
 
 
                 if(parseTone != null && parseTone.length > 0){
@@ -205,10 +219,11 @@ public class HearingActivity extends ReactActivity {
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onClickStart(View view) {
 
-
+        suggestionLayout.setVisibility(View.GONE);
+        warningLayout.setVisibility(View.GONE);
         startButton.setText((String) transalationMap.get("HearToneButton"));
         playToneHeader.setText((String) transalationMap.get("TonePlayHeaderLabel"));
-        playToneDescription.setText((String) transalationMap.get("TonePlayDescription"));
+        playToneDescription.setVisibility(View.VISIBLE);
         noOfClick += 1;
         System.out.println(" no of click = " + noOfClick);
 
@@ -224,6 +239,7 @@ public class HearingActivity extends ReactActivity {
                 startPlayToneFromStart = System.currentTimeMillis();
                 startPlayToneByTonePlayed = System.currentTimeMillis();
                 userHearingTest = new TestResultHeader( protocolId, userId);
+                cancelButton.setVisibility(View.INVISIBLE);
                 play();
             }catch (InterruptedException e) {
                 e.printStackTrace();
@@ -315,6 +331,7 @@ public class HearingActivity extends ReactActivity {
                     generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.amplitude, currentRunTone.testSide);
                     synchronized (this) {
                         try {
+                            testToneImage.setImageResource(R.drawable.tone_none);
                             Thread.sleep(currentRunTone.intervalSleep);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -448,7 +465,10 @@ public class HearingActivity extends ReactActivity {
         }
 
         // double amp =( Math.pow(10, volDB/20.0));
-        double amp = amplitude;
+        double amp = 0;
+        if(amplitude >= 0){
+            amp = amplitude;
+        }
 //        double max_amp = Math.pow(10, 100/20.0);
 //        double rmsdB = 20.0 * Math.log10(amp);
 //        double maxVolDB =  20.0 * Math.log10(max_amp);

@@ -30,22 +30,20 @@ let testtone_get = (userId, deviceModel) =>{
 
 /* 
 * GET : Get test tone header by user Id
-* URL : https://www3.ict.mahidol.ac.th/test/hearing/api/api/v1.1/UserHearingTests/{UserID}
+* URL : https://www3.ict.mahidol.ac.th/test/hearing/api/api/v1.2/UserHearingTests/{UserID}
 */
 let testtone_header_get = (userToken, userId) => {
      let token = 'Bearer ' + userToken;
      api.setHeader('Authorization', token);
-     const response = api.get('/v1.1/UserHearingTests/' + userId);
-     console.log(api);
-     console.log(response);
+     const response = api.get('/v1.2/UserHearingTests/' + userId);
      return response;
 }
 
 /* 
 * POST : Post test tone result
-* URL : https://www3.ict.mahidol.ac.th/test/hearing/api/api/v1.1/UserHearingTests/
+* URL : https://www3.ict.mahidol.ac.th/test/hearing/api/api/v1.2/UserHearingTests/
 */
-let testtone_result_post = (body) => api.post('/v1.1/UserHearingTests/', body).then(response => response);
+let testtone_result_post = (body) => api.post('/v1.2/UserHearingTests/', body).then(response => response);
 
 export {
      login_post,

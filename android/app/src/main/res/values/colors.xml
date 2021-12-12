@@ -15,4 +15,7 @@
     <color name="text_inverse" >#FFFFFF</color>
     <color name="background_white" >#FFFFFF</color>
     <color name="backround_default" >#F3F7FB</color>
+    <color name="light_secondary">#F1F2F3</color>
+    <color name="suggestion">#F8D7DA</color>
+    <color name="suggestion_text">#813139</color>
 </resources>

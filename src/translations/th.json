@@ -65,14 +65,17 @@
 
     "ErrorNoTestData" : "ขออภัยค่ะ ไม่พบข้อมูลชุดทดสอบสำหรับคุณในขณะนี้ กรุณาลองใหม่ภายหลัง",
 
-    
-    "TonePlaySuggestionHeaderLabel": "กรุณาสวมหูฟังเพื่อผลทดสอบที่แม่นยำ",
-    "TonePlaySuggestionDescription": "เริ่มทำการทดสอบการได้",
-
+    "StartHeaderLabel" : "เพื่อผลทดสอบที่แม่นยำ",
+    "SuggestionLine1" : "กรุณาสวมหูฟังระหว่างการทดสอบ",
+    "SuggestionLine2" : "อยู่ในห้องที่ปราศจากเสียงรบกวน",
+    "WarningLabel"  : "คำเตือน :",
+    "WarningDescription" : "การทดสอบมีการเล่นเสียงเพื่อทดสอบการได้ยินของหูแต่ละข้าง กรุณาตรวจสอบและใส่หูฟังให้ถูกข้าง",
     "StartPlayToneButton": "เริ่มทดสอบ",
+
     "TonePlayHeaderLabel": "กำลังอยู่ในกระบวนการทดสอบ",
     "TonePlayDescription": "กรุณากดปุ่ม เมื่อได้ยินเสียง",
     "HearToneButton": "ฉันได้ยิน",
+    
     "ToneResultIntro": "เสร็จสิ้น การทดสอบการได้ยิน",
     "ToneResultLabel": "ผลของคุณคือ",
     "ToneResultInfo_Good": "การได้ยินปกติ",

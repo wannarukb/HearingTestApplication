@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
-import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView, View , KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, Dimensions, ImageBackground, Image, ScrollView, View ,ActivityIndicator, KeyboardAvoidingView } from 'react-native';
 import { Block, Icon, Text, theme } from "galio-framework";
 import themeColor from "../constants/Theme";
 import Images from "../constants/Images";
@@ -14,11 +14,15 @@ import {connect} from 'react-redux';
 import {LanguageService} from "../services/LanguageService";
 import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
+import mainStyle  from "../constants/mainStyle";
+
 
 const translate = memoize(
     (key, config) => i18n.t(key, config),
     (key, config) => (config ? key + JSON.stringify(config) : key)
 )
+
+const styles = mainStyle.styles;
 
 const { height, width } = Dimensions.get("screen");
 
@@ -26,17 +30,15 @@ class HearingTestResult extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            // testResults : [],
-            // HeadTable: ['Frequency', 'DB (HL)', 'Side', 'Is Heard'],
-            // DataTable: [],
-            hearingTestHeader : []
-
+            hearingTestHeader : [],
+            loading: false
         };
 
         console.log('----- HearingTestResult -----');
         console.log(JSON.stringify(this.props));
 
-        this.getDeviceInfo();
+        var lang = this.props.deviceInfo.language;
+        this.setDeviceLanguage(lang);
 
         this.getToken().then( response =>{
             if(!this.props.network.isConnected){
@@ -45,44 +47,23 @@ class HearingTestResult extends Component {
             }else{
                 console.log('Internet Connected');
                 console.log("User = ");
-                console.log(this.state.userInfo.id);
+                console.log(this.state.userInfo);
+                console.log(this.state.userInfo);
                 let userToken = this.state.userInfo.token;
                 let userId    = this.state.userInfo.id;
                 this.loadToneHeaderList(userToken, userId);
+                // this.getTestResult();
             }
         })
+       
         
     }
-
+    
     setDeviceLanguage(lang){
         console.log("SET DEVICE Language = " + lang);
         translate.cache.clear();
         LanguageService.getInstance().changeLanguage(lang);
         
-    }
-    
-    
-    getDeviceInfo = async() =>{
-        var defaultLanguage = 'en';
-        try {
-            let data = await AsyncStorage.getItem("DeviceInfo");
-            
-            if(data){
-                let deviceData = JSON.parse(data);
-                console.log('device data = ', deviceData);
-                this.setState({
-                    DeviceInfo : deviceData
-                });
-                
-                console.log(deviceData);
-                defaultLanguage = (deviceData.language != undefined) ? deviceData.language : 'en';
-            }
-            this.setDeviceLanguage(defaultLanguage);
-        } catch (error) {
-            
-            console.log("Something went getDeviceInfo = ", error);
-            this.setDeviceLanguage(defaultLanguage);
-        }
     }
 
     async getToken() {
@@ -117,6 +98,7 @@ class HearingTestResult extends Component {
             TestToneService.get_test_tone_header_api(userToken, userId)
             .then(responseJson => {
                 console.log('get_test_tone_header_api Response JSON = ', responseJson.status);
+                console.log(JSON.stringify(responseJson));
                 if (responseJson.ok) {
                     if (responseJson.data != null) {
                         var data = responseJson.data;
@@ -124,6 +106,7 @@ class HearingTestResult extends Component {
                         this.showHearingTest(data);
                         this.props.loadTestToneResultHeader(data);
                         this.storeTestToneResultHeader(data);
+                        this.forceUpdate();
                     } else {
                         alert('server error no data')
                     }
@@ -173,26 +156,28 @@ class HearingTestResult extends Component {
 
     renderHearingList(){
         console.log('renderHearingList');
-        // console.log(this.state.hearingTestHeader);
+        console.log(this.state.hearingTestHeader);
         return this.state.hearingTestHeader.map((item) => {
             // console.log(item);
             var dateString = item.startDateTime;
             var dateObj = new Date(dateString);
             var momentObj = moment(dateObj);
             var momentString = momentObj.format('DD/MM/YYYY');
+            var resultSum = item.resultSum;
+            var isGood    = resultSum.includes("Good");
             return (
-                <Block key={item.hearingTestId} style={styles.resultBlock}>
+                <Block key={item.hearingTestId} style={customStyles.resultBlock}>
                     <Block style={styles.row}>
-                        <Block style={styles.resultImageBox} >
-                        {(item.resultSum == 'Good') ? <Image source={Images.HearingResult_Good} style={styles.resultImage} />: <Image source={Images.HearingResult_Bad} style={styles.resultImage} /> }
+                        <Block style={customStyles.resultImageBox} >
+                        {(isGood===true) ? <Image source={Images.HearingResult_Good} style={customStyles.resultImage} />: <Image source={Images.HearingResult_Bad} style={customStyles.resultImage} /> }
                             
                         </Block>
-                        <Block style={styles.resultDescBox} >
-                            <Text  style={styles.descText} >
+                        <Block style={customStyles.resultDescBox} >
+                            <Text  style={customStyles.descText} >
                                 {momentString}
                             </Text>
-                            <Text  style={styles.resultText} >
-                                {(item.resultSum == 'Good') ? translate('ToneResultInfo_Good') : translate('ToneResultInfo_Bad') }
+                            <Text  style={customStyles.resultText} >
+                                {(isGood===true) ? translate('ToneResultInfo_Good') : translate('ToneResultInfo_Bad') }
                             </Text>
                         </Block>
                     </Block>
@@ -203,33 +188,39 @@ class HearingTestResult extends Component {
 
     render() {
         const { navigation } = this.props;
+        const {loading}=this.state;
         return (
             <Block flex style={styles.container}>
                 <Block flex>
                     <ImageBackground
-                        source={Images.lightBG}
-                        style={{ height, width, zIndex: 1 }}
+                        // source={Images.lightBG}
+                        style={{ height, width, zIndex: 1 , backgroundColor: themeColor.COLORS.WHITE}}
                     >
-                        <Block  style={styles.navbar}>
+                        {loading && <Block  style={styles.loadingBox}><ActivityIndicator size="large"  color={themeColor.COLORS.PRIMARY_BTN_SUCCESS} /></Block>}
+        
+                        <Block  style={customStyles.navbar}>
                             <Block style={styles.row}>
                                 <Block style={{width: '25%',marginHorizontal: 2, paddingLeft: 10, justifyContent: 'center'}}>
-                                    <Text style={styles.backText}  onPress={() => navigation.navigate("Home")}>
+                                    <Text style={customStyles.backText}  onPress={() => navigation.navigate("Home")}>
                                         {translate('BackButton')}
                                     </Text>
                                 </Block>
                                 <Block style={{width: '50%',marginHorizontal: 2, justifyContent: 'center'}}>
-                                    <Text  style={styles.navbarText} >
+                                    <Text  style={customStyles.navbarText} >
                                         {translate('TestResultInfoLabel')}
                                     </Text>
                                 </Block>
                                 <Block style={{width: '25%',marginHorizontal: 2}}></Block>
                             </Block>
                         </Block>
-                        <ScrollView 
-                                style={styles.dataWrapper}
+                        <View style={styles.viewSection}>
+                            <ScrollView
+                                showsVerticalScrollIndicator={false}
+                                style={customStyles.dataWrapper}
                             >
                                 {this.renderHearingList()}
-                        </ScrollView>
+                            </ScrollView>
+                        </View>
                 
                     </ImageBackground>
                 </Block>
@@ -239,7 +230,7 @@ class HearingTestResult extends Component {
     }
 }
 
-const styles = StyleSheet.create({
+const customStyles = StyleSheet.create({
     dataWrapper :{
         width : width,
         marginTop: '0%' ,
@@ -263,14 +254,8 @@ const styles = StyleSheet.create({
         shadowRadius: 2.62,
         elevation: 8,
     },
-    row: {
-        flex: 1, 
-        flexDirection: 'row',
-        flexWrap: "wrap",
-    },
-    
     resultImageBox : {
-        width: '24%',
+        width: '23%',
         paddingHorizontal: 5,
         paddingVertical: 12,
         alignItems: 'center',
@@ -286,24 +271,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flex: 1
     },
-    head: { 
-        height: 50, 
-        backgroundColor: themeColor.COLORS.BTN_SECONDARY
-    },
-    headText:{
-        fontSize: 14,
-        fontFamily: 'Sarabun-Bold',
-        textAlign: "center",
-        color: themeColor.COLORS.WHITE,
-    },
-    text: { 
-        textAlign: 'center', 
-        fontWeight: '200' 
-    },
-    tableRow : {
-        height: 40, 
-        backgroundColor: '#F7F8FA' 
-    },
+        
     resultText: {
         fontSize: 18,
         fontFamily: 'Sarabun-SemiBold',
@@ -333,39 +301,10 @@ const styles = StyleSheet.create({
     backText : {
         fontSize: 14,
         fontFamily: 'Sarabun-Regular',
-        color: themeColor.COLORS.BTN_SECONDARY,
+        color: themeColor.COLORS.PRIMARY_BTN_SUCCESS,
         textAlign: "left"
     },
 
-    alertBox : {
-        backgroundColor: themeColor.COLORS.ALERT,
-        borderRadius: 4,
-        borderWidth: 1,
-        borderColor: themeColor.COLORS.ALERT_BORDER,
-        padding: 10,
-        marginHorizontal: 20,
-        width: '90%',
-    },
-    alertTextHead : {
-        fontSize: 16,
-        fontFamily: 'Sarabun-Medium',
-        color: themeColor.COLORS.ALERT_TEXT,
-        textAlign: "center"
-    },
-    alertText : {
-        fontSize: 14,
-        fontFamily: 'Sarabun-Regular',
-        color: themeColor.COLORS.ALERT_TEXT,
-        textAlign: "center"
-    },
-
-    homeContainer: {
-        position: "relative",
-        padding: 10,
-        marginHorizontal: 5,
-        marginTop: 25,
-        zIndex: 2
-    },
     navbar:{
         paddingTop: 10,
         backgroundColor: themeColor.COLORS.WHITE,
@@ -382,94 +321,6 @@ const styles = StyleSheet.create({
         color: themeColor.COLORS.PRIMARY,
         textAlign: 'center'
     },
-    contentContainer : {
-        flex: 1,
-        paddingVertical: 20,
-        justifyContent: "space-around",
-        alignItems: "center",
-    },
-   
-    container: {
-        // marginTop: Platform.OS === "android" ? -HeaderHeight : 0,
-        // marginBottom: -HeaderHeight * 2,
-        flex: 1
-    },
-    createButton:{
-        marginVertical: 20,
-        borderRadius: 20,
-        backgroundColor: themeColor.COLORS.BTN_SECONDARY
-    },
-    createButtonText:{
-        fontSize: 16,
-        fontFamily: 'Sarabun-Medium',
-        color: themeColor.COLORS.WHITE
-    },
-    avatar: {
-        width: 60,
-        height: 60,
-        alignItems: 'flex-end'
-    },
-    
-    menuSet:{
-        marginTop: 10,
-        paddingVertical: 10,
-        position: "relative",
-        width: "100%",
-    },
-    menuButtonRegister:{
-        width: '100%', 
-        alignItems:'center', 
-        justifyContent: 'center',
-        marginVertical: 20,
-        borderRadius: 20,
-        backgroundColor: themeColor.COLORS.BTN_REGISTER
-    },
-    menuButtonTry:{
-        width: '100%', 
-        alignItems:'center', 
-        justifyContent: 'center',
-        marginVertical: 20,
-        borderRadius: 20,
-        backgroundColor: themeColor.COLORS.BTN_SECONDARY
-    },
-    menuText:{
-        fontSize: 14,
-        fontFamily: 'Sarabun-Medium'
-    },
-
-    button: {
-        width: width - theme.SIZES.BASE * 4,
-        height: theme.SIZES.BASE * 3,
-        shadowRadius: 0,
-        shadowOpacity: 0
-    },
-    earImg: {
-        width: 66,
-        height: 76.09
-    },
-    logo: {
-        width: '100%',
-        height: 80,
-        backgroundColor: '#ff0000',
-        position: 'relative',
-        marginTop: '0%',
-        marginHorizontal : 'auto'
-    },
-    titleBlock:{
-        marginTop:'5%'
-    },
-    title: {
-        fontFamily:'SarabunSemiBold',
-        fontSize: 20
-    },
-    subTitle: {
-        fontFamily:'Sarabun-Medium',
-        fontSize: 14,
-    },
-    formLabel:{
-        fontFamily:'Sarabun-Medium',
-        fontSize: 14,
-    }
 });
 
 

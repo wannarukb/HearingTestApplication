@@ -7,7 +7,6 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
         height: '75%',
-       
     },
     homeContainer: {
         position: "relative",
