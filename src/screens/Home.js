@@ -226,14 +226,15 @@ onClickLogOut = ()=> {
     console.log("LOGOUT");
     try{
         this.props.logout();
+        this.props.removeTone();
+       
         this.resetToken();
         var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
         var data = {};
         AsyncStorage.setItem("TestResults", JSON.stringify(data));
-        // write the file
-        RNFS.writeFile(path, '{}', 'utf8')
-        .then((Writesuccess) => {
-            console.log('FILE WRITTEN!');
+
+        RNFS.unlink(path).then(() => {
+            console.log('FILE DELETED');
             this.closeModal();
             this.props.navigation.dispatch(
                 CommonActions.reset({
@@ -243,12 +244,11 @@ onClickLogOut = ()=> {
                 ],
                 })
             );
-        })
-        .catch((error) => {
-            console.error(error);
-            alertMessage = JSON.stringify(error);
-            this.showAlert(alertTitle, alertMessage);
+        }).catch((err) => {
+            // `unlink` will throw an error, if the item to unlink does not exist
+            console.log(err.message);
         });
+        
     }catch (error) {
         console.error(error);
         alertMessage = JSON.stringify(error);
@@ -510,10 +510,12 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     const {actions} = require('../redux/UserRedux');
     const {deviceInfoActions} = require('../redux/DeviceRedux');
+    const {testToneActions} = require('../redux/TestToneRedux');
 
     return {
         logout: () => dispatch(actions.logout()),
-        setupDeviceInfo: deviceInfo => dispatch(deviceInfoActions.setupDeviceInfo(deviceInfo))
+        setupDeviceInfo: deviceInfo => dispatch(deviceInfoActions.setupDeviceInfo(deviceInfo)),
+        removeTone: () => dispatch(testToneActions.logout()),
     };
 };
 

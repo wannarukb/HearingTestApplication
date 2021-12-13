@@ -1,6 +1,7 @@
 const types = {
     TESTTONERESULTLIST: 'TESTTONERESULT_LIST',
-    TESTTONERESULT_HEADER_LIST : 'TESTTONERESULT_HEADER_LIST'
+    TESTTONERESULT_HEADER_LIST : 'TESTTONERESULT_HEADER_LIST',
+    LOGOUT: 'LOGOUT',
 };
   
 export const testToneActions = {
@@ -10,6 +11,9 @@ export const testToneActions = {
 
     loadTestToneResult: testToneResultHeader => {
         return {type: types.TESTTONERESULTLIST, testToneResultHeader};
+    },
+    logout() {
+        return {type: types.LOGOUT};
     },
 };
   
@@ -31,6 +35,9 @@ export const reducer = (state = initialState, action) => {
                 ...state,
                 testToneResultHeader
             });
+        case types.LOGOUT:
+            console.log(initialState);
+            return Object.assign({}, initialState);
         default:
             return state;
     }

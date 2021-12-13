@@ -35,6 +35,7 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 //import android.widget.TextView;
 
 import com.facebook.react.ReactActivity;
@@ -184,6 +185,7 @@ public class HearingActivity extends ReactActivity {
                             parseToneArray.add(newTestTone);
                             tonesize++;
                         }
+
                         testToneList.add(tempTone);
 
                     };
@@ -198,6 +200,7 @@ public class HearingActivity extends ReactActivity {
 
                 mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
                 devices      = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
+
                 result_pass_validation_time = 0;
             }
             catch (JsonGenerationException e) {
@@ -231,7 +234,6 @@ public class HearingActivity extends ReactActivity {
             System.out.println("++++++++++++ Start ++++++++++++ ");
             try {
 
-
                 play();
                 m_PlayThread.interrupt();
                 m_PlayThread.join();
@@ -239,7 +241,7 @@ public class HearingActivity extends ReactActivity {
                 startPlayToneFromStart = System.currentTimeMillis();
                 startPlayToneByTonePlayed = System.currentTimeMillis();
                 userHearingTest = new TestResultHeader( protocolId, userId);
-                cancelButton.setVisibility(View.INVISIBLE);
+                cancelButton.setVisibility(View.GONE);
                 play();
             }catch (InterruptedException e) {
                 e.printStackTrace();
@@ -331,7 +333,6 @@ public class HearingActivity extends ReactActivity {
                     generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.amplitude, currentRunTone.testSide);
                     synchronized (this) {
                         try {
-                            testToneImage.setImageResource(R.drawable.tone_none);
                             Thread.sleep(currentRunTone.intervalSleep);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -415,7 +416,7 @@ public class HearingActivity extends ReactActivity {
     public void generateTone(int frequency, double durationSec, double amplitude, String earSide){
 
 //        System.out.println("GET TONE");
-        System.out.println(" --> F = " + frequency + " amplitude : " + amplitude);
+        System.out.println(" --> F = " + frequency + " amplitude : " + amplitude + " durationSec : " + durationSec +  " earSide : " + earSide);
 
         // int mBufferSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
@@ -452,32 +453,30 @@ public class HearingActivity extends ReactActivity {
                 .setBufferSizeInBytes(mBuffer.length)
                 .setTransferMode(AudioTrack.MODE_STREAM)
                 .build();
-        //mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length, AudioTrack.MODE_STATIC);
 
-        if (devices  != null){
-            for (AudioDeviceInfo device : devices)
-                if (device.getType() == AudioDeviceInfo.TYPE_WIRED_HEADSET || device.getType() == AudioDeviceInfo.TYPE_WIRED_HEADPHONES ||
+        if (devices  != null) {
+            for (AudioDeviceInfo device : devices){
+                System.out.println("Device = " + device.getType());
+                mAudioTrack.setPreferredDevice(device);
+                if ( device.getType() == AudioDeviceInfo.TYPE_USB_HEADSET || device.getType() == AudioDeviceInfo.TYPE_WIRED_HEADSET || device.getType() == AudioDeviceInfo.TYPE_WIRED_HEADPHONES ||
                         device.getType() == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP || device.getType() == AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {
-                    mAudioTrack.setPreferredDevice(device);
-//                    mAudioManager.setWiredHeadsetOn(true);
-                    mAudioManager.setSpeakerphoneOn(false);
+                    if(mAudioManager.isSpeakerphoneOn()){
+                        mAudioManager.setSpeakerphoneOn(false);
+                    }
+
+                }else{
+                    if(!mAudioManager.isSpeakerphoneOn()){
+                        mAudioManager.setSpeakerphoneOn(true);
+                    }
                 }
+            }
         }
 
-        // double amp =( Math.pow(10, volDB/20.0));
         double amp = 0;
         if(amplitude >= 0){
             amp = amplitude;
         }
-//        double max_amp = Math.pow(10, 100/20.0);
-//        double rmsdB = 20.0 * Math.log10(amp);
-//        double maxVolDB =  20.0 * Math.log10(max_amp);
-//        float volumePercentage = (float) (rmsdB/maxVolDB);
-//        System.out.println(" amp = " + amp);
-//        System.out.println(" max_amp = " + max_amp);
-//        System.out.println(" volumePercentage = " + volumePercentage);
         float volumePercentage = (float) (amp);
-      //  volumeTextView.setText(""+volumePercentage);
 
         if(earSide == "L"){
             mAudioTrack.setStereoVolume(volumePercentage, 0.0f);
@@ -489,7 +488,6 @@ public class HearingActivity extends ReactActivity {
 
         mAudioTrack.write(mBuffer, 0, mBuffer.length);
         mAudioTrack.play();
-
     }
 
     @Override
@@ -497,6 +495,10 @@ public class HearingActivity extends ReactActivity {
 
         System.out.println("Android - HearingActivity Back Pressed");
         stop();
+
+        Intent intent = new Intent(this, ReactResultActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -504,6 +506,10 @@ public class HearingActivity extends ReactActivity {
         super.onStop();
         System.out.println("Android - HearingActivity - Stop");
         stop();
+
+        Intent intent = new Intent(this, ReactResultActivity.class);
+        startActivity(intent);
+        finish();
     }
 
 

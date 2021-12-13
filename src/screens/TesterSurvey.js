@@ -77,7 +77,7 @@ class TesterSurvey extends Component {
         var alertMessage = '';
         try {
 
-            var testToneResult = await TestToneService.test_tone_api(userID, brandModel);
+            var testToneResult = await TestToneService.test_tone_api(8, brandModel);
             console.log(testToneResult);
             this.setState({loading:false});
             if(testToneResult){

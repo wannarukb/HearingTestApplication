@@ -35,7 +35,8 @@ class HomeGuest extends React.Component {
         super(props);
 
         this.state = {
-            openModal: false 
+            openModal: false,
+            loading: false
         };
         console.log("----- Home Guest -----");
         console.log(JSON.stringify(this.props));
@@ -217,7 +218,7 @@ class HomeGuest extends React.Component {
         
         } catch (error) {
             console.error(error);
-            this.setState({ loading: false, });
+            this.setState({ loading: false });
             alertMessage = 'Login as Guest : ' +  JSON.stringify(error);
             this.showAlert(alertTitle, alertMessage);
         }
