@@ -85,5 +85,6 @@
     "GoBackToHomePageButton": "Back to Main Menu",
     "ToneAllResultHeaderLabel": "Hearing Test Result",
     "TestDateLabel": "Date of testing",
-    "TestResultInfoLabel": "Result"
+    "TestResultInfoLabel": "Result",
+    "GuestRefCodeLabel" : "Latest Hearing Test Result (Ref. Code)"
 }

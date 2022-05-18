@@ -6,6 +6,7 @@ import {reducer as TestToneRedux} from './TestToneRedux';
 import {reducer as TestToneResultRedux} from './TestToneResultRedux';
 import {reducer as DeviceRedux} from './DeviceRedux';
 import {reducer as network} from 'react-native-offline';
+import {reducer as GuestTestResult} from './GuestResultRedux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const persistConfig = {
@@ -19,5 +20,6 @@ export default persistCombineReducers(persistConfig, {
     network: network,
     testToneList : TestToneRedux,
     testToneResultTemp: TestToneResultRedux,
-    deviceInfo : DeviceRedux
+    deviceInfo : DeviceRedux,
+    guestTestResult : GuestTestResult
 });

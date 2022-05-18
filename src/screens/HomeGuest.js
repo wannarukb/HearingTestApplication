@@ -8,6 +8,7 @@ import Modal from "react-native-simple-modal";
 
 import AuthService from '../services/AuthService';
 import TestToneService from '../services/TestToneService';
+import UtilityService from '../services/UtilityService';
 
 const { height, width } = Dimensions.get("screen");
 import themeColor from "../constants/Theme";
@@ -63,7 +64,28 @@ class HomeGuest extends React.Component {
                 if (postToneResult.ok) {
                     if (postToneResult.data != null) {
                         var data = postToneResult.data;
+
+
                         console.log("post_testTone_result_api Success ! " + JSON.stringify(data));
+                        //store result
+
+                        let hearingCode = data.hearingTestId;
+                        let hearingShowCode =  UtilityService.leftPad(hearingCode, 8, '0');
+                        console.log("Hearing Code = " + hearingShowCode);
+                        var guestResultInfo =  {
+                            hearingTestId : hearingShowCode,
+                            userId        : data.userId,
+                            startDate     : data.startDateTime,
+                            resultSum     : data.resultSum,
+                            isSync        : true
+                        }
+                        console.log("store result");
+                        console.log(guestResultInfo);
+
+                        this.props.setTestToneGuest(guestResultInfo);
+
+
+                        
                         var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
                         RNFS.unlink(path).then(() => {
                             console.log('FILE DELETED');
@@ -97,6 +119,7 @@ class HomeGuest extends React.Component {
     readResultJSONFile = async() =>{
     
         this.setState({ loading: true});
+        
         var alertTitle = translate('AlertTitleError');
         var alertMessage = '';
         try {
@@ -113,6 +136,7 @@ class HomeGuest extends React.Component {
                     if(isSyncData === false){
                         await AsyncStorage.setItem("TestResults", JSON.stringify(data));
                         this.postTestToneResult(data);
+                    }else{
                     }
                 }
             }
@@ -375,8 +399,6 @@ class HomeGuest extends React.Component {
         );
     }
 
-    
-
     render() {
         const {loading}=this.state;
         return (
@@ -406,21 +428,51 @@ class HomeGuest extends React.Component {
                                                 </Block>
                                             </Block>
                                             
-                                            <Block  style={styles.row}>
-                                                <Block style={{width: '100%', alignItems: 'center',}}>
-                                                    <Text style={styles.subTitle}>
-                                                        {translate('AppConcept')}
-                                                    </Text>
-                                                </Block>
-                                            </Block>
+                                            {
+                                                (this.props.guestResultInfo && this.props.guestResultInfo.isSync == true) ? 
+                                                (
+                                                    <Block  style={styles.row}>
+                                                        <Block style={{width: '100%', alignItems: 'center',}}>
+                                                            <Block style={styles.row}>
+                                                                <Block style={{width: '100%' }}>
+                                                                    <Text style={styles.subTitleDesc}>
+                                                                        {translate('GuestRefCodeLabel')}
+                                                                    </Text>
+                                                                </Block>
+                                                            </Block>
 
-                                            <Block style={styles.row}>
-                                                <Block style={{width: '100%'}}>
-                                                    <Text style={styles.subTitleDesc}>
-                                                        {translate('AppConceptSubDesc')}
-                                                    </Text>
-                                                </Block>
-                                            </Block>
+                                                            <Block  style={styles.row}>
+                                                                <Block style={{width: '100%', alignItems: 'center',}}>
+                                                                    <Text style={customStyles.refCode}>
+                                                                        {this.props.guestResultInfo.hearingTestId}
+                                                                    </Text>
+                                                                </Block>
+                                                            </Block>
+                                                        </Block>
+                                                    </Block>
+                                                ) :
+                                                (
+                                                    <Block  style={styles.row}>
+                                                        <Block style={{width: '100%', alignItems: 'center',}}>
+                                                            <Block  style={styles.row}>
+                                                                <Block style={{width: '100%', alignItems: 'center',}}>
+                                                                    <Text style={styles.subTitle}>
+                                                                        {translate('AppConcept')}
+                                                                    </Text>
+                                                                </Block>
+                                                            </Block>
+                                                            <Block style={styles.row}>
+                                                                <Block style={{width: '100%'}}>
+                                                                    <Text style={styles.subTitleDesc}>
+                                                                        {translate('AppConceptSubDesc')}
+                                                                    </Text>
+                                                                </Block>
+                                                            </Block>
+                                                        </Block>
+                                                    </Block>
+                                                )
+                                            }
+                                            
                                             
                                         </Block>
                                     </Block>
@@ -500,6 +552,13 @@ const customStyles = StyleSheet.create({
         height: '70%',
        
     },
+
+    refCode: {
+        fontFamily:'Sarabun-SemiBold',
+        fontSize: 24,
+        color: themeColor.COLORS.PRIMARY,
+        textAlign : 'center'
+    },
 });
 
 
@@ -514,6 +573,7 @@ const mapStateToProps = state => {
         userInfo : state.user,
         ...state.deviceInfo,
         ...state.testToneList,
+        ...state.guestTestResult
     };
 };
 
@@ -521,12 +581,14 @@ const mapDispatchToProps = dispatch => {
     const {actions} = require('../redux/UserRedux');
     const {deviceInfoActions} = require('../redux/DeviceRedux');
     const {testToneActions} = require('../redux/TestToneRedux');
+    const {guestResultActions}   = require('../redux/GuestResultRedux');
 
     return {
         logout: () => dispatch(actions.logout()),
         setupDeviceInfo: deviceInfo => dispatch(deviceInfoActions.setupDeviceInfo(deviceInfo)),
         loginGuest: user => dispatch(actions.loginGuest(user)),
-        loadTestToneList: testToneList => dispatch(testToneActions.loadTestToneList(testToneList))
+        loadTestToneList: testToneList => dispatch(testToneActions.loadTestToneList(testToneList)),
+        setTestToneGuest : guestResultInfo => dispatch(guestResultActions.setTestToneGuest(guestResultInfo))
     };
 };
 

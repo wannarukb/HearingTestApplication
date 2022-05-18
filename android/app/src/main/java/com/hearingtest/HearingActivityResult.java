@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.AudioManager;
+import android.net.http.SslCertificate;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Base64;
@@ -63,6 +64,8 @@ public class HearingActivityResult extends ReactActivity {
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
+
+            System.out.println("---- HearingActivityResult ----");
             Gson gson = new Gson();
 
             String resultJSON = extras.getString("TestResultList");
@@ -99,10 +102,10 @@ public class HearingActivityResult extends ReactActivity {
 
         }
 
-        for(int i=0; i < resultHeader.resultTestTones.size(); i++){
-            TestResultItem eachResult = resultHeader.resultTestTones.get(i);
-            System.out.println(eachResult.frequency + ", " + eachResult.amplitude + ", " + eachResult.testSide + ", " + eachResult.isHeard + ", " + eachResult.timeClicked + ", " + eachResult.clickTimeByTone + ", " + eachResult.clickTimeByTest);
-        }
+//        for(int i=0; i < resultHeader.resultTestTones.size(); i++){
+//            TestResultItem eachResult = resultHeader.resultTestTones.get(i);
+//            System.out.println(eachResult.frequency + ", " + eachResult.amplitude + ", " + eachResult.testSide + ", " + eachResult.isHeard + ", " + eachResult.timeClicked + ", " + eachResult.clickTimeByTone + ", " + eachResult.clickTimeByTest);
+//        }
 
 
 
@@ -238,6 +241,8 @@ public class HearingActivityResult extends ReactActivity {
     }
 
     public void onClickDone(View view) {
+
+        System.out.println("On Click Done");
         System.out.println(resultHeader);
         if( resultHeader != null ){
 

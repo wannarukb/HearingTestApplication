@@ -128,7 +128,7 @@ class TesterSurvey extends Component {
         this.setState({ loading: true, });
         console.log(this.state);
 
-        var userID          = (this.props.userInfo.isGuest) ? this.props.userInfo.user.userId : this.props.userInfo.user.id;
+        var userID          = '8';//(this.props.userInfo.isGuest) ? this.props.userInfo.user.userId : this.props.userInfo.user.id;
         var brandModel      = (this.props.deviceInfo.model) ? this.props.deviceInfo.model : DeviceInfo.getModel();
 
         if(!this.props.network.isConnected){
@@ -157,6 +157,8 @@ class TesterSurvey extends Component {
         }else{
             let testData = this.props.testToneList;
             let parseTestData = [];
+
+            console.log(testData);
             
             try{
                 if(testData != null && testData != undefined){
@@ -198,9 +200,11 @@ class TesterSurvey extends Component {
                     //     JSON.stringify(translateMenu)
                     // );
 
+                    let mockTestData = [{"testToneID":30,"protocolID":3,"orderNo":10,"frequency":6000.0,"dbHL":"55 ","dbSPL":70.5,"amplitude":0.0063,"durationMin":5.0,"durationMax":5.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":31,"protocolID":3,"orderNo":11,"frequency":8000.0,"dbHL":"55 ","dbSPL":68.0,"amplitude":0.031,"durationMin":5.0,"durationMax":5.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""}];
+
                     NativeModules.HearingTestModule.GotoActivity(
                         JSON.stringify(userID),
-                        JSON.stringify(testData),
+                        JSON.stringify(mockTestData),
                         JSON.stringify(translateMenu)
                     );
                 }

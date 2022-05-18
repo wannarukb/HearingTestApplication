@@ -238,15 +238,18 @@ public class HearingActivity extends ReactActivity {
                 m_PlayThread.interrupt();
                 m_PlayThread.join();
                 m_PlayThread = null;
+                m_PlayThread = new Thread();
                 startPlayToneFromStart = System.currentTimeMillis();
                 startPlayToneByTonePlayed = System.currentTimeMillis();
                 userHearingTest = new TestResultHeader( protocolId, userId);
                 cancelButton.setVisibility(View.GONE);
                 play();
+
             }catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }else{
+            System.out.println("++++++++++++ is Hear ++++++++++++ ");
             m_bStop = true;
             if (m_PlayThread != null) {
                 try {
@@ -276,6 +279,7 @@ public class HearingActivity extends ReactActivity {
         startActivity(intent);
         finish();
     }
+
     synchronized void stop() {
         m_bStop = true;
 
@@ -297,8 +301,8 @@ public class HearingActivity extends ReactActivity {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    synchronized void play() {
+     @RequiresApi(api = Build.VERSION_CODES.M)
+     synchronized void play() {
         System.out.println("TONE PLAY");
         playExecuteCount += 1;
 
@@ -392,6 +396,7 @@ public class HearingActivity extends ReactActivity {
     }
 
 
+
     public void finishActivity() throws InterruptedException {
 
         System.out.println("FINISH ACTIVITY");
@@ -408,7 +413,7 @@ public class HearingActivity extends ReactActivity {
         intent.putExtra("UserId", userId);
         intent.putExtra("TranslateMenu", translationMenu);
         startActivity(intent);
-        finish();
+        ///finish();
 
     }
 
@@ -442,7 +447,7 @@ public class HearingActivity extends ReactActivity {
         //that means remove "final AudioTrack" here
         mAudioTrack = new AudioTrack.Builder()
                 .setAudioAttributes(new AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_ALARM)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
                         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                         .build())
                 .setAudioFormat(new AudioFormat.Builder()
@@ -454,9 +459,11 @@ public class HearingActivity extends ReactActivity {
                 .setTransferMode(AudioTrack.MODE_STREAM)
                 .build();
 
+
+        devices = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
         if (devices  != null) {
             for (AudioDeviceInfo device : devices){
-                System.out.println("Device = " + device.getType());
+                System.out.println("Device Type = " + device.getType());
                 mAudioTrack.setPreferredDevice(device);
                 if ( device.getType() == AudioDeviceInfo.TYPE_USB_HEADSET || device.getType() == AudioDeviceInfo.TYPE_WIRED_HEADSET || device.getType() == AudioDeviceInfo.TYPE_WIRED_HEADPHONES ||
                         device.getType() == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP || device.getType() == AudioDeviceInfo.TYPE_BLUETOOTH_SCO) {
@@ -465,7 +472,7 @@ public class HearingActivity extends ReactActivity {
                     }
 
                 }else{
-                    if(!mAudioManager.isSpeakerphoneOn()){
+                    if(mAudioManager.isSpeakerphoneOn() == false){
                         mAudioManager.setSpeakerphoneOn(true);
                     }
                 }
@@ -505,11 +512,11 @@ public class HearingActivity extends ReactActivity {
     protected void onStop() {
         super.onStop();
         System.out.println("Android - HearingActivity - Stop");
-        stop();
+       // stop();
 
-        Intent intent = new Intent(this, ReactResultActivity.class);
-        startActivity(intent);
-        finish();
+       // Intent intent = new Intent(this, ReactResultActivity.class);
+       // startActivity(intent);
+       // finish();
     }
 
 

@@ -85,5 +85,6 @@
     "GoBackToHomePageButton": "กลับหน้าหลัก",
     "ToneAllResultHeaderLabel": "ผลการทดสอบการได้ยิน",
     "TestDateLabel": "วันที่ทดสอบ",
-    "TestResultInfoLabel": "ผลการทดสอบ"
+    "TestResultInfoLabel": "ผลการทดสอบ",
+    "GuestRefCodeLabel" : "เลขที่อ้างอิงผลทดสอบล่าสุด (Ref. Code)"
 }
