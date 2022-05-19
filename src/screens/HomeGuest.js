@@ -339,7 +339,19 @@ class HomeGuest extends React.Component {
                 ],
             })
         );
-    }
+    };
+
+    gotoResultDetail(){
+        console.log('-------------- GO TO RESULT DETAIL --------------')
+        this.props.navigation.dispatch(
+            CommonActions.reset({
+                index: 0,
+                routes: [
+                    { name: 'HearingGuestResult' },
+                ],
+            })
+        );
+    };
 
     //Change Language
 
@@ -443,7 +455,9 @@ class HomeGuest extends React.Component {
 
                                                             <Block  style={styles.row}>
                                                                 <Block style={{width: '100%', alignItems: 'center',}}>
-                                                                    <Text style={customStyles.refCode}>
+                                                                    <Text style={customStyles.refCode}
+                                                                        onPress={() => this.gotoResultDetail()}
+                                                                    >
                                                                         {this.props.guestResultInfo.hearingTestId}
                                                                     </Text>
                                                                 </Block>
@@ -554,9 +568,9 @@ const customStyles = StyleSheet.create({
     },
 
     refCode: {
-        fontFamily:'Sarabun-SemiBold',
+        fontFamily:'Sarabun-Bold',
         fontSize: 24,
-        color: themeColor.COLORS.PRIMARY,
+        color: themeColor.COLORS.PRIMARY_BTN_SUCCESS,
         textAlign : 'center'
     },
 });

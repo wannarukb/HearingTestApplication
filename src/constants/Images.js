@@ -13,6 +13,8 @@ const HearingResult_Bad = require("../assets/imgs/hearingResult_Bad.png");
 
 const GuestHeader = require("../assets/imgs/GuestHeader.png");
 const Suggestion  = require("../assets/imgs/Suggestion.png");
+const BannerResult_Good = require("../assets/imgs/result_normalcase.png");
+const BannerResult_Bad  = require("../assets/imgs/result_badcase.png");
 // internet imgs
 
 
@@ -29,5 +31,7 @@ export default {
   HearingResult_Good,
   HearingResult_Bad,
   GuestHeader,
-  Suggestion
+  Suggestion,
+  BannerResult_Good,
+  BannerResult_Bad
 };

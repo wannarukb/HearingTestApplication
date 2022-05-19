@@ -12,6 +12,7 @@ import HearingTestResult from "../screens/HearingTestResult";
 
 import TesterSurvey from "../screens/TesterSurvey";
 import Consent from "../screens/Consent";
+import HearingGuestResult from '../screens/HearingGuestResult';
 
 
 const Stack = createStackNavigator();
@@ -38,6 +39,7 @@ export default () => {
             <Stack.Screen name="UserSurvey" component={UserSurvey}/>
             <Stack.Screen name="Consent" component={Consent}/>
             <Stack.Screen name="TesterSurvey" component={TesterSurvey}/>
+            <Stack.Screen name="HearingGuestResult" component={HearingGuestResult}/>
             <Stack.Screen 
               name="HearingTestResult" 
               component={HearingTestResult} 
