@@ -121,7 +121,7 @@ public class HearingActivity extends ReactActivity {
         startButton         = (Button) findViewById(R.id.start);
         cancelButton        = (Button) findViewById(R.id.cancel);
 
-        suggestionLayout    = (LinearLayout) findViewById(R.id.suggestionLayout);
+        suggestionLayout    = (LinearLayout) findViewById(R.id.sugg∂estionLayout);
         warningLayout       = (LinearLayout) findViewById(R.id.warninglayout);
         suggestionLine1     = (TextView) findViewById(R.id.suggestionLine1);
         suggestionLine2     = (TextView) findViewById(R.id.suggestionLine2);
@@ -306,6 +306,8 @@ public class HearingActivity extends ReactActivity {
         System.out.println("TONE PLAY");
         playExecuteCount += 1;
 
+
+
         m_PlayThread = new Thread() {
 
 
@@ -314,15 +316,9 @@ public class HearingActivity extends ReactActivity {
                 try {
 
 
-                    if(currentRunTone.testSide == "L"){
-                        testToneImage.setImageResource(R.drawable.tone_left);
-                    }else if(  currentRunTone.testSide == "R"){
-                        testToneImage.setImageResource(R.drawable.tone_left);
-                    }else{
-                        testToneImage.setImageResource(R.drawable.tone_both);
-                    }
-
                     if(playExecuteCount > 1){
+
+
                         if(currentTestResult != null){
                             currentTestResult.setEndResult();
                             testResultList.add(currentTestResult);
@@ -332,54 +328,79 @@ public class HearingActivity extends ReactActivity {
                                 currentRunTone.counter,currentRunTone.roundNo, currentRunTone.frequency, currentRunTone.amplitude,
                                 currentRunTone.testSide, currentRunTone.duration, currentRunTone.interval,
                                 currentRunTone.dbHl, currentRunTone.dbSpl);
-                    }
-                    startPlayToneByTonePlayed = System.currentTimeMillis();
-                    generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.amplitude, currentRunTone.testSide);
-                    synchronized (this) {
-                        try {
-                            Thread.sleep(currentRunTone.intervalSleep);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+
+                        startPlayToneByTonePlayed = System.currentTimeMillis();
+
+
+                        generateTone(currentRunTone.frequency, currentRunTone.duration, currentRunTone.amplitude, currentRunTone.testSide);
+                        synchronized (this) {
+                            try {
+                                Thread.sleep(currentRunTone.intervalSleep);
+
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
 
-                    synchronized (this) {
+                        synchronized (this) {
 
-                        if (runningIndex < testToneList.size()) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    System.out.println(" m_bStop = " + m_bStop);
-                                    if(m_bStop) {
-                                        m_bStop = false;
-                                    }
-                                    System.out.println(" RUN = " + currentRunTone.frequency + ", " + currentRunTone.amplitude + " , " + currentRunTone.testSide + " , " + currentRunTone.duration + ", " + currentRunTone.interval);
+                            if (runningIndex < testToneList.size()) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
 
-                                    runningIndex = runningIndex + 1;
-                                    if(runningIndex < testToneList.size()){
-                                        currentRunTone = testToneList.get(runningIndex);
-                                    }
-
-                                    m_PlayThread = null;
-                                    if(runningIndex < testToneList.size()){
-                                        play();
-                                    }else{
-                                        try {
-                                            if(currentTestResult != null){
-                                                currentTestResult.setEndResult();
-                                                testResultList.add(currentTestResult);
-                                            }
-                                            finishActivity();
-                                        } catch (InterruptedException e) {
-                                            e.printStackTrace();
+                                        System.out.println("currentRunTone.testSide  = " + currentRunTone.testSide );
+                                        if(currentRunTone.testSide.equals("L")){
+                                            testToneImage.setImageResource(R.drawable.tone_left);
+                                        }else if(  currentRunTone.equals("R")){
+                                            testToneImage.setImageResource(R.drawable.tone_right);
+                                        }else{
+                                            testToneImage.setImageResource(R.drawable.tone_both);
                                         }
-                                    }
 
-                                }
-                            });
+                                        System.out.println(" m_bStop = " + m_bStop);
+                                        if(m_bStop) {
+                                            m_bStop = false;
+                                        }
+                                        System.out.println(" RUN = " + currentRunTone.frequency + ", " + currentRunTone.amplitude + " , " + currentRunTone.testSide + " , " + currentRunTone.duration + ", " + currentRunTone.interval);
+
+                                        runningIndex = runningIndex + 1;
+                                        if(runningIndex < testToneList.size()){
+                                            currentRunTone = testToneList.get(runningIndex);
+                                        }
+
+                                        m_PlayThread = null;
+                                        if(runningIndex < testToneList.size()){
+                                            play();
+                                        }else{
+                                            try {
+                                                if(currentTestResult != null){
+                                                    currentTestResult.setEndResult();
+                                                    testResultList.add(currentTestResult);
+                                                }
+                                                finishActivity();
+                                            } catch (InterruptedException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+
+                                    }
+                                });
+
+                            }
 
                         }
 
+                    }
+                    else{
+                        System.out.println("currentRunTone.testSide  = " + currentRunTone.testSide );
+                        if(currentRunTone.testSide.equals("L")){
+                            testToneImage.setImageResource(R.drawable.tone_left);
+                        }else if(  currentRunTone.equals("R")){
+                            testToneImage.setImageResource(R.drawable.tone_right);
+                        }else{
+                            testToneImage.setImageResource(R.drawable.tone_both);
+                        }
                     }
 
 

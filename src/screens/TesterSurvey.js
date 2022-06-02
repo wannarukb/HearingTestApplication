@@ -85,31 +85,42 @@ class TesterSurvey extends Component {
                     if (testToneResult.data != undefined && testToneResult.data != null) {
                         var data = testToneResult.data;
                         console.log('Tester Survey, load test tone data ' + JSON.stringify(data));
-                        if(data.length != 0){
+                        if(data && data.length != 0){
                             this.props.loadTestToneList(data);
+                            let storeTestTone =  await this.storeTestToneList(data);
+                        }else{
+                            data = [{"testToneID":21,"protocolID":3,"orderNo":1,"frequency":125.0,"dbHL":"25 ","dbSPL":70.0,"amplitude":0.32,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":22,"protocolID":3,"orderNo":2,"frequency":250.0,"dbHL":"45 ","dbSPL":70.5,"amplitude":0.1,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":23,"protocolID":3,"orderNo":3,"frequency":500.0,"dbHL":"60 ","dbSPL":71.5,"amplitude":0.7,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""},{"testToneID":24,"protocolID":3,"orderNo":4,"frequency":750.0,"dbHL":"65 ","dbSPL":73.0,"amplitude":0.3,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":25,"protocolID":3,"orderNo":5,"frequency":1000.0,"dbHL":"65 ","dbSPL":72.0,"amplitude":0.48,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":26,"protocolID":3,"orderNo":6,"frequency":1500.0,"dbHL":"65 ","dbSPL":71.5,"amplitude":0.5,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""}];
                             let storeTestTone =  await this.storeTestToneList(data);
                         }
                         this.startHearingTest(data);
                     } else {
                         alertMessage = 'Server error no data return.';
-                        this.showAlert(alertTitle, alertMessage);
+                        //this.showAlert(alertTitle, alertMessage);
+                        let mockTestData = [{"testToneID":21,"protocolID":3,"orderNo":1,"frequency":125.0,"dbHL":"25 ","dbSPL":70.0,"amplitude":0.32,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":22,"protocolID":3,"orderNo":2,"frequency":250.0,"dbHL":"45 ","dbSPL":70.5,"amplitude":0.1,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":23,"protocolID":3,"orderNo":3,"frequency":500.0,"dbHL":"60 ","dbSPL":71.5,"amplitude":0.7,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""},{"testToneID":24,"protocolID":3,"orderNo":4,"frequency":750.0,"dbHL":"65 ","dbSPL":73.0,"amplitude":0.3,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":25,"protocolID":3,"orderNo":5,"frequency":1000.0,"dbHL":"65 ","dbSPL":72.0,"amplitude":0.48,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":26,"protocolID":3,"orderNo":6,"frequency":1500.0,"dbHL":"65 ","dbSPL":71.5,"amplitude":0.5,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""}];
+                        this.startHearingTest(mockTestData);
                     }
                 } else {
                     var problem = testToneResult.problem;
                     var status  = testToneResult.status;
                     alertMessage = 'Server status: ' + status + ' error: ' + problem;
-                    this.showAlert(alertTitle, alertMessage);
+                    // this.showAlert(alertTitle, alertMessage);
+                    let mockTestData = [{"testToneID":21,"protocolID":3,"orderNo":1,"frequency":125.0,"dbHL":"25 ","dbSPL":70.0,"amplitude":0.32,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":22,"protocolID":3,"orderNo":2,"frequency":250.0,"dbHL":"45 ","dbSPL":70.5,"amplitude":0.1,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":23,"protocolID":3,"orderNo":3,"frequency":500.0,"dbHL":"60 ","dbSPL":71.5,"amplitude":0.7,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""},{"testToneID":24,"protocolID":3,"orderNo":4,"frequency":750.0,"dbHL":"65 ","dbSPL":73.0,"amplitude":0.3,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":25,"protocolID":3,"orderNo":5,"frequency":1000.0,"dbHL":"65 ","dbSPL":72.0,"amplitude":0.48,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":26,"protocolID":3,"orderNo":6,"frequency":1500.0,"dbHL":"65 ","dbSPL":71.5,"amplitude":0.5,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""}];
+                    this.startHearingTest(mockTestData);
                 }
             }else{
                 alertMessage = 'Server error no result return.';
-                this.showAlert(alertTitle, alertMessage);
+                //this.showAlert(alertTitle, alertMessage);
+                let mockTestData = [{"testToneID":21,"protocolID":3,"orderNo":1,"frequency":125.0,"dbHL":"25 ","dbSPL":70.0,"amplitude":0.32,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":22,"protocolID":3,"orderNo":2,"frequency":250.0,"dbHL":"45 ","dbSPL":70.5,"amplitude":0.1,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":23,"protocolID":3,"orderNo":3,"frequency":500.0,"dbHL":"60 ","dbSPL":71.5,"amplitude":0.7,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""},{"testToneID":24,"protocolID":3,"orderNo":4,"frequency":750.0,"dbHL":"65 ","dbSPL":73.0,"amplitude":0.3,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":25,"protocolID":3,"orderNo":5,"frequency":1000.0,"dbHL":"65 ","dbSPL":72.0,"amplitude":0.48,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":26,"protocolID":3,"orderNo":6,"frequency":1500.0,"dbHL":"65 ","dbSPL":71.5,"amplitude":0.5,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""}];
+                this.startHearingTest(mockTestData);
             }
         
         } catch (error) {
             console.log(error);
             this.setState({ loading: false, });
             alertMessage = JSON.stringify(error);
-            this.showAlert(alertTitle, alertMessage);
+            // this.showAlert(alertTitle, alertMessage);
+            let mockTestData = [{"testToneID":21,"protocolID":3,"orderNo":1,"frequency":125.0,"dbHL":"25 ","dbSPL":70.0,"amplitude":0.32,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":22,"protocolID":3,"orderNo":2,"frequency":250.0,"dbHL":"45 ","dbSPL":70.5,"amplitude":0.1,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":23,"protocolID":3,"orderNo":3,"frequency":500.0,"dbHL":"60 ","dbSPL":71.5,"amplitude":0.7,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""},{"testToneID":24,"protocolID":3,"orderNo":4,"frequency":750.0,"dbHL":"65 ","dbSPL":73.0,"amplitude":0.3,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":25,"protocolID":3,"orderNo":5,"frequency":1000.0,"dbHL":"65 ","dbSPL":72.0,"amplitude":0.48,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":26,"protocolID":3,"orderNo":6,"frequency":1500.0,"dbHL":"65 ","dbSPL":71.5,"amplitude":0.5,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""}];
+            this.startHearingTest(mockTestData);
         }
     }
 
@@ -128,7 +139,7 @@ class TesterSurvey extends Component {
         this.setState({ loading: true, });
         console.log(this.state);
 
-        var userID          = '8';//(this.props.userInfo.isGuest) ? this.props.userInfo.user.userId : this.props.userInfo.user.id;
+        var userID          = (this.props.userInfo.isGuest) ? this.props.userInfo.user.userId : this.props.userInfo.user.id;
         var brandModel      = (this.props.deviceInfo.model) ? this.props.deviceInfo.model : DeviceInfo.getModel();
 
         if(!this.props.network.isConnected){
@@ -138,6 +149,7 @@ class TesterSurvey extends Component {
             console.log('Internet Connected');
             this.loadTestTone(userID, brandModel);
         }
+        
     }
 
     startHearingTest(testToneData){
@@ -159,7 +171,8 @@ class TesterSurvey extends Component {
             let parseTestData = [];
 
             console.log(testData);
-            
+            testData = [{"testToneID":21,"protocolID":3,"orderNo":1,"frequency":125.0,"dbHL":"25 ","dbSPL":70.0,"amplitude":0.32,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":22,"protocolID":3,"orderNo":2,"frequency":250.0,"dbHL":"45 ","dbSPL":70.5,"amplitude":0.1,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":23,"protocolID":3,"orderNo":3,"frequency":500.0,"dbHL":"60 ","dbSPL":71.5,"amplitude":0.7,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""},{"testToneID":24,"protocolID":3,"orderNo":4,"frequency":750.0,"dbHL":"65 ","dbSPL":73.0,"amplitude":0.3,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":25,"protocolID":3,"orderNo":5,"frequency":1000.0,"dbHL":"65 ","dbSPL":72.0,"amplitude":0.48,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":26,"protocolID":3,"orderNo":6,"frequency":1500.0,"dbHL":"65 ","dbSPL":71.5,"amplitude":0.5,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""}];
+             
             try{
                 if(testData != null && testData != undefined){
                     console.log(testData);
@@ -194,19 +207,18 @@ class TesterSurvey extends Component {
                     }
     
                     console.log(translateMenu);
+
+                    NativeModules.HearingTestModule.GotoActivity(
+                        JSON.stringify(userID),
+                        JSON.stringify(testData),
+                        JSON.stringify(translateMenu)
+                    );
+                    
                     // NativeModules.HearingTestModule.GotoActivity(
                     //     JSON.stringify(userInformation),
                     //     JSON.stringify(testData),
                     //     JSON.stringify(translateMenu)
                     // );
-
-                    let mockTestData = [{"testToneID":30,"protocolID":3,"orderNo":10,"frequency":6000.0,"dbHL":"55 ","dbSPL":70.5,"amplitude":0.0063,"durationMin":5.0,"durationMax":5.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":31,"protocolID":3,"orderNo":11,"frequency":8000.0,"dbHL":"55 ","dbSPL":68.0,"amplitude":0.031,"durationMin":5.0,"durationMax":5.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""}];
-
-                    NativeModules.HearingTestModule.GotoActivity(
-                        JSON.stringify(userID),
-                        JSON.stringify(mockTestData),
-                        JSON.stringify(translateMenu)
-                    );
                 }
             }catch(error){
                 console.log(error);
