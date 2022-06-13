@@ -84,7 +84,7 @@
             <ImageView
                 android:id="@+id/resultImage"
                 android:layout_width="wrap_content"
-                android:layout_height="200dp"
+                android:layout_height="160dp"
                 android:layout_centerInParent="true"
                 android:src="@drawable/result_badcase" />
 
@@ -114,6 +114,21 @@
             app:layout_constraintTop_toBottomOf="@+id/animateLayout"
             app:layout_constraintVertical_bias="0.042"
             tools:layout_editor_absoluteX="0dp">
+
+            <Button
+                android:id="@+id/tryAgainButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/primary_btn_success"
+                android:fontFamily="@font/sarabun_medium"
+                android:gravity="center"
+                android:onClick="onClickTryAgain"
+                android:text="ทดสอบอีกครั้ง"
+                android:textColor="@color/text_inverse"
+                android:textSize="18sp"
+                tools:ignore="OnClick"
+                android:layout_marginBottom="10dp"
+                />
 
             <Button
                 android:id="@+id/doneTesting"

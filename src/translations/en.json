@@ -40,7 +40,7 @@
     "BackButton": "Back",
     "NextButton": "Next",
     "CancelButton": "I don't want to test",
-    "UserSurveyHeaderLabel" : "Suggestion",
+    "UserSurveyHeaderLabel" : "Questionnaire",
     "MainPageQuestion": "Do you have any health condition as belows",
     "FirstQuestion": "Do you feel tinnitus ?",
     "SecondQuestion": "Do you have a cold ?",
@@ -86,5 +86,8 @@
     "ToneAllResultHeaderLabel": "Hearing Test Result",
     "TestDateLabel": "Date of testing",
     "TestResultInfoLabel": "Result",
-    "GuestRefCodeLabel" : "Latest Hearing Test Result (Ref. Code)"
+    "GuestRefCodeLabel" : "Latest Hearing Test Result (Ref. Code)",
+
+    "CheckResultButton" : "Check Result",
+    "TryAgainButton" : "Try Hearing Test Again"
 }

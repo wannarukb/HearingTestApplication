@@ -15,6 +15,10 @@ public class TestResultHeader {
     public String resultSum;
     public List<TestResultItem> resultTestTones;
 
+    public String q1;
+    public String q2;
+    public String q3;
+
     public TestResultHeader(int protocolId, int userId ){
        // this.hearingTestId = hearingTestId;
         this.protocolId = protocolId;
@@ -24,6 +28,9 @@ public class TestResultHeader {
         Date currentStartDate= Calendar.getInstance().getTime();
         this.startDateTime   = sdf.format(currentStartDate);
         this.resultSum = "";
+        this.q1 = "";
+        this.q2 = "";
+        this.q3 = "";
     }
 
     public void endTestResult(List<TestResultItem> resultItems){

@@ -67,7 +67,8 @@ public class HearingActivity extends ReactActivity {
 
     private final int       SAMPLE_RATE = 44100;
     private final int       RESULT_VALIDATION_DECEIBEL = 35; //dB HL
-    private final int       PASS_RESULT_CRITERIA = 2;
+    private final int       PASS_RESULT_CRITERIA_MAX = 2;
+    public int              pass_result_criteria  = 0;
     public AudioTrack       mAudioTrack;
     public List<TestTone>   testToneList;
     public List<TestResultItem> testResultList;
@@ -100,6 +101,8 @@ public class HearingActivity extends ReactActivity {
     public TextView playToneHeader, playToneDescription, suggestionLine1, suggestionLine2, warningLabel, warningText;
     public LinearLayout suggestionLayout, warningLayout;
     public String translationMenu;
+    public String testToneJSON;
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -121,7 +124,7 @@ public class HearingActivity extends ReactActivity {
         startButton         = (Button) findViewById(R.id.start);
         cancelButton        = (Button) findViewById(R.id.cancel);
 
-        suggestionLayout    = (LinearLayout) findViewById(R.id.sugg∂estionLayout);
+        suggestionLayout    = (LinearLayout) findViewById(R.id.suggestionLayout);
         warningLayout       = (LinearLayout) findViewById(R.id.warninglayout);
         suggestionLine1     = (TextView) findViewById(R.id.suggestionLine1);
         suggestionLine2     = (TextView) findViewById(R.id.suggestionLine2);
@@ -131,7 +134,7 @@ public class HearingActivity extends ReactActivity {
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
             Gson gson = new Gson();
-            String testToneJSON = extras.getString("TestToneList");
+            testToneJSON = extras.getString("TestToneList");
             String translateMenu = extras.getString("TranslateMenu");
             userId              = Integer.parseInt(extras.getString("UserId"));
             saveHearingPath     = extras.getString("FilePath");
@@ -196,6 +199,7 @@ public class HearingActivity extends ReactActivity {
                 System.out.println("Hearing - Current Run Tone  = " + currentRunTone.testToneId + ", " + currentRunTone.testSide + ", " + currentRunTone.frequency + ", " + currentRunTone.amplitude);
                 currentTestRound    = currentRunTone.testRound;
                 noOfClick = 0;
+                pass_result_criteria = testToneList.size();
 
 
                 mAudioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
@@ -261,9 +265,10 @@ public class HearingActivity extends ReactActivity {
 
                     System.out.println("RESULTJA :  "+ (playExecuteCount - 1) + " : " + currentRunTone.frequency  + ", " + currentRunTone.amplitude  + ", "+ currentRunTone.testSide  + ", " + clickSecFromStart + ", " + clickSecFromByTonePlayedInt + ", " + timeClickedType);
                     currentTestResult.setCanHear(timeClickedType, clickSecFromStart, clickSecFromByTonePlayed);
-                    if(currentRunTone.dbHl <= RESULT_VALIDATION_DECEIBEL){
+                    /*if(currentRunTone.dbHl <= RESULT_VALIDATION_DECEIBEL){
                         result_pass_validation_time++;
-                    }
+                    }*/
+                    result_pass_validation_time++;
 
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
@@ -422,18 +427,30 @@ public class HearingActivity extends ReactActivity {
 
         System.out.println("FINISH ACTIVITY");
         userHearingTest.endTestResult(testResultList);
-        if(result_pass_validation_time >= PASS_RESULT_CRITERIA) userHearingTest.setGoodSummary();
+        if(result_pass_validation_time == pass_result_criteria) userHearingTest.setGoodSummary();
+
         Gson gson = new Gson();
         String resultJson = gson.toJson(userHearingTest);
-
         System.out.print("result" + resultJson);
 
-        Intent intent = new Intent(this, HearingActivityResult.class);
-        intent.putExtra("TestResultList", resultJson);
-        intent.putExtra("FilePath", saveHearingPath);
-        intent.putExtra("UserId", userId);
-        intent.putExtra("TranslateMenu", translationMenu);
-        startActivity(intent);
+        if(userHearingTest.isGoodResult()){
+            Intent intent = new Intent(this, HearingActivityResult.class);
+            intent.putExtra("TestToneList", testToneJSON);
+            intent.putExtra("TestResultList", resultJson);
+            intent.putExtra("FilePath", saveHearingPath);
+            intent.putExtra("UserId", userId);
+            intent.putExtra("TranslateMenu", translationMenu);
+            startActivity(intent);
+        }else{
+            Intent intent = new Intent(this, SurveyQuestion.class);
+            intent.putExtra("TestToneList", testToneJSON);
+            intent.putExtra("TestResultList", resultJson);
+            intent.putExtra("FilePath", saveHearingPath);
+            intent.putExtra("UserId", userId);
+            intent.putExtra("TranslateMenu", translationMenu);
+            startActivity(intent);
+        }
+
         ///finish();
 
     }
@@ -533,11 +550,6 @@ public class HearingActivity extends ReactActivity {
     protected void onStop() {
         super.onStop();
         System.out.println("Android - HearingActivity - Stop");
-       // stop();
-
-       // Intent intent = new Intent(this, ReactResultActivity.class);
-       // startActivity(intent);
-       // finish();
     }
 
 

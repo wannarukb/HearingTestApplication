@@ -40,8 +40,8 @@
     "NextButton": "ถัดไป",
     "CancelButton": "ยกเลิก",
 
-    "UserSurveyHeaderLabel" : "ข้อแนะนำ",
-    "MainPageQuestion": "หากท่านมีอาการดังต่อไปนี้จะไม่สามารถทดสอบการได้ยินได้",
+    "UserSurveyHeaderLabel" : "แบบสอบถาม",
+    "MainPageQuestion": "ท่านมีอาการดังต่อไปนี้หรือไม่ ?",
     "FirstQuestion": "ท่านรู้สึกหูอื้อ ?",
     "SecondQuestion": "ท่านไม่สบายเป็นหวัด ?",
     "ThirdQuestion": "ท่านมีน้ำไหลในหู ?",
@@ -86,5 +86,8 @@
     "ToneAllResultHeaderLabel": "ผลการทดสอบการได้ยิน",
     "TestDateLabel": "วันที่ทดสอบ",
     "TestResultInfoLabel": "ผลการทดสอบ",
-    "GuestRefCodeLabel" : "เลขที่อ้างอิงผลทดสอบล่าสุด (Ref. Code)"
+    "GuestRefCodeLabel" : "เลขที่อ้างอิงผลทดสอบล่าสุด (Ref. Code)",
+
+    "CheckResultButton" : "ตรวจผลการทดสอบ",
+    "TryAgainButton" : "ทดสอบอีกครั้ง"
 }

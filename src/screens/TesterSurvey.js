@@ -1,3 +1,4 @@
+import Config from '../constants/Config';
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import {CommonActions } from '@react-navigation/native';
@@ -16,6 +17,8 @@ import i18n from 'i18n-js';
 import memoize from 'lodash.memoize';
 
 import mainStyle  from "../constants/mainStyle";
+
+var postTestToneResultURL = Config.CONNECTIONS.server_url + Config.CONNECTIONS.post_testToneResult;
 
 const translate = memoize(
     (key, config) => i18n.t(key, config),
@@ -171,7 +174,7 @@ class TesterSurvey extends Component {
             let parseTestData = [];
 
             console.log(testData);
-            testData = [{"testToneID":21,"protocolID":3,"orderNo":1,"frequency":125.0,"dbHL":"25 ","dbSPL":70.0,"amplitude":0.32,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":22,"protocolID":3,"orderNo":2,"frequency":250.0,"dbHL":"45 ","dbSPL":70.5,"amplitude":0.1,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":23,"protocolID":3,"orderNo":3,"frequency":500.0,"dbHL":"60 ","dbSPL":71.5,"amplitude":0.7,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""},{"testToneID":24,"protocolID":3,"orderNo":4,"frequency":750.0,"dbHL":"65 ","dbSPL":73.0,"amplitude":0.3,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":25,"protocolID":3,"orderNo":5,"frequency":1000.0,"dbHL":"65 ","dbSPL":72.0,"amplitude":0.48,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":26,"protocolID":3,"orderNo":6,"frequency":1500.0,"dbHL":"65 ","dbSPL":71.5,"amplitude":0.5,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""}];
+            //testData = [{"testToneID":21,"protocolID":3,"orderNo":1,"frequency":125.0,"dbHL":"25 ","dbSPL":70.0,"amplitude":0.32,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":22,"protocolID":3,"orderNo":2,"frequency":250.0,"dbHL":"45 ","dbSPL":70.5,"amplitude":0.1,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":23,"protocolID":3,"orderNo":3,"frequency":500.0,"dbHL":"60 ","dbSPL":71.5,"amplitude":0.7,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""},{"testToneID":24,"protocolID":3,"orderNo":4,"frequency":750.0,"dbHL":"65 ","dbSPL":73.0,"amplitude":0.3,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"Both","roundRandom":""},{"testToneID":25,"protocolID":3,"orderNo":5,"frequency":1000.0,"dbHL":"65 ","dbSPL":72.0,"amplitude":0.48,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"L","roundRandom":""},{"testToneID":26,"protocolID":3,"orderNo":6,"frequency":1500.0,"dbHL":"65 ","dbSPL":71.5,"amplitude":0.5,"durationMin":3.0,"durationMax":3.0,"upDB":null,"downDB":null,"intervalMin":2.0,"intervalMax":2.0,"testRoundMin":1.0,"testRoundMax":1.0,"testSide":"R","roundRandom":""}];
              
             try{
                 if(testData != null && testData != undefined){
@@ -203,7 +206,18 @@ class TesterSurvey extends Component {
                         "ToneResultInfo_Bad": translate('ToneResultInfo_Bad'),
                         "ToneResultInfo_BadSuggestion": translate('ToneResultInfo_BadSuggestion'),
                         "GoBackToHomePageButton": translate('GoBackToHomePageButton'),
-                        "CancelButton" : translate('CancelButton')
+                        "CancelButton" : translate('CancelButton'),
+                        "NextButton"   : translate('NextButton'),
+
+                        "UserSurveyHeaderLabel" : translate('UserSurveyHeaderLabel'),
+                        "MainPageQuestion" : translate('MainPageQuestion'),
+                        "FirstQuestion": translate('FirstQuestion'),
+                        "SecondQuestion": translate('SecondQuestion'),
+                        "ThirdQuestion": translate('ThirdQuestion'),
+                        "CheckResultButton" : translate('CheckResultButton'),
+                        "YesLabel"     : translate('YesLabel'),
+                        "PostTestToneResult" : postTestToneResultURL,
+                        "TryAgainButton" : translate('TryAgainButton')
                     }
     
                     console.log(translateMenu);

@@ -191,7 +191,7 @@ onClickStartTesting(){
             CommonActions.reset({
             index: 0,
             routes: [
-                { name: 'UserSurvey' },
+                { name: 'Consent' },
             ],
             })
         );

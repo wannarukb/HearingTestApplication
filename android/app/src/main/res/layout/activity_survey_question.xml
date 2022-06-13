@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:background="@color/background_white"
+tools:context=".SurveyQuestion">
+<LinearLayout
+    android:id="@+id/result_page"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    app:layout_constraintStart_toStartOf="parent">
+
+    <LinearLayout
+        android:id="@+id/result_intro"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/survey_header_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:layout_marginBottom="20dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/userSurveyHeaderLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sarabun_semibold"
+                android:gravity="center_horizontal"
+                android:text="แบบสอบถาม"
+                android:textColor="@color/text_default"
+                android:textSize="20sp"
+                tools:ignore="MissingConstraints" />
+
+            <TextView
+                android:id="@+id/mainPageQuestion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sarabun_light"
+                android:gravity="center_horizontal"
+                android:text="ท่านมีอาการดังต่อไปนี้หรือไม่ ?"
+                android:textColor="@color/text_default"
+                android:textSize="18sp"
+                tools:ignore="MissingConstraints" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/survey_question1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/question1"
+                android:layout_width="291dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sarabun_light"
+                android:gravity="left"
+                android:text="ท่านรู้สึกหูอื้อ ?"
+                android:textColor="@color/text_default"
+                android:textSize="18sp"
+                tools:ignore="MissingConstraints" />
+
+            <CheckBox
+                android:id="@+id/checkbox_q1"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sarabun_light"
+                android:onClick="onCheckboxClicked"
+                android:text="ใช่"
+                android:gravity="right"
+                android:textColor="@color/text_default"
+                android:textSize="18sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/survey_question2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/question2"
+                android:layout_width="291dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sarabun_light"
+                android:gravity="left"
+                android:text="ท่านไม่สบายเป็นหวัด ?"
+                android:textColor="@color/text_default"
+                android:textSize="18sp"
+                tools:ignore="MissingConstraints" />
+            <CheckBox android:id="@+id/checkbox_q2"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:text="ใช่"
+                android:fontFamily="@font/sarabun_light"
+                android:textColor="@color/text_default"
+                android:textSize="18sp"
+                android:onClick="onCheckboxClicked"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/survey_question3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/question3"
+                android:layout_width="291dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sarabun_light"
+                android:gravity="left"
+                android:text="ท่านมีน้ำไหลในหู ?"
+                android:textColor="@color/text_default"
+                android:textSize="18sp"
+                tools:ignore="MissingConstraints" />
+            <CheckBox android:id="@+id/checkbox_q3"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:text="ใช่"
+                android:gravity="right"
+                android:fontFamily="@font/sarabun_light"
+                android:textColor="@color/text_default"
+                android:textSize="18sp"
+                android:onClick="onCheckboxClicked"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/animateLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="100dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/result_intro">
+
+
+<!--        <TextView-->
+<!--            android:id="@+id/resultSuggestion"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:fontFamily="@font/sarabun_light"-->
+<!--            android:gravity="center_horizontal"-->
+<!--            android:paddingTop="20dp"-->
+<!--            android:paddingBottom="10dp"-->
+<!--            android:text="คุณสามารถพบจักษุแพทย์ เพื่อปรึกษาและทำการทดสอบการได้ยินโดยละเอียดอีกครั้งหนึ่ง"-->
+
+<!--            android:textColor="@color/text_default"-->
+<!--            android:textSize="16sp"-->
+<!--            tools:ignore="MissingConstraints" />-->
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/survey_Intro_Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/animateLayout"
+        app:layout_constraintVertical_bias="0.042"
+        tools:layout_editor_absoluteX="0dp">
+
+        <Button
+            android:id="@+id/checkResultButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/primary_btn_success"
+            android:fontFamily="@font/sarabun_medium"
+            android:gravity="center"
+            android:onClick="onClickDone"
+            android:text="ต่อไป"
+            android:textColor="@color/text_inverse"
+            android:textSize="18sp"
+            tools:ignore="OnClick" />
+
+    </LinearLayout>
+
+</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

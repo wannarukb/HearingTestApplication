@@ -46,7 +46,7 @@ class HomeGuest extends React.Component {
         this.setDeviceLanguage(defaultLang);
 
 
-        this.readResultJSONFile();
+       this.readResultJSONFile();
     }
 
     postTestToneResult = async (testToneResult) => {
@@ -56,8 +56,30 @@ class HomeGuest extends React.Component {
         var alertMessage = '';
     
         try {
-    
-            var postToneResult = await TestToneService.post_testTone_result_api(testToneResult);
+            this.setState({loading:false});
+            let hearingCode = testToneResult.hearingTestId;
+            let hearingShowCode =  UtilityService.leftPad(hearingCode, 8, '0');
+            console.log("Hearing Code = " + hearingShowCode);
+            var guestResultInfo =  {
+                hearingTestId : hearingShowCode,
+                userId        : testToneResult.userId,
+                startDate     : testToneResult.startDateTime,
+                resultSum     : testToneResult.resultSum,
+                isSync        : true
+            }
+            console.log("store result");
+            console.log(guestResultInfo);
+
+            this.props.setTestToneGuest(guestResultInfo);
+            var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
+            RNFS.unlink(path).then(() => {
+                console.log('FILE DELETED');
+            }).catch((err) => {
+                // `unlink` will throw an error, if the item to unlink does not exist
+                console.log(err.message);
+            });
+
+          /*  var postToneResult = await TestToneService.post_testTone_result_api(testToneResult);
             console.log(postToneResult);
             this.setState({loading:false});
             if(postToneResult){
@@ -106,7 +128,7 @@ class HomeGuest extends React.Component {
             }else{
                 alertMessage = 'Server error no result return.';
                 this.showAlert(alertTitle, alertMessage);
-            }
+            }*/
     
         } catch (error) {
             console.log(error);
@@ -295,7 +317,7 @@ class HomeGuest extends React.Component {
             CommonActions.reset({
                 index: 0,
                 routes: [
-                { name: 'UserSurvey' },
+                { name: 'Consent' },
                 ],
             })
         );

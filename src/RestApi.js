@@ -23,8 +23,8 @@ let login_guest_post = (body) => api.post('/v1.2/UserAccounts', body).then(respo
 * URL : https://www3.ict.mahidol.ac.th/test/hearing/api/api/v1.2/TestTones/userid/{UserId}/{BrandModel}
 */
 let testtone_get = (userId, deviceModel) =>{ 
-     // const response = api.get('/v1.2/TestTones/userid/'+ userId +'/' + deviceModel);
-     const response = api.get('/v1.2/TestTones/'+ userId +'/' + deviceModel);
+     const response = api.get('/v1.2/TestTones/userId/'+ userId +'/' + deviceModel);
+     // const response = api.get('/v1.2/TestTones/'+ userId +'/' + deviceModel);
      return response;
  }
 
@@ -44,7 +44,7 @@ let testtone_header_get = (userToken, userId) => {
 * POST : Post test tone result
 * URL : https://www3.ict.mahidol.ac.th/test/hearing/api/api/v1.2/UserHearingTests/
 */
-let testtone_result_post = (body) => api.post('/v1.2/UserHearingTests/', body).then(response => response);
+let testtone_result_post = (body) => api.post(Config.CONNECTIONS.post_testToneResult, body).then(response => response);
 
 export {
      login_post,
