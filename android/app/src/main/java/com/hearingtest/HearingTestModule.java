@@ -30,6 +30,7 @@ public class HearingTestModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void GotoActivity(String userInfo, String testSet, String translateMenu) {
+        System.out.println("HearingTestModule");
         System.out.println("Hearing UserInfo = " + userInfo);
         System.out.println("Hearing Test Set = " + testSet);
         System.out.println("Hearing TranslateMenu = " + translateMenu);

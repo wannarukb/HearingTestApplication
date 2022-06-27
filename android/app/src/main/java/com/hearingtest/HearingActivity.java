@@ -440,6 +440,8 @@ public class HearingActivity extends ReactActivity {
             intent.putExtra("FilePath", saveHearingPath);
             intent.putExtra("UserId", userId);
             intent.putExtra("TranslateMenu", translationMenu);
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }else{
             Intent intent = new Intent(this, SurveyQuestion.class);
@@ -448,7 +450,10 @@ public class HearingActivity extends ReactActivity {
             intent.putExtra("FilePath", saveHearingPath);
             intent.putExtra("UserId", userId);
             intent.putExtra("TranslateMenu", translationMenu);
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
+            finish();
         }
 
         ///finish();

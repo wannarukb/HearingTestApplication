@@ -18,6 +18,7 @@ import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.facebook.react.ReactActivity;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -151,6 +152,7 @@ public class HearingActivityResult extends ReactActivity {
         System.out.println(resultHeader);
         if( resultHeader != null ){
 
+            saveFile();
             Intent intent = new Intent(this, ReactResultActivity.class);
             startActivity(intent);
             finish();
@@ -161,13 +163,15 @@ public class HearingActivityResult extends ReactActivity {
 
         System.out.println("On Try Again");
         if (resultHeader != null) {
-            Intent intent = new Intent(this, HearingActivity.class);
+
+            Intent intent = new Intent(getApplication(), HearingActivity.class);
             intent.putExtra("TestToneList", testToneJSON);
             intent.putExtra("FilePath", filePath);
-            intent.putExtra("UserId", userId);
+            intent.putExtra("UserId", String.valueOf(resultHeader.userId));
             intent.putExtra("TranslateMenu", translationMenu);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
+
         }
     }
 
@@ -190,7 +194,7 @@ public class HearingActivityResult extends ReactActivity {
                     try {
                         hearingTestId = response.getString("hearingTestId");
                         testResultReturnInfo.setHearingTestId(hearingTestId);
-                        saveFile();
+
 
                     } catch (JSONException e) {
                         e.printStackTrace();
