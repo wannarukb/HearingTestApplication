@@ -15,8 +15,8 @@ const TestToneService = {
         return await testtone_result_post(testToneResult);
     },
 
-    get_test_tone_header_api : async(userToken, userId) => {
-        let response = await testtone_header_get(userToken, userId);
+    get_test_tone_header_api : async(userId) => {
+        let response = await testtone_header_get(userId);
         return response;
     }
 };

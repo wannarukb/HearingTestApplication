@@ -26,16 +26,13 @@
     "FemaleLabel": "Female",
     "MaleLabel": "Male",
     "YearOfBirthLabel" : "Year of Birth",
-    
     "RequireField" : "Require Fields Missing:",
     "EmailFormatError" : "Email format is incorrect (Ex. test@mail.com)",
     "PasswordLengthError" : "Password length should be 6 - 10 characters",
-
-
     "NoInternet" : "Please connect to Internet",
+    "InternetRequire" : "Please connect to Internet",
     "AlertTitleError" : "Error",
     "LoginError" : "Email or Password is incorrect, please recheck your information.",
-
     "ConfirmRegisterButton": "Confirm",
     "BackButton": "Back",
     "NextButton": "Next",
@@ -48,12 +45,10 @@
     "YesLabel": "Yes",
     "SurveyResult": "Your physical condition is not ready to take the test.",
     "SurveySuggest": "Please take the test on another day, if you test it may affect the results and it will be incorrect.",
-
     "ConsentHeaderLabel" : "Consent",
     "ConsentInfo"   : "This hearing test system which is 'Hearing Test', it requires to test the user's hearing through randomly played tones. This system will coleect your personal daa which are age and gender of the tester for the test result analysis.",
     "ConsentAcceptLabel" : "Accept",
     "ConsentNotAcceptLabel" : "Not Accept",
-
     "TesterSurveyHeaderLabel" : "Questionnaires",
     "TesterSurveyInfo" : "For an effective analysis of results, please provide the following information:",
     "TesterSurveyAgeLabel" : "Ages",
@@ -62,20 +57,16 @@
     "TesterTeenLabel" : "15 - 20 Year",
     "TesterAdultLabel" : "21 - 59 Year",
     "TesterElderLabel" : "Above 60 Year",
-
     "ErrorNoTestData" : "Sorry, we cannot find your hearing test. Please try again later.",
-
     "StartHeaderLabel" : "For the accurate result",
     "SuggestionLine1" : "Please wear the headphones",
     "SuggestionLine2" : "and stay in the quite room.",
     "WarningLabel"  : "Warning :",
     "WarningDescription" : "In the test, the sounds are played to test the hearing of each ear. Please put headphones on the right side.",
     "StartPlayToneButton": "Start",
-
     "TonePlayHeaderLabel": "You are in the hearing testing process",
     "TonePlayDescription": "Press 'I can hear' button, if you can hear the tone.",
     "HearToneButton": "I can hear",
-    
     "ToneResultIntro": "Done ! Hearing Test",
     "ToneResultLabel": "Your result is",
     "ToneResultInfo_Good": "Normal",
@@ -87,7 +78,17 @@
     "TestDateLabel": "Date of testing",
     "TestResultInfoLabel": "Result",
     "GuestRefCodeLabel" : "Latest Hearing Test Result (Ref. Code)",
-
     "CheckResultButton" : "Check Result",
-    "TryAgainButton" : "Try Hearing Test Again"
+    "TryAgainButton" : "Try Hearing Test Again",
+    "UserContactButton" : "Please contact me",
+    "ConfirmButton" : "Confirm",
+    "UserContactHeader" : "ลงชื่อให้เจ้าหน้าที่ติดต่อกลับ",
+    "UserContactSubHeader" : "กรุณาแจ้งข้อมูลเบื้องต้นเพื่อให้เจ้าหน้าที่ติดกลับเพื่อทำการนัดหมาย",
+    "UserContactNameLabel" : "ชื่อ-นามสกุล",
+    "UserContactNoLabel" : "เบอร์โทรศัพท์สำหรับติดต่อกลับ",
+    "UserContactRefCodeLabel" : "เลขที่อ้างอิงผลทดสอบล่าสุด (Ref. Code)",
+    "SuccessReceiveContact" : "ได้รับข้อมูลเรียบร้อย",
+    "SuccessReceiveContactDetail" : "เจ้าหน้าที่จะทำการติดต่อเพื่อทำการนัดหมายเพิ่มเติมภายใน 7 วันทำการ ขอบคุณค่ะ",
+    "FailedReceiveContact" : "ขออภัยค่ะ เนื่องจากระบบขัดข้องจึงไม่สามารถนำส่งข้อมูลได้ กรุณากดปุ่มเพื่อส่งข้อมูลใหม่อีกครั้ง หรือ ติดต่อ 02-032-0230 ในเวลาทำการ เพื่อนัดหมายเพิ่มเติมโดยตรง",
+    "RequireFieldMissing" : "This field is required."
 }

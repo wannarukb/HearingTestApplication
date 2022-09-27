@@ -29,7 +29,7 @@ public class HearingTestModule extends ReactContextBaseJavaModule {
 
 
     @ReactMethod
-    public void GotoActivity(String userInfo, String testSet, String translateMenu) {
+    public void GotoActivity(String userId, String userInfo, String testSet, String translateMenu) {
         System.out.println("HearingTestModule");
         System.out.println("Hearing UserInfo = " + userInfo);
         System.out.println("Hearing Test Set = " + testSet);
@@ -39,7 +39,8 @@ public class HearingTestModule extends ReactContextBaseJavaModule {
         if(intent.resolveActivity(reactContext.getPackageManager()) != null){
             String filePath = ""+getReactApplicationContext().getFilesDir().getAbsolutePath();
             intent.putExtra("FilePath", filePath);
-            intent.putExtra("UserId", userInfo);
+            intent.putExtra("UserId", userId);
+            intent.putExtra("UserInfo" , userInfo);
             intent.putExtra("TestToneList", testSet);
             intent.putExtra("TranslateMenu" , translateMenu);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

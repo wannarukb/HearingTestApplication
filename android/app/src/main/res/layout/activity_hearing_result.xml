@@ -116,6 +116,22 @@
             tools:layout_editor_absoluteX="0dp">
 
             <Button
+                android:id="@+id/userContactButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/primary_btn_success"
+                android:fontFamily="@font/sarabun_medium"
+                android:gravity="center"
+                android:onClick="onClickContactInfo"
+                android:text="ลงชื่อให้เจ้าหน้าที่ติดต่อกลับ"
+                android:textColor="@color/text_inverse"
+                android:textSize="18sp"
+                tools:ignore="onClick"
+                android:layout_marginBottom="7dp"
+                android:visibility="gone"
+                />
+
+            <Button
                 android:id="@+id/tryAgainButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -126,20 +142,20 @@
                 android:text="ทดสอบอีกครั้ง"
                 android:textColor="@color/text_inverse"
                 android:textSize="18sp"
-                tools:ignore="OnClick"
-                android:layout_marginBottom="10dp"
+                tools:ignore="onClick"
+                android:layout_marginBottom="7dp"
                 />
 
             <Button
                 android:id="@+id/doneTesting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/primary_btn_success"
+                android:background="@color/background_white"
                 android:fontFamily="@font/sarabun_medium"
                 android:gravity="center"
                 android:onClick="onClickDone"
                 android:text="@string/done_testing"
-                android:textColor="@color/text_inverse"
+                android:textColor="@color/text_default"
                 android:textSize="18sp"
                 tools:ignore="OnClick" />
 

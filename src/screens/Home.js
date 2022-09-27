@@ -59,7 +59,7 @@ postTestToneResult = async (testToneResult) => {
 
     try {
 
-        var postToneResult = await TestToneService.post_testTone_result_api(testToneResult);
+        /*var postToneResult = await TestToneService.post_testTone_result_api(testToneResult);
         console.log(postToneResult);
         this.setState({loading:false});
         if(postToneResult){
@@ -87,7 +87,7 @@ postTestToneResult = async (testToneResult) => {
         }else{
             alertMessage = 'Server error no result return.';
             this.showAlert(alertTitle, alertMessage);
-        }
+        }*/
 
     } catch (error) {
         console.log(error);
@@ -115,7 +115,7 @@ readResultJSONFile = async() =>{
                 let isSyncData = JSON.stringify(data) === JSON.stringify({});
                 if(isSyncData === false){
                     await AsyncStorage.setItem("TestResults", JSON.stringify(data));
-                    this.postTestToneResult(data);
+                    //this.postTestToneResult(data);
                 }
             }
         }
@@ -232,6 +232,7 @@ onClickLogOut = ()=> {
         var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
         var data = {};
         AsyncStorage.setItem("TestResults", JSON.stringify(data));
+        this.closeModal();
 
         RNFS.unlink(path).then(() => {
             console.log('FILE DELETED');

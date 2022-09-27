@@ -33,9 +33,9 @@ let testtone_get = (userId, deviceModel) =>{
 * GET : Get test tone header by user Id
 * URL : https://www3.ict.mahidol.ac.th/test/hearing/api/api/v1.2/UserHearingTests/{UserID}
 */
-let testtone_header_get = (userToken, userId) => {
-     let token = 'Bearer ' + userToken;
-     api.setHeader('Authorization', token);
+let testtone_header_get = (userId) => {
+     // let token = 'Bearer ' + userToken;
+     // api.setHeader('Authorization', token);
      const response = api.get('/v1.2/UserHearingTests/' + userId);
      return response;
 }

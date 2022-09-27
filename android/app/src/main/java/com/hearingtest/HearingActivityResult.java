@@ -47,13 +47,18 @@ public class HearingActivityResult extends ReactActivity {
     public Map<String, Object> transalationMap;
     public ImageView resultImage;
     public TextView  header, subHeader, resultText, suggestionText;
-    public Button backToMainButton;
+    public Button backToMainButton, tryAgainButton, userContactButton;
 
     public TestResultReturn testResultReturnInfo;
+    public String userInfoJSON;
+    public Boolean httpResultMessage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hearing_result);
+
+        this.httpResultMessage = false;
 
         header      = (TextView) findViewById(R.id.toneResultHeader);
         subHeader   = (TextView) findViewById(R.id.toneResultSubHeader);
@@ -61,7 +66,10 @@ public class HearingActivityResult extends ReactActivity {
         suggestionText = (TextView) findViewById(R.id.resultSuggestion);
 
         resultImage = (ImageView) findViewById(R.id.resultImage);
+
         backToMainButton = (Button) findViewById(R.id.doneTesting);
+        tryAgainButton   = (Button) findViewById(R.id.tryAgainButton);
+        userContactButton= (Button) findViewById(R.id.userContactButton);
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
@@ -75,6 +83,8 @@ public class HearingActivityResult extends ReactActivity {
             filePath            = extras.getString("FilePath");
             translationMenu     =  extras.getString("TranslateMenu");
             userId              = extras.getString("UserId");
+            userInfoJSON        = extras.getString("UserInfo");
+
 
             String translateMenu = extras.getString("TranslateMenu");
 
@@ -83,6 +93,9 @@ public class HearingActivityResult extends ReactActivity {
                 transalationMap = new ObjectMapper().readValue(translateMenu, Map.class);
                 header.setText((String) transalationMap.get("ToneResultIntro"));
                 subHeader.setText((String) transalationMap.get("ToneResultLabel"));
+
+                tryAgainButton.setText((String) transalationMap.get("TryAgainButton"));
+                userContactButton.setText((String) transalationMap.get("UserContactButton"));
                 backToMainButton.setText((String) transalationMap.get("GoBackToHomePageButton"));
 
                 if(resultHeader.isGoodResult()){
@@ -96,9 +109,9 @@ public class HearingActivityResult extends ReactActivity {
                 }
 
                 String postTestResultURL = (String) transalationMap.get("PostTestToneResult");
-                executeTestResultCallout(postTestResultURL);
-
                 testResultReturnInfo = new TestResultReturn(resultHeader.userId, resultHeader.startDateTime, resultHeader.resultSum);
+
+                executeTestResultCallout(postTestResultURL);
 
             }
             catch (JsonGenerationException e) {
@@ -159,6 +172,30 @@ public class HearingActivityResult extends ReactActivity {
         }
     }
 
+    public void onClickContactInfo(View view) {
+
+        System.out.println("on Click Contact Info");
+        if (resultHeader != null && testResultReturnInfo != null) {
+
+            saveFile();
+
+            Gson gson = new Gson();
+            String testResultReturnJSON = gson.toJson(testResultReturnInfo);
+
+            Intent intent = new Intent(getApplication(), UserContact.class);
+            intent.putExtra("TestToneList", testToneJSON);
+            intent.putExtra("FilePath", filePath);
+            intent.putExtra("UserId", String.valueOf(resultHeader.userId));
+            intent.putExtra("UserInfo", userInfoJSON);
+            intent.putExtra("TranslateMenu", translationMenu);
+            intent.putExtra("TestResultForReturn", testResultReturnJSON);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+
+        }
+    }
+
+
     public void onClickTryAgain(View view) {
 
         System.out.println("On Try Again");
@@ -168,12 +205,15 @@ public class HearingActivityResult extends ReactActivity {
             intent.putExtra("TestToneList", testToneJSON);
             intent.putExtra("FilePath", filePath);
             intent.putExtra("UserId", String.valueOf(resultHeader.userId));
+            intent.putExtra("UserInfo", userInfoJSON);
             intent.putExtra("TranslateMenu", translationMenu);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
 
         }
     }
+
+
 
 
     public void executeTestResultCallout(String postTestToneResultURL){
@@ -194,9 +234,10 @@ public class HearingActivityResult extends ReactActivity {
                     try {
                         hearingTestId = response.getString("hearingTestId");
                         testResultReturnInfo.setHearingTestId(hearingTestId);
-
-
+                        httpResultMessage = true;
+                        userContactButton.setVisibility(View.VISIBLE);
                     } catch (JSONException e) {
+                        httpResultMessage = false;
                         e.printStackTrace();
                     }
 
@@ -208,6 +249,7 @@ public class HearingActivityResult extends ReactActivity {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     // TODO: Handle error
+                    httpResultMessage = false;
                     System.out.println("VolleyError: " + error.getMessage() + error.toString());
                     Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG);
                 }
@@ -215,7 +257,9 @@ public class HearingActivityResult extends ReactActivity {
 
             queue.add(jsonObjectRequest);
         }catch (JSONException jsonEx){
+            httpResultMessage = false;
             System.out.println(jsonEx.getMessage() + '\n' + jsonEx.getStackTrace());
+            Toast.makeText(getApplicationContext(), jsonEx.getMessage(), Toast.LENGTH_LONG);
         }
 
 

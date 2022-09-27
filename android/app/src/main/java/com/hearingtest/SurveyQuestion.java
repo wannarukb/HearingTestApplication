@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.facebook.react.ReactActivity;
@@ -29,6 +30,8 @@ public class SurveyQuestion extends ReactActivity {
     public String translationMenu;
     public String userId;
     public String testToneJSON;
+    public String userInfoJSON;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +50,7 @@ public class SurveyQuestion extends ReactActivity {
         checkbox2      = (CheckBox) findViewById(R.id.checkbox_q2);
         checkbox3      = (CheckBox) findViewById(R.id.checkbox_q3);
 
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
 
@@ -57,8 +61,10 @@ public class SurveyQuestion extends ReactActivity {
             testToneJSON        = extras.getString("TestToneList");
             resultHeader        = gson.fromJson(resultJSON, TestResultHeader.class);
             filePath            = extras.getString("FilePath");
-            translationMenu     =  extras.getString("TranslateMenu");
+            translationMenu     = extras.getString("TranslateMenu");
             userId              = extras.getString("UserId");
+            userInfoJSON        = extras.getString("UserInfo");
+
 
             try {
                 transalationMap = new ObjectMapper().readValue(translationMenu, Map.class);
@@ -123,6 +129,7 @@ public class SurveyQuestion extends ReactActivity {
             intent.putExtra("TestResultList", resultHeaderJson);
             intent.putExtra("FilePath", filePath);
             intent.putExtra("UserId", userId);
+            intent.putExtra("UserInfo", userInfoJSON);
             intent.putExtra("TranslateMenu", translationMenu);
             startActivity(intent);
         }

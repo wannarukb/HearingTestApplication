@@ -1,6 +1,6 @@
-import React from 'react'
+import React from 'react';
 import {connect} from 'react-redux';
-import AsyncStorage  from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
 import {ImageBackground,Image,StyleSheet,View,Dimensions,ScrollView, LogBox, TouchableOpacity, Alert, ActivityIndicator} from "react-native";
 import { Block, Button, Text, theme } from "galio-framework";

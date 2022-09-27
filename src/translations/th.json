@@ -26,20 +26,16 @@
     "FemaleLabel": "หญิง",
     "MaleLabel": "ชาย",
     "YearOfBirthLabel" : "ปีเกิด (พ.ศ.)",
-
     "RequireField" : "กรุณากรอกข้อมูลต่อไปนี้",
     "EmailFormatError" : "รูปแบบของอีเมลไม่ถูกต้อง (ตัวอย่าง: test@mail.com)",
     "PasswordLengthError" : "รหัสผ่านต้องมีความยาว 6-10 ตัวอักษร",
-
     "InternetRequire" : "กรุณาเชื่อมต่ออินเตอร์เน็ต",
     "AlertTitleError" : "เกิดข้อผิดพลาด",
     "LoginError" : "อีเมล หรือ รหัสผ่าน ไม่ถูกต้อง กรุณาตรวจสอบข้อมูล",
-
     "ConfirmRegisterButton": "ยืนยันการสมัคร",
     "BackButton": "ย้อนกลับ",
     "NextButton": "ถัดไป",
     "CancelButton": "ยกเลิก",
-
     "UserSurveyHeaderLabel" : "แบบสอบถาม",
     "MainPageQuestion": "ท่านมีอาการดังต่อไปนี้หรือไม่ ?",
     "FirstQuestion": "ท่านรู้สึกหูอื้อ ?",
@@ -48,12 +44,10 @@
     "YesLabel": "ใช่",
     "SurveyResult": "สภาพร่างกายของคุณไม่พร้อมที่จะทำการทดสอบ",
     "SurveySuggest": "โปรดทำการทดสอบในวันอื่น หากท่านทดสอบ อาจทำให้ผลลัพธ์ที่ได้ จะไม่สมบูรณ์ถูกต้อง",
-    
     "ConsentHeaderLabel" : "การยินยอม",
     "ConsentInfo"   : "ระบบทดสอบการได้ยิน ' Hearing Test'  นี้ ต้องการทดสอบการได้ยินของผู้ใช้งานผ่านการเล่นโทนเสียงแบบสุ่ม และจะมีการบันทึกข้อมูล อายุ เพศของผู้ทดสอบ เพื่อใช้ในการวิเคราะห์การได้ยินเสียง",
     "ConsentAcceptLabel" : "ยอมรับ",
     "ConsentNotAcceptLabel" : "ไม่ยอมรับ",
-
     "TesterSurveyHeaderLabel" : "แบบสอบถาม",
     "TesterSurveyInfo" : "เพื่อการวิเคราะห์ผลที่มีประสิทธิภาพ ท่านโปรดระบุ ข้อมูลดังต่อไปนี้",
     "TesterSurveyAgeLabel" : "ช่วงอายุ",
@@ -62,20 +56,16 @@
     "TesterTeenLabel" : "15 - 20 ปี",
     "TesterAdultLabel" : "21 - 59 ปี",
     "TesterElderLabel" : "60 ปี ขึ้นไป",
-
     "ErrorNoTestData" : "ขออภัยค่ะ ไม่พบข้อมูลชุดทดสอบสำหรับคุณในขณะนี้ กรุณาลองใหม่ภายหลัง",
-
     "StartHeaderLabel" : "เพื่อผลทดสอบที่แม่นยำ",
     "SuggestionLine1" : "กรุณาสวมหูฟังระหว่างการทดสอบ",
     "SuggestionLine2" : "อยู่ในห้องที่ปราศจากเสียงรบกวน",
     "WarningLabel"  : "คำเตือน :",
     "WarningDescription" : "การทดสอบมีการเล่นเสียงเพื่อทดสอบการได้ยินของหูแต่ละข้าง กรุณาตรวจสอบและใส่หูฟังให้ถูกข้าง",
     "StartPlayToneButton": "เริ่มทดสอบ",
-
     "TonePlayHeaderLabel": "กำลังอยู่ในกระบวนการทดสอบ",
     "TonePlayDescription": "กรุณากดปุ่ม เมื่อได้ยินเสียง",
     "HearToneButton": "ฉันได้ยิน",
-    
     "ToneResultIntro": "เสร็จสิ้น การทดสอบการได้ยิน",
     "ToneResultLabel": "ผลของคุณคือ",
     "ToneResultInfo_Good": "การได้ยินปกติ",
@@ -87,7 +77,18 @@
     "TestDateLabel": "วันที่ทดสอบ",
     "TestResultInfoLabel": "ผลการทดสอบ",
     "GuestRefCodeLabel" : "เลขที่อ้างอิงผลทดสอบล่าสุด (Ref. Code)",
-
     "CheckResultButton" : "ตรวจผลการทดสอบ",
-    "TryAgainButton" : "ทดสอบอีกครั้ง"
+    "TryAgainButton" : "ทดสอบอีกครั้ง",
+    "UserContactButton" : "ลงชื่อให้เจ้าหน้าที่ติดต่อกลับ",
+    "ConfirmButton" : "บันทึก",
+    "UserContactHeader" : "ลงชื่อให้เจ้าหน้าที่ติดต่อกลับ",
+    "UserContactSubHeader" : "กรุณาแจ้งข้อมูลเบื้องต้นเพื่อให้เจ้าหน้าที่ติดกลับเพื่อทำการนัดหมาย",
+    "UserContactNameLabel" : "ชื่อ-นามสกุล",
+    "UserContactNoLabel" : "เบอร์โทรศัพท์สำหรับติดต่อกลับ",
+    "UserContactRefCodeLabel" : "เลขที่อ้างอิงผลทดสอบล่าสุด (Ref. Code)",
+    "SuccessReceiveContact" : "ได้รับข้อมูลเรียบร้อย",
+    "SuccessReceiveContactDetail" : "เจ้าหน้าที่จะทำการติดต่อเพื่อทำการนัดหมายเพิ่มเติมภายใน 7 วันทำการ ขอบคุณค่ะ",
+    "FailedReceiveContact" : "ขออภัยค่ะ เนื่องจากระบบขัดข้องจึงไม่สามารถนำส่งข้อมูลได้ กรุณากดปุ่มเพื่อส่งข้อมูลใหม่อีกครั้ง หรือ ติดต่อ 02-032-0230 ในเวลาทำการ เพื่อนัดหมายเพิ่มเติมโดยตรง",
+    "RequireFieldMissing" : "กรุณาระบุข้อมูล"
+    
 }

@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_white"
+    tools:context=".UserContact">
+    <LinearLayout
+        android:id="@+id/result_page"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:id="@+id/result_intro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:id="@+id/survey_header_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:layout_marginBottom="20dp"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/contactHeaderLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_semibold"
+                    android:gravity="center_horizontal"
+                    android:text="ลงชื่อให้เจ้าหน้าที่ติดต่อกลับ"
+                    android:textColor="@color/text_default"
+                    android:textSize="20sp"
+                    tools:ignore="MissingConstraints" />
+
+                <TextView
+                    android:id="@+id/subHeaderLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_light"
+                    android:gravity="left"
+                    android:text="กรุณาแจ้งข้อมูลเบื้องต้นเพื่อให้เจ้าหน้าที่ติดกลับเพื่อทำการนัดหมาย"
+                    android:textColor="@color/text_default"
+                    android:textSize="18sp"
+                    tools:ignore="MissingConstraints" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/userContactSection1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginBottom="7dp">
+
+                <TextView
+                    android:id="@+id/contactNameLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_medium"
+                    android:gravity="left"
+                    android:text="ชื่อ-นามสกุล *"
+                    android:textColor="@color/text_default"
+                    android:textSize="18sp"
+                    tools:ignore="MissingConstraints" />
+
+
+                <EditText
+                    android:id="@+id/contactName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_light"
+                    android:textColor="@color/text_default"
+                    android:textSize="18sp"
+                    android:inputType="textPersonName"
+                    android:background="@drawable/edit_text_background"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="5dp"
+                    />
+
+                <TextView
+                    android:id="@+id/contactNameError"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_light"
+                    android:gravity="right"
+                    android:text="กรุณาระบุข้อมูล"
+                    android:textColor="@color/error"
+                    android:textSize="12sp"
+                    tools:ignore="MissingConstraints"
+                    android:visibility="gone"/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/userContactSection2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginBottom="7dp">
+
+                <TextView
+                    android:id="@+id/contactNoLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_medium"
+                    android:gravity="left"
+                    android:text="เบอร์โทรศัพท์สำหรับติดต่อกลับ *"
+                    android:textColor="@color/text_default"
+                    android:textSize="18sp"
+                    tools:ignore="MissingConstraints" />
+
+
+                <EditText
+                    android:id="@+id/contactNo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/edit_text_background"
+                    android:fontFamily="@font/sarabun_light"
+                    android:inputType="textPersonName"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="5dp"
+                    android:textColor="@color/text_default"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/contactNoError"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_light"
+                    android:gravity="right"
+                    android:text="กรุณาระบุข้อมูล"
+                    android:textColor="@color/error"
+                    android:textSize="12sp"
+                    tools:ignore="MissingConstraints"
+                    android:visibility="gone"/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/userContactSection3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/contactRefCodeLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_medium"
+                    android:gravity="left"
+                    android:text="เลขที่อ้างอิงผลทดสอบล่าสุด (Ref. Code)"
+                    android:textColor="@color/text_default"
+                    android:textSize="18sp"
+                    tools:ignore="MissingConstraints" />
+
+
+                <TextView
+                    android:id="@+id/contactRefCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/light_secondary"
+                    android:fontFamily="@font/sarabun_light"
+                    android:inputType="textPersonName"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="5dp"
+                    android:textColor="@color/text_default"
+                    android:textSize="18sp"
+                    android:text="000001"/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/result_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="gone"
+                >
+
+                <TextView
+                    android:id="@+id/errorMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_light"
+                    android:gravity="left"
+                    android:text="ขออภัยค่ะ เนื่องจากระบบขัดข้องจึงไม่สามารถนำส่งข้อมูลได้ กรุณากดปุ่มเพื่อส่งข้อมูลใหม่อีกครั้ง หรือ ติดต่อ 02-032-0230 ในเวลาทำการ เพื่อนัดหมายเพิ่มเติมโดยตรง"
+                    android:textColor="@color/suggestion_text"
+                    android:background="@color/suggestion_error_bg"
+                    android:textSize="12sp"
+                    android:padding="5dp"
+                    tools:ignore="MissingConstraints" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/result_success"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+                <ImageView
+                    android:id="@+id/successImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/success" />
+                <TextView
+                    android:id="@+id/result_success_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_semibold"
+                    android:gravity="center_horizontal"
+                    android:text="ได้รับข้อมูลเรียบร้อย"
+                    android:textColor="@color/text_default"
+                    android:textSize="18sp"
+                    tools:ignore="MissingConstraints" />
+                <TextView
+                    android:id="@+id/result_success_detail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sarabun_light"
+                    android:gravity="center_horizontal"
+                    android:text="เจ้าหน้าที่จะทำการติดต่อเพื่อทำการนัดหมายเพิ่มเติมภายใน 7 วันทำการ ขอบคุณค่ะ"
+                    android:textColor="@color/text_default"
+                    android:textSize="14sp"
+                    tools:ignore="MissingConstraints" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/survey_Intro_Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/animateLayout"
+            app:layout_constraintVertical_bias="0.042"
+            tools:layout_editor_absoluteX="0dp">
+
+            <Button
+                android:id="@+id/confirmButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/primary_btn_success"
+                android:fontFamily="@font/sarabun_medium"
+                android:gravity="center"
+                android:onClick="onClickConfirmContact"
+                android:text="บันทึก"
+                android:textColor="@color/text_inverse"
+                android:textSize="18sp"
+                tools:ignore="OnClickConfirm"
+                android:layout_marginBottom="7dp"
+                />
+
+            <Button
+                android:id="@+id/tryAgainButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_secondary"
+                android:fontFamily="@font/sarabun_medium"
+                android:gravity="center"
+                android:onClick="onClickTryAgain"
+                android:text="ทดสอบอีกครั้ง"
+                android:textColor="@color/primary_btn_success"
+                android:textSize="18sp"
+                tools:ignore="OnClick"
+                android:layout_marginBottom="7dp"
+                />
+
+            <Button
+                android:id="@+id/doneTesting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/background_white"
+                android:fontFamily="@font/sarabun_medium"
+                android:gravity="center"
+                android:onClick="onClickDone"
+                android:text="@string/done_testing"
+                android:textColor="@color/text_default"
+                android:textSize="18sp"
+                tools:ignore="OnClick" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

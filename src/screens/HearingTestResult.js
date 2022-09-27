@@ -49,9 +49,9 @@ class HearingTestResult extends Component {
                 console.log("User = ");
                 console.log(this.state.userInfo);
                 console.log(this.state.userInfo);
-                let userToken = this.state.userInfo.token;
+                // let userToken = this.state.userInfo.token;
                 let userId    = this.state.userInfo.id;
-                this.loadToneHeaderList(userToken, userId);
+                this.loadToneHeaderList(userId);
                 // this.getTestResult();
             }
         })
@@ -93,9 +93,9 @@ class HearingTestResult extends Component {
         }
     }
 
-    loadToneHeaderList = (userToken, userId) =>{
+    loadToneHeaderList = (userId) =>{
         try {
-            TestToneService.get_test_tone_header_api(userToken, userId)
+            TestToneService.get_test_tone_header_api(userId)
             .then(responseJson => {
                 console.log('get_test_tone_header_api Response JSON = ', responseJson.status);
                 console.log(JSON.stringify(responseJson));

@@ -19,6 +19,7 @@ import memoize from 'lodash.memoize';
 import mainStyle  from "../constants/mainStyle";
 
 var postTestToneResultURL = Config.CONNECTIONS.server_url + Config.CONNECTIONS.post_testToneResult;
+var postContactInfoURL    = Config.CONNECTIONS.server_url + Config.CONNECTIONS.post_userContactInfo;
 
 const translate = memoize(
     (key, config) => i18n.t(key, config),
@@ -185,7 +186,9 @@ class TesterSurvey extends Component {
 
                     let userInformation   = {
                         userID  : userID,
-                        gender  : gender,
+                        firstName : this.props.userInfo.user.fn,
+                        lastName  : this.props.userInfo.user.ln,
+                        gender    : gender,
                         ageRange : ageRange
                     }
 
@@ -216,24 +219,42 @@ class TesterSurvey extends Component {
                         "ThirdQuestion": translate('ThirdQuestion'),
                         "CheckResultButton" : translate('CheckResultButton'),
                         "YesLabel"     : translate('YesLabel'),
+                        "TryAgainButton" : translate('TryAgainButton'),
+                        "UserContactButton" : translate('UserContactButton'),
+                        "ConfirmButton": translate('ConfirmButton'),
+
+                        "UserContactHeader": translate('UserContactHeader'),
+                        "UserContactSubHeader": translate('UserContactSubHeader'),
+                        "UserContactNameLabel": translate('UserContactNameLabel'),
+                        "UserContactNoLabel": translate('UserContactNoLabel'),
+                        "UserContactRefCodeLabel": translate('UserContactRefCodeLabel'),
+                        "SuccessReceiveContact": translate('SuccessReceiveContact'),
+                        "SuccessReceiveContactDetail": translate('SuccessReceiveContactDetail'),
+                        "FailedReceiveContact": translate('FailedReceiveContact'),
+                        "RequireFieldMissing" : translate('RequireFieldMissing'),
+
+
                         "PostTestToneResult" : postTestToneResultURL,
-                        "TryAgainButton" : translate('TryAgainButton')
+                        "PostUserContactInfo" : postContactInfoURL
                     }
-    
+
                     console.log(translateMenu);
 
                     NativeModules.HearingTestModule.GotoActivity(
                         JSON.stringify(userID),
+                        JSON.stringify(userInformation),
                         JSON.stringify(testData),
                         JSON.stringify(translateMenu)
                     );
-                    
-                    // NativeModules.HearingTestModule.GotoActivity(
-                    //     JSON.stringify(userInformation),
-                    //     JSON.stringify(testData),
-                    //     JSON.stringify(translateMenu)
-                    // );
                 }
+                
+                
+                // NativeModules.HearingTestModule.GotoActivity(
+                //     JSON.stringify(userInformation),
+                //     JSON.stringify(testData),
+                //     JSON.stringify(translateMenu)
+                // );
+                
             }catch(error){
                 console.log(error);
                 this.setState({ loading: false, });

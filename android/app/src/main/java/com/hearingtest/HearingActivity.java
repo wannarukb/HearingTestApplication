@@ -102,6 +102,7 @@ public class HearingActivity extends ReactActivity {
     public LinearLayout suggestionLayout, warningLayout;
     public String translationMenu;
     public String testToneJSON;
+    public String userInfoJSON;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -137,6 +138,7 @@ public class HearingActivity extends ReactActivity {
             testToneJSON = extras.getString("TestToneList");
             String translateMenu = extras.getString("TranslateMenu");
             userId              = Integer.parseInt(extras.getString("UserId"));
+            userInfoJSON        = extras.getString("UserInfo)");
             saveHearingPath     = extras.getString("FilePath");
             translationMenu     = translateMenu;
 
@@ -255,6 +257,10 @@ public class HearingActivity extends ReactActivity {
         }else{
             System.out.println("++++++++++++ is Hear ++++++++++++ ");
             m_bStop = true;
+
+//            stop();
+//            currentRunTone = testToneList.get(runningIndex+1);
+//            play();
             if (m_PlayThread != null) {
                 try {
                     long clickedTime = System.currentTimeMillis();
@@ -265,9 +271,9 @@ public class HearingActivity extends ReactActivity {
 
                     System.out.println("RESULTJA :  "+ (playExecuteCount - 1) + " : " + currentRunTone.frequency  + ", " + currentRunTone.amplitude  + ", "+ currentRunTone.testSide  + ", " + clickSecFromStart + ", " + clickSecFromByTonePlayedInt + ", " + timeClickedType);
                     currentTestResult.setCanHear(timeClickedType, clickSecFromStart, clickSecFromByTonePlayed);
-                    /*if(currentRunTone.dbHl <= RESULT_VALIDATION_DECEIBEL){
+                    if(currentRunTone.dbHl <= RESULT_VALIDATION_DECEIBEL){
                         result_pass_validation_time++;
-                    }*/
+                    }
                     result_pass_validation_time++;
 
                 } catch (Exception e) {
@@ -439,6 +445,7 @@ public class HearingActivity extends ReactActivity {
             intent.putExtra("TestResultList", resultJson);
             intent.putExtra("FilePath", saveHearingPath);
             intent.putExtra("UserId", userId);
+            intent.putExtra("UserInfo", userInfoJSON);
             intent.putExtra("TranslateMenu", translationMenu);
 
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -449,14 +456,13 @@ public class HearingActivity extends ReactActivity {
             intent.putExtra("TestResultList", resultJson);
             intent.putExtra("FilePath", saveHearingPath);
             intent.putExtra("UserId", userId);
+            intent.putExtra("UserInfo", userInfoJSON);
             intent.putExtra("TranslateMenu", translationMenu);
 
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-            finish();
+            //finish();
         }
-
-        ///finish();
 
     }
 

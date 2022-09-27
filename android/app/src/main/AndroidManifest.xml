@@ -18,6 +18,7 @@
         <activity android:name=".HearingTonePlayActivity"></activity>
         <activity android:name=".HearingActivityResult" />
         <activity android:name=".SurveyQuestion" />
+        <activity android:name=".UserContact" />
         <activity android:name=".HearingActivity" />
         <activity
             android:name=".MainActivity"

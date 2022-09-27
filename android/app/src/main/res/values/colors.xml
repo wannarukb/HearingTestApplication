@@ -18,4 +18,6 @@
     <color name="light_secondary">#F1F2F3</color>
     <color name="suggestion">#F8D7DA</color>
     <color name="suggestion_text">#813139</color>
+    <color name="suggestion_error_bg">#F8D7DA</color>
+    <color name="input_border">#DCDCDC</color>
 </resources>
