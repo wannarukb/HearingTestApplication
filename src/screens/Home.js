@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React, { Component } from 'react';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
@@ -219,7 +220,7 @@ openModal = () => this.setState({ openModal: true });
 
 closeModal = () => this.setState({ openModal: false });
 
-onClickLogOut = ()=> { 
+onClickLogOut = async()=> { 
     var alertTitle = translate('AlertTitleError');
     var alertMessage = '';
     
@@ -227,15 +228,41 @@ onClickLogOut = ()=> {
     try{
         this.props.logout();
         this.props.removeTone();
+        this.props.resetGuestResult();
        
         this.resetToken();
         var path = RNFS.DocumentDirectoryPath + '/HearingTestResult.txt';
         var data = {};
         AsyncStorage.setItem("TestResults", JSON.stringify(data));
-        this.closeModal();
 
-        RNFS.unlink(path).then(() => {
-            console.log('FILE DELETED');
+        var isNoFile = false;
+        try{
+            const fileContent = await RNFS.readFile(path, 'utf8');
+            if(fileContent){
+                RNFS.unlink(path).then(() => {
+                    console.log('FILE DELETED');
+                    this.closeModal();
+                    this.props.navigation.dispatch(
+                        CommonActions.reset({
+                        index: 0,
+                        routes: [
+                            { name: 'HomeGuest' },
+                        ],
+                        })
+                    );
+                }).catch((err) => {
+                    // `unlink` will throw an error, if the item to unlink does not exist
+                    console.log(err.message);
+                    isNoFile = true;
+                });
+            }else{
+                isNoFile = true;
+            }
+        }catch(error){
+            isNoFile = true;
+        }
+        
+        if(isNoFile){
             this.closeModal();
             this.props.navigation.dispatch(
                 CommonActions.reset({
@@ -245,10 +272,7 @@ onClickLogOut = ()=> {
                 ],
                 })
             );
-        }).catch((err) => {
-            // `unlink` will throw an error, if the item to unlink does not exist
-            console.log(err.message);
-        });
+        }
         
     }catch (error) {
         console.error(error);
@@ -272,7 +296,7 @@ resetToken = async() =>{
 storeDeviceInfo = async(deviceInfo) =>{
     try {
         await AsyncStorage.setItem("DeviceInfo", JSON.stringify(deviceInfo));
-        console.log("reset Token", "Token have been reset to undefined");
+        console.log("storeDeviceInfo", "storeDeviceInfo successfully set");
     } catch (error) {
         console.log("Something went wrong, store DeviceInfo = ", error);
     }
@@ -512,11 +536,13 @@ const mapDispatchToProps = dispatch => {
     const {actions} = require('../redux/UserRedux');
     const {deviceInfoActions} = require('../redux/DeviceRedux');
     const {testToneActions} = require('../redux/TestToneRedux');
+    const {guestResultActions}   = require('../redux/GuestResultRedux');
 
     return {
         logout: () => dispatch(actions.logout()),
         setupDeviceInfo: deviceInfo => dispatch(deviceInfoActions.setupDeviceInfo(deviceInfo)),
         removeTone: () => dispatch(testToneActions.logout()),
+        resetGuestResult: () => dispatch(guestResultActions.setInitialState())
     };
 };
 

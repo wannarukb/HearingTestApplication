@@ -1,9 +1,11 @@
+/* eslint-disable prettier/prettier */
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
 import {CommonActions } from '@react-navigation/native';
 import AsyncStorage  from '@react-native-async-storage/async-storage';
 import AuthService from '../services/AuthService';
 import TestToneService from '../services/TestToneService';
+
 
 import { StyleSheet, Dimensions, ActivityIndicator,Platform, TouchableWithoutFeedback, Keyboard, ImageBackground, Image, ScrollView, View ,KeyboardAvoidingView ,TextInput, Alert} from 'react-native';
 import { Block, Text, theme } from "galio-framework";
@@ -56,7 +58,6 @@ class Register extends React.Component {
             yearList : yearPickerList
         };
 
-       
         this.setDeviceLanguage(lang)
     }
 

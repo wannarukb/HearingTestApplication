@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 const types = {
     LOGOUT: 'LOGOUT',
     LOGIN: 'LOGIN_SUCCESS',

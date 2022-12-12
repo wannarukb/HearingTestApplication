@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {create} from 'apisauce';
 import Config from './constants/Config';
 var baseURL= Config.CONNECTIONS.server_url

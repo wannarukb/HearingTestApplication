@@ -1,11 +1,17 @@
+/* eslint-disable prettier/prettier */
 const types = {
     SET_GUEST_RESULT: 'SET_GUEST_RESULT',
+    SET_INITIAL_STATE : 'SET_INITIAL_STATE'
 };
   
 export const guestResultActions = {
     setTestToneGuest: guestResultInfo => {
         return {type: types.SET_GUEST_RESULT, guestResultInfo};
     },
+
+    setInitialState(){
+        return {type: types.SET_INITIAL_STATE};
+    }
 };
   
 const initialState = {   
@@ -27,6 +33,9 @@ export const reducer = (state = initialState, action) => {
                 ...state,
                 guestResultInfo
             });
+        case types.SET_INITIAL_STATE:
+            console.log(initialState);
+            return Object.assign({}, initialState);
         default:
             return state;
     }

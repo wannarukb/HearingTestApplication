@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
     login_post,
     register_post,
