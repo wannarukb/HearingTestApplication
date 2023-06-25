@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable quotes */
 import Config from '../constants/Config';
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
@@ -233,6 +235,7 @@ class TesterSurvey extends Component {
                         "FailedReceiveContact": translate('FailedReceiveContact'),
                         "RequireFieldMissing" : translate('RequireFieldMissing'),
 
+                        "PleaseWaitButton" : translate('PleaseWaitButton'),
 
                         "PostTestToneResult" : postTestToneResultURL,
                         "PostUserContactInfo" : postContactInfoURL

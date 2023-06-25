@@ -103,6 +103,8 @@ public class HearingActivity extends ReactActivity {
     public String translationMenu;
     public String testToneJSON;
     public String userInfoJSON;
+    public String pleaseWaitStr;
+    public String canHearStr;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -160,6 +162,8 @@ public class HearingActivity extends ReactActivity {
                 suggestionLine2.setText((String) transalationMap.get("SuggestionLine2"));
                 warningLabel.setText((String) transalationMap.get("WarningLabel"));
                 warningText.setText((String) transalationMap.get("WarningDescription"));
+                pleaseWaitStr = (String) transalationMap.get("PleaseWaitButton");
+                canHearStr    = (String) transalationMap.get("HearToneButton");
 
 
                 if(parseTone != null && parseTone.length > 0){
@@ -230,7 +234,7 @@ public class HearingActivity extends ReactActivity {
 
         suggestionLayout.setVisibility(View.GONE);
         warningLayout.setVisibility(View.GONE);
-        startButton.setText((String) transalationMap.get("HearToneButton"));
+        startButton.setText(canHearStr);
         playToneHeader.setText((String) transalationMap.get("TonePlayHeaderLabel"));
         playToneDescription.setVisibility(View.VISIBLE);
         noOfClick += 1;
@@ -256,6 +260,8 @@ public class HearingActivity extends ReactActivity {
             }
         }else{
             System.out.println("++++++++++++ is Hear ++++++++++++ ");
+            startButton.setBackgroundColor(Color.parseColor("#9D9D9D"));
+            startButton.setText(pleaseWaitStr);
             m_bStop = true;
 
 //            stop();
@@ -330,6 +336,9 @@ public class HearingActivity extends ReactActivity {
                     if(playExecuteCount > 1){
 
 
+
+                        startButton.setBackgroundColor(Color.parseColor("#14468A"));
+                        startButton.setText(canHearStr);
                         if(currentTestResult != null){
                             currentTestResult.setEndResult();
                             testResultList.add(currentTestResult);
@@ -433,7 +442,8 @@ public class HearingActivity extends ReactActivity {
 
         System.out.println("FINISH ACTIVITY");
         userHearingTest.endTestResult(testResultList);
-        if(result_pass_validation_time == pass_result_criteria) userHearingTest.setGoodSummary();
+//        if(result_pass_validation_time == pass_result_criteria) userHearingTest.setGoodSummary();
+        if(result_pass_validation_time > 0) userHearingTest.setGoodSummary();
 
         Gson gson = new Gson();
         String resultJson = gson.toJson(userHearingTest);

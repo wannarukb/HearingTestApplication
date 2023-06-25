@@ -65,7 +65,7 @@
     "StartPlayToneButton": "เริ่มทดสอบ",
     "TonePlayHeaderLabel": "กำลังอยู่ในกระบวนการทดสอบ",
     "TonePlayDescription": "กรุณากดปุ่ม เมื่อได้ยินเสียง",
-    "HearToneButton": "ฉันได้ยิน",
+    "HearToneButton": "กดปุ่ม เมื่อได้ยิน",
     "ToneResultIntro": "เสร็จสิ้น การทดสอบการได้ยิน",
     "ToneResultLabel": "ผลของคุณคือ",
     "ToneResultInfo_Good": "การได้ยินปกติ",
@@ -89,6 +89,7 @@
     "SuccessReceiveContact" : "ได้รับข้อมูลเรียบร้อย",
     "SuccessReceiveContactDetail" : "เจ้าหน้าที่จะทำการติดต่อเพื่อทำการนัดหมายเพิ่มเติมภายใน 7 วันทำการ ขอบคุณค่ะ",
     "FailedReceiveContact" : "ขออภัยค่ะ เนื่องจากระบบขัดข้องจึงไม่สามารถนำส่งข้อมูลได้ กรุณากดปุ่มเพื่อส่งข้อมูลใหม่อีกครั้ง หรือ ติดต่อ 02-032-0230 ในเวลาทำการ เพื่อนัดหมายเพิ่มเติมโดยตรง",
-    "RequireFieldMissing" : "กรุณาระบุข้อมูล"
+    "RequireFieldMissing" : "กรุณาระบุข้อมูล",
+    "PleaseWaitButton" : "กรุณารอสักครู่"
     
 }

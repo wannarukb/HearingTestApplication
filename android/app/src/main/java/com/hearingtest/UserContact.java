@@ -129,11 +129,13 @@ public class UserContact extends ReactActivity {
                 contactNoLabel.setText((String) transalationMap.get("UserContactNoLabel"));
                 contactNameError.setText((String) transalationMap.get("RequireFieldMissing"));
                 contactNoError.setText((String) transalationMap.get("RequireFieldMissing"));
+                contactRefCodeLabel.setText((String) transalationMap.get("UserContactRefCodeLabel"));
 
 
                 resultSuccessHeader.setText((String) transalationMap.get("SuccessReceiveContact"));
                 resultSuccessDetail.setText((String) transalationMap.get("SuccessReceiveContactDetail"));
                 resultErrorDetail.setText((String) transalationMap.get("FailedReceiveContact"));
+
 
                 postUserContactURL = (String) transalationMap.get("PostUserContactInfo");
 
